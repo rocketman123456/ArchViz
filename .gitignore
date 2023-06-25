@@ -30,3 +30,28 @@
 *.exe
 *.out
 *.app
+
+# Build Files
+build/
+
+# Ignore macOS .DS_Store
+.DS_Store
+
+# Assets that are part of the asset pack and should not be stored in the repo
+data/models/**
+data/textures/**
+data/README_asset_pack.md
+data/font*.*
+data/roboto*.*
+
+# Downloadable assets
+vulkan_asset_pack_gltf.*
+data/textures/hdr/*.*
+data/readme.txt
+data/models/cerberus/*.*
+!data/textures/hdr/README.md
+
+# Don't ignore 3d models in obj format
+!data/models/*.obj
+!data/models/lowpoly/*.obj
+!data/models/voyager/*.obj
