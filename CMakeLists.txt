@@ -12,9 +12,10 @@ set(BUILD_SHARED_LIBS OFF)
 
 include(CMakeDependentOption)
 
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
 # find_package(LLVM CONFIG REQUIRED)
-# find_package(fmt CONFIG REQUIRED)
-# find_package(spdlog CONFIG REQUIRED)
 # find_package(Eigen3 CONFIG REQUIRED)
 # find_path(TINYGLTF_INCLUDE_DIRS "tiny_gltf.h")
 # find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")

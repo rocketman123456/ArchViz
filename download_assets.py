@@ -27,5 +27,5 @@ print("Download finished")
 print("Extracting assets")
 
 zip = ZipFile(ASSET_PACK_FILE_NAME, 'r')
-zip.extractall("./")
+zip.extractall("./engine/asset/")
 zip.close()

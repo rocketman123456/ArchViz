@@ -3,13 +3,6 @@
 #include "runtime/platform/file_system/basic/file_system.h"
 #include "runtime/platform/file_system/vfs_config.h"
 
-// #include "runtime/platform/file_system/memory_file/memory_file.h"
-// #include "runtime/platform/file_system/memory_file/memory_file_system.h"
-// #include "runtime/platform/file_system/native_file/native_file.h"
-// #include "runtime/platform/file_system/native_file/native_file_system.h"
-// #include "runtime/platform/file_system/zip_file/zip_file.h"
-// #include "runtime/platform/file_system/zip_file/zip_file_system.h"
-
 #include <unordered_map>
 
 namespace Piccolo
@@ -40,6 +33,4 @@ namespace Piccolo
         std::unordered_map<std::string, FileSystemPtr> m_fileCache;
         std::unordered_map<std::string, FileSystemPtr> m_dirCache;
     };
-
-    extern VFS g_vfs;
 } // namespace Piccolo

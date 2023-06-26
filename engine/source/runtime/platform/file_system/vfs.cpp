@@ -8,15 +8,13 @@
 #include "runtime/platform/file_system/zip_file/zip_file.h"
 #include "runtime/platform/file_system/zip_file/zip_file_system.h"
 
-#include "runtime/function/global/global_context.h"
-#include "runtime/resource/config_manager/config_manager.h"
+// #include "runtime/function/global/global_context.h"
+// #include "runtime/resource/config_manager/config_manager.h"
 
 #include <algorithm>
 
 namespace Piccolo
 {
-    VFS g_vfs;
-
     void VFS::mount(const VFSConfig& config)
     {
         for (auto& fs : config.m_configs)
@@ -30,7 +28,7 @@ namespace Piccolo
     {
         if (fs.m_type == "native")
         {
-            auto root  = g_runtime_global_context.m_config_manager->getRootFolder().string();
+            auto root  = std::string("");//g_runtime_global_context.m_config_manager->getRootFolder().string();
             auto rpath = combine_path(root, fs.m_rpath);
             m_fs.emplace_back(std::make_shared<NativeFileSystem>(fs.m_vpath, rpath));
         }
@@ -40,7 +38,7 @@ namespace Piccolo
         }
         else if (fs.m_type == "compress-zip")
         {
-            auto root  = g_runtime_global_context.m_config_manager->getRootFolder().string();
+            auto root  = std::string("");//g_runtime_global_context.m_config_manager->getRootFolder().string();
             auto rpath = combine_path(root, fs.m_rpath);
             m_fs.emplace_back(std::make_shared<ZipFileSystem>(fs.m_vpath, rpath));
         }

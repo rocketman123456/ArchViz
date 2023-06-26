@@ -32,26 +32,27 @@
 *.app
 
 # Build Files
+bin/
 build/
 
 # Ignore macOS .DS_Store
 .DS_Store
 
 # Assets that are part of the asset pack and should not be stored in the repo
-data/models/**
-data/textures/**
-data/README_asset_pack.md
-data/font*.*
-data/roboto*.*
+engine/asset/data/models/**
+engine/asset/data/textures/**
+engine/asset/data/README_asset_pack.md
+engine/asset/data/font*.*
+engine/asset/data/roboto*.*
 
 # Downloadable assets
 vulkan_asset_pack_gltf.*
-data/textures/hdr/*.*
-data/readme.txt
-data/models/cerberus/*.*
-!data/textures/hdr/README.md
+engine/asset/data/textures/hdr/*.*
+engine/asset/data/readme.txt
+engine/asset/data/models/cerberus/*.*
+!engine/asset/data/textures/hdr/README.md
 
 # Don't ignore 3d models in obj format
-!data/models/*.obj
-!data/models/lowpoly/*.obj
-!data/models/voyager/*.obj
+!engine/asset/data/models/*.obj
+!engine/asset/data/models/lowpoly/*.obj
+!engine/asset/data/models/voyager/*.obj

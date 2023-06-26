@@ -1,1 +1,7 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mustache)
+# if(NOT TARGET soloud)
+#     include(soloud.cmake)
+# endif()
+
+if(NOT TARGET soloud)
+    add_subdirectory(json11)
+endif()

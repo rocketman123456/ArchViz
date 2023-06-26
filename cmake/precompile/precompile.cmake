@@ -8,13 +8,13 @@ configure_file(${ENGINE_PRECOMPILE_PARAMS_IN_PATH} ${ENGINE_PRECOMPILE_PARAMS_PA
 # use wine for linux
 if(CMAKE_HOST_WIN32)
   set(PRECOMPILE_PRE_EXE)
-  set(PRECOMPILE_PARSER ${PRECOMPILE_TOOLS_PATH}/PiccoloParser.exe)
+  set(PRECOMPILE_PARSER ${PRECOMPILE_TOOLS_PATH}/MetaParser.exe)
   set(sys_include "*")
 elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux")
   set(PRECOMPILE_PRE_EXE)
-  set(PRECOMPILE_PARSER ${PRECOMPILE_TOOLS_PATH}/PiccoloParser)
+  set(PRECOMPILE_PARSER ${PRECOMPILE_TOOLS_PATH}/MetaParser)
   set(sys_include "/usr/include/c++/9/")
-# execute_process(COMMAND chmod a+x ${PRECOMPILE_PARSER} WORKING_DIRECTORY ${PRECOMPILE_TOOLS_PATH})
+  # execute_process(COMMAND chmod a+x ${PRECOMPILE_PARSER} WORKING_DIRECTORY ${PRECOMPILE_TOOLS_PATH})
 elseif(CMAKE_HOST_APPLE)
   find_program(XCRUN_EXECUTABLE xcrun)
 
@@ -29,7 +29,7 @@ elseif(CMAKE_HOST_APPLE)
   )
 
   set(PRECOMPILE_PRE_EXE)
-  set(PRECOMPILE_PARSER ${PRECOMPILE_TOOLS_PATH}/PiccoloParser)
+  set(PRECOMPILE_PARSER ${PRECOMPILE_TOOLS_PATH}/MetaParser)
   set(sys_include "${osx_sdk_platform_path_test}/../../Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1")
 endif()
 
