@@ -1,3 +1,6 @@
 [submodule "engine/asset/model-glTF"]
 	path = engine/asset/model-glTF
 	url = git@github.com:rocketman123456/glTF-Sample-Models.git
+[submodule "engine/3rd_party/glfw"]
+	path = engine/3rd_party/glfw
+	url = https://github.com/glfw/glfw.git
