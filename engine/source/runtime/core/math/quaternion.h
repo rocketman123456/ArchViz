@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-namespace Piccolo
+namespace ArchViz
 {
     class Matrix3x3;
     class Vector3;
@@ -203,4 +203,4 @@ namespace Piccolo
 
         static const float k_epsilon;
     };
-} // namespace Piccolo
+} // namespace ArchViz

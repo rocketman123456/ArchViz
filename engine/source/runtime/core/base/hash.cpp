@@ -1,6 +1,6 @@
 #include "runtime/core/base/hash.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     int32_t hash_1(const std::string& key)
     {

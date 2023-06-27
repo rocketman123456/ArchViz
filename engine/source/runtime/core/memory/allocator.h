@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<class T, size_t BlockSize>
     class Allocator;
@@ -92,4 +92,4 @@ namespace Piccolo
     {
         return false;
     }
-} // namespace Piccolo
+} // namespace ArchViz

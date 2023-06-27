@@ -1,10 +1,10 @@
 #pragma once
 #include "runtime/core/meta/reflection/reflection.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(FSConfig)
     CLASS(FSConfig, Fields)
@@ -24,4 +24,4 @@ namespace Piccolo
     public:
         std::vector<FSConfig> m_configs;
     };
-}
+} // namespace ArchViz

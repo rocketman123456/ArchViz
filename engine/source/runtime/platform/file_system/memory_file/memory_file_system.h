@@ -2,7 +2,7 @@
 #include "runtime/platform/file_system/basic/file_system.h"
 #include "runtime/platform/file_system/memory_file/memory_file.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     class MemoryFileSystem : public FileSystem
     {
@@ -15,4 +15,4 @@ namespace Piccolo
         virtual FilePtr open(const std::string& vpath, uint32_t mode) override;
         virtual bool    close(FilePtr file) override;
     };
-}
+} // namespace ArchViz

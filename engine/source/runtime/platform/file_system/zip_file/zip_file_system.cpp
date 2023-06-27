@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace Piccolo
+namespace ArchViz
 {
     ZipFileSystem::ZipFileSystem(const std::string& vpath, const std::string& rpath) : FileSystem(vpath, rpath)
     {
@@ -82,4 +82,4 @@ namespace Piccolo
     }
 
     bool ZipFileSystem::close(FilePtr file) { return file->close(); }
-} // namespace Piccolo
+} // namespace ArchViz

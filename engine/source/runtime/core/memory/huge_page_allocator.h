@@ -8,7 +8,7 @@
 #if defined(_WIN32)
 #include <malloc.h>
 #include <stdio.h>
-//#define posix_memalign(p, a, s) (((*(p)) = _aligned_malloc((s), (a))), *(p) ?0 :errno)
+// #define posix_memalign(p, a, s) (((*(p)) = _aligned_malloc((s), (a))), *(p) ?0 :errno)
 static int check_align(size_t align)
 {
     for (size_t i = sizeof(void*); i != 0; i *= 2)
@@ -36,7 +36,7 @@ int posix_memalign(void** ptr, size_t align, size_t size)
 #else
 #include <sys/mman.h> // for posix_memalign
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T, size_t HugePageSize = 1 << 21>
     class THPAllocator
@@ -87,5 +87,5 @@ namespace Piccolo
             free(p);
         }
     };
-} // namespace Piccolo
+} // namespace ArchViz
 #endif

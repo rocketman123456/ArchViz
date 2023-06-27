@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename Base, typename T>
     inline bool instanceof (const T* ptr)

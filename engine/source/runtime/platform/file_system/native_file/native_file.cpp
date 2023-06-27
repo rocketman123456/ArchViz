@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <utility>
 
-namespace Piccolo
+namespace ArchViz
 {
     bool is_native_readonly(const std::string& real_path)
     {
@@ -198,4 +198,4 @@ namespace Piccolo
         return static_cast<size_t>(m_stream.gcount());
     }
 
-} // namespace Piccolo
+} // namespace ArchViz

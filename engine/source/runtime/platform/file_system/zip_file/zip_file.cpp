@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-namespace Piccolo
+namespace ArchViz
 {
     ZipFile::ZipFile(const std::string& vpath, const std::string& rpath, zip_t* zip) : File(vpath, rpath), m_zip(zip) {}
 
@@ -162,4 +162,4 @@ namespace Piccolo
         LOG_WARN("Unable to Weite in Zip File, {} {}", m_rpath, m_vpath);
         return 0;
     }
-} // namespace Piccolo
+} // namespace ArchViz

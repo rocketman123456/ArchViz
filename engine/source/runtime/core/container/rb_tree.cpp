@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace Piccolo
+namespace ArchViz
 {
     void rb_tree::init(Node* nil)
     {

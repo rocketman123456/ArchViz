@@ -1,7 +1,7 @@
 #pragma once
 #include "runtime/platform/file_system/basic/file.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     class MemoryFile : public File
     {
@@ -27,10 +27,10 @@ namespace Piccolo
         size_t   m_seek_pos     = 0;
         uint32_t m_mode         = 0;
         bool     m_is_read_only = false;
-        bool     m_opened    = false;
+        bool     m_opened       = false;
 
         FileBuffer m_buffer;
     };
 
     using MemoryFilePtr = std::shared_ptr<MemoryFile>;
-} // namespace Piccolo
+} // namespace ArchViz

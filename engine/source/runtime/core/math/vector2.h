@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cmath>
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(Vector2)
     CLASS(Vector2, Fields)
@@ -352,4 +352,4 @@ namespace Piccolo
         static const Vector2 UNIT_SCALE;
     };
 
-} // namespace Piccolo
+} // namespace ArchViz

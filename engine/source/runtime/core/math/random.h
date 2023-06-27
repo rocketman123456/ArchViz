@@ -4,7 +4,7 @@
 #include <cfloat>
 #include <random>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename NumericType>
     using uniform_distribution = typename std::
@@ -91,4 +91,4 @@ namespace Piccolo
     };
 
     using DefaultRNG = RandomNumberGenerator<std::mt19937>;
-} // namespace Piccolo
+} // namespace ArchViz

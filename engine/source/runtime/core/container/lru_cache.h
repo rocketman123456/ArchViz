@@ -5,7 +5,7 @@
 #include <exception>
 #include <stdexcept>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename S, typename T>
     class lru_cache

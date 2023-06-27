@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T>
     class unbounded_queue

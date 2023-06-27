@@ -2,7 +2,7 @@
 #include "runtime/core/base/macro.h"
 #include "runtime/core/math/vectorN.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(MatrixMxN)
     CLASS(MatrixMxN, Fields)
@@ -153,4 +153,4 @@ namespace Piccolo
             return tmp;
         }
     };
-} // namespace Piccolo
+} // namespace ArchViz

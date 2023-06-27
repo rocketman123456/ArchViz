@@ -1,8 +1,8 @@
 #pragma once
 
-namespace Piccolo
+namespace ArchViz
 {
     // TODO : use arena to manage all memory allocation
     class MemoryArena
     {};
-} // namespace Piccolo
+} // namespace ArchViz

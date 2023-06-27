@@ -3,7 +3,7 @@
 
 #include <memory>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T, size_t BlockSize>
     class LinearAllocator : public Allocator<T, BlockSize>
@@ -52,4 +52,4 @@ namespace Piccolo
         void reset() override { m_offset = 0; }
     };
 
-} // namespace Piccolo
+} // namespace ArchViz

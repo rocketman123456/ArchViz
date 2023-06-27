@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     void split_multi_char(const std::string& in, const std::string& token, std::vector<std::string>& out);
     void split_single_char(const std::string& in, const char token, std::vector<std::string>& out);
@@ -16,4 +16,4 @@ namespace Piccolo
 
     bool start_with(const std::string& full_string, const std::string& starting);
     bool end_with(const std::string& full_string, const std::string& ending);
-} // namespace Piccolo
+} // namespace ArchViz

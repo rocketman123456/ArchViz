@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-namespace Piccolo
+namespace ArchViz
 {
     void VFS::mount(const VFSConfig& config)
     {
@@ -28,7 +28,7 @@ namespace Piccolo
     {
         if (fs.m_type == "native")
         {
-            auto root  = std::string("");//g_runtime_global_context.m_config_manager->getRootFolder().string();
+            auto root  = std::string(""); // g_runtime_global_context.m_config_manager->getRootFolder().string();
             auto rpath = combine_path(root, fs.m_rpath);
             m_fs.emplace_back(std::make_shared<NativeFileSystem>(fs.m_vpath, rpath));
         }
@@ -38,7 +38,7 @@ namespace Piccolo
         }
         else if (fs.m_type == "compress-zip")
         {
-            auto root  = std::string("");//g_runtime_global_context.m_config_manager->getRootFolder().string();
+            auto root  = std::string(""); // g_runtime_global_context.m_config_manager->getRootFolder().string();
             auto rpath = combine_path(root, fs.m_rpath);
             m_fs.emplace_back(std::make_shared<ZipFileSystem>(fs.m_vpath, rpath));
         }
@@ -106,4 +106,4 @@ namespace Piccolo
     {
         return tp->enqueue_task(&VFS::write, this, file, buffer);
     }
-} // namespace Piccolo
+} // namespace ArchViz

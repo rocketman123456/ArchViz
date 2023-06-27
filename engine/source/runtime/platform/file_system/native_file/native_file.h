@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-namespace Piccolo
+namespace ArchViz
 {
     class NativeFile : public File
     {
@@ -31,4 +31,4 @@ namespace Piccolo
     };
 
     using NativeFilePtr = std::shared_ptr<NativeFile>;
-} // namespace Piccolo
+} // namespace ArchViz

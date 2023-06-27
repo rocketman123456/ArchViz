@@ -1,8 +1,8 @@
 #include "serializer.h"
 #include <assert.h>
-namespace Piccolo
-{
 
+namespace ArchViz
+{
     template<>
     Json Serializer::write(const char& instance)
     {
@@ -149,4 +149,4 @@ namespace Piccolo
     }*/
 
     ////////////////////////////////////
-} // namespace Piccolo
+} // namespace ArchViz

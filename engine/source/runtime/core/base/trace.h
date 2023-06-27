@@ -1,9 +1,8 @@
 #pragma once
-
 #include <iostream>
 #include <mutex>
 
-namespace Piccolo
+namespace ArchViz
 {
     namespace
     {

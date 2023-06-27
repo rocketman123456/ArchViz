@@ -1,6 +1,6 @@
 #include "runtime/core/math/axis_aligned.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     AxisAlignedBox::AxisAlignedBox(const Vector3& center, const Vector3& half_extent) { update(center, half_extent); }
 

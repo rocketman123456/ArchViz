@@ -2,7 +2,7 @@
 
 #include "runtime/core/string/string_utils.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     std::string get_normalized_path(const std::string& path)
     {
@@ -18,7 +18,7 @@ namespace Piccolo
 
     std::string combine_path(const std::string& path1, const std::string& path2)
     {
-        if(path1.size() == 0)
+        if (path1.size() == 0)
         {
             return path2;
         }
@@ -27,4 +27,4 @@ namespace Piccolo
             return path1 + "/" + path2;
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

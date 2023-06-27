@@ -1,7 +1,7 @@
 #pragma once
 #include "runtime/platform/file_system/basic/file_system.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     class NativeFileSystem : public FileSystem
     {
@@ -14,4 +14,4 @@ namespace Piccolo
         virtual FilePtr open(const std::string& vpath, uint32_t mode) override;
         virtual bool    close(FilePtr file) override;
     };
-} // namespace Piccolo
+} // namespace ArchViz

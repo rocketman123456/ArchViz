@@ -6,7 +6,7 @@
 #define BLOCK_SIZE (4096)
 #define CACHE_L1_LINE_SIZE (64)
 
-namespace Piccolo
+namespace ArchViz
 {
     void buddy_init(void* space, int block_num); // allocate buddy
 
@@ -15,9 +15,9 @@ namespace Piccolo
     void buddy_free(void* space, int n); // free page (starting address is space, size of page is 2^n)
 
     void buddy_print(); // print current state of buddy
-}
+} // namespace ArchViz
 
-namespace Piccolo
+namespace ArchViz
 {
     typedef struct kmem_cache_s kmem_cache_t;
 
@@ -40,4 +40,4 @@ namespace Piccolo
     void slab_cache_info(kmem_cache_t* cachep); // Print cache info
 
     int slab_cache_error(kmem_cache_t* cachep); // Print error message
-} // namespace Piccolo
+} // namespace ArchViz

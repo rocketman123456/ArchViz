@@ -21,7 +21,7 @@ inline void hash_combine(std::size_t& seed, const T& v, Ts... rest)
     }
 }
 
-namespace Piccolo
+namespace ArchViz
 {
     namespace details
     {
@@ -73,7 +73,7 @@ namespace Piccolo
     template<typename T>
     constexpr uint64_t hash(T&& t)
     {
-        return Piccolo::details::hasher<typename std::decay<T>::type>()(std::forward<T>(t));
+        return ArchViz::details::hasher<typename std::decay<T>::type>()(std::forward<T>(t));
     }
 
     constexpr uint64_t operator"" _hash(const char* s, size_t) { return details::hasher<std::string>()(s); }

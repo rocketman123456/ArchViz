@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 
-namespace Piccolo
+namespace ArchViz
 {
     class VFS
     {
@@ -33,4 +33,4 @@ namespace Piccolo
         std::unordered_map<std::string, FileSystemPtr> m_fileCache;
         std::unordered_map<std::string, FileSystemPtr> m_dirCache;
     };
-} // namespace Piccolo
+} // namespace ArchViz

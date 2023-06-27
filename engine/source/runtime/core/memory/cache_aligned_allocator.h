@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T>
     class CacheAlignedAllocator : public Allocator<T, 0>
@@ -52,4 +52,4 @@ namespace Piccolo
 
         void reset() override {}
     };
-} // namespace Piccolo
+} // namespace ArchViz

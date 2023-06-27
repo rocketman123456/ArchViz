@@ -3,7 +3,7 @@
 
 #include <zip.h>
 
-namespace Piccolo
+namespace ArchViz
 {
     class ZipFile : public File
     {
@@ -35,4 +35,4 @@ namespace Piccolo
     };
 
     using ZipFilePtr = std::shared_ptr<ZipFile>;
-} // namespace Piccolo
+} // namespace ArchViz

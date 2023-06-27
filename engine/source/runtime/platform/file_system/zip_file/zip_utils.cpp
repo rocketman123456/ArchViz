@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-namespace Piccolo
+namespace ArchViz
 {
     zip_t* open_zip(const std::string& file_name, uint32_t mode)
     {
@@ -49,4 +49,4 @@ namespace Piccolo
             LOG_WARN("Get File Info in Zip Error: {}", file_name);
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

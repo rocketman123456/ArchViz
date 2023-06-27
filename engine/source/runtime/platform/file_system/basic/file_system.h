@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <future>
 
-namespace Piccolo
+namespace ArchViz
 {
     class FileSystem
     {
@@ -87,4 +87,4 @@ namespace Piccolo
     };
 
     using FileSystemPtr = std::shared_ptr<FileSystem>;
-} // namespace Piccolo
+} // namespace ArchViz

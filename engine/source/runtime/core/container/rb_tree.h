@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string>
 
-namespace Piccolo
+namespace ArchViz
 {
     class rb_tree
     {

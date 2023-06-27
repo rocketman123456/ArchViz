@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(Matrix2x2)
     CLASS(Matrix2x2, Fields)
@@ -150,4 +150,4 @@ namespace Piccolo
     Matrix2x2 operator*(float scalar, const Matrix2x2& rhs);
 
     Vector2 operator*(const Vector2& point, const Matrix2x2& rhs);
-} // namespace Piccolo
+} // namespace ArchViz

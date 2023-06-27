@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <deque>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T>
     class SimpleAllocator : public Allocator<T>
@@ -53,4 +53,4 @@ namespace Piccolo
         (void)a2;
         return false;
     }
-} // namespace Piccolo
+} // namespace ArchViz

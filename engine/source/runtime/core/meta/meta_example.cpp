@@ -6,7 +6,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-namespace Piccolo
+
+namespace ArchViz
 {
     void metaExample()
     {
@@ -76,4 +77,4 @@ namespace Piccolo
             }
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

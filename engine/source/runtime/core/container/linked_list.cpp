@@ -1,6 +1,6 @@
 #include "runtime/core/container/linked_list.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     void linked_list::search_first(const std::size_t v, Node*& curr, Node*& prev)
     {

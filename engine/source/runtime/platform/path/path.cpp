@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace Piccolo
+namespace ArchViz
 {
     const filesystem::path Path::getRelativePath(const filesystem::path& directory, const filesystem::path& file_path)
     {

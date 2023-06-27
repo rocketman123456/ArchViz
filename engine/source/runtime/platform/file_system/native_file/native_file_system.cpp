@@ -10,7 +10,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-namespace Piccolo
+namespace ArchViz
 {
     NativeFileSystem::NativeFileSystem(const std::string& vpath, const std::string& rpath) : FileSystem(vpath, rpath)
     {
@@ -37,7 +37,7 @@ namespace Piccolo
 
                 auto path_str  = path.string();
                 auto vpath_str = Path::getRelativePath(m_rpath, path).string();
-                vpath_str = get_normalized_path(vpath_str);
+                vpath_str      = get_normalized_path(vpath_str);
                 vpath_str      = m_vpath + "/" + vpath_str;
                 m_rfiles.push_back(path_str);
                 m_vfiles.push_back(vpath_str);
@@ -48,7 +48,7 @@ namespace Piccolo
 
                 auto path_str  = path.string();
                 auto vpath_str = Path::getRelativePath(m_rpath, path).string();
-                vpath_str = get_normalized_path(vpath_str);
+                vpath_str      = get_normalized_path(vpath_str);
                 vpath_str      = m_vpath + "/" + vpath_str;
                 m_rdirs.push_back(path_str);
                 m_vdirs.push_back(vpath_str);
@@ -61,7 +61,7 @@ namespace Piccolo
         // normalize vpath
         auto vpath = get_normalized_path(vpath_);
         // remove native file system vpath prefix
-        std::string temp_vpath = vpath.substr(m_vpath.size()  + 1, vpath.size() - m_vpath.size() - 1);
+        std::string temp_vpath = vpath.substr(m_vpath.size() + 1, vpath.size() - m_vpath.size() - 1);
         // get real path
         std::string   rpath = m_rpath + "/" + temp_vpath;
         NativeFilePtr file  = std::make_shared<NativeFile>(vpath, rpath);
@@ -72,4 +72,4 @@ namespace Piccolo
     }
 
     bool NativeFileSystem::close(FilePtr file) { return file->close(); }
-} // namespace Piccolo
+} // namespace ArchViz

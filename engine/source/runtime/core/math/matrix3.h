@@ -23,7 +23,7 @@
 //           0       0       1
 // where t > 0 indicates a counterclockwise rotation in the xy-plane.
 
-namespace Piccolo
+namespace ArchViz
 {
     /** A 3x3 matrix which can represent rotations around axes.
     @note
@@ -341,4 +341,4 @@ namespace Piccolo
     Matrix3x3 operator*(float scalar, const Matrix3x3& rhs);
 
     Vector3 operator*(const Vector3& v, const Matrix3x3& mat);
-} // namespace Piccolo
+} // namespace ArchViz

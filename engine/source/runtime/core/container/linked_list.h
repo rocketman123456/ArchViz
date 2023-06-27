@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-namespace Piccolo
+namespace ArchViz
 {
     class linked_list
     {

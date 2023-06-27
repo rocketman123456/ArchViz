@@ -5,7 +5,7 @@
 #include <tuple>
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     class Path
     {

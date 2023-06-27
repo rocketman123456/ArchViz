@@ -3,7 +3,7 @@
 #include "runtime/core/meta/reflection/reflection.h"
 #include <limits>
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(AxisAlignedBox)
     CLASS(AxisAlignedBox, Fields)

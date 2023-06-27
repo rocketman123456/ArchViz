@@ -4,7 +4,7 @@
 
 #include <utility>
 
-namespace Piccolo
+namespace ArchViz
 {
     MemoryFile::MemoryFile(const std::string& vpath, const std::string& rpath) : File(vpath, rpath) {}
 
@@ -160,4 +160,4 @@ namespace Piccolo
             return 0;
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

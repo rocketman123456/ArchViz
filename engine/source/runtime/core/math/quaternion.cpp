@@ -3,7 +3,7 @@
 #include "runtime/core/math/matrix4.h"
 #include "runtime/core/math/vector3.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     const Quaternion Quaternion::ZERO(0, 0, 0, 0);
     const Quaternion Quaternion::IDENTITY(1, 0, 0, 0);
@@ -486,4 +486,4 @@ namespace Piccolo
         result.normalise();
         return result;
     }
-} // namespace Piccolo
+} // namespace ArchViz

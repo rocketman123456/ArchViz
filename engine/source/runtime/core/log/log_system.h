@@ -5,9 +5,8 @@
 #include <cstdint>
 #include <stdexcept>
 
-namespace Piccolo
+namespace ArchViz
 {
-
     class LogSystem final
     {
     public:

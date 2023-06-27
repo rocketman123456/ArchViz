@@ -13,5 +13,5 @@
 #include "runtime/core/math/vector3.h"
 #include "runtime/core/math/vector4.h"
 
-namespace Piccolo
+namespace ArchViz
 {} // namespace Piccolo

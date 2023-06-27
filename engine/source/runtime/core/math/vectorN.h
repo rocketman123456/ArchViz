@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(VectorN)
     CLASS(VectorN, Fields)
@@ -142,4 +142,4 @@ namespace Piccolo
             return false;
         }
     };
-} // namespace Piccolo
+} // namespace ArchViz

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <memory>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T, size_t BlockSize>
     class FreeListAllocator : public Allocator<T, BlockSize>
@@ -22,7 +22,7 @@ namespace Piccolo
         {
             std::size_t m_size;
         };
-        linked_list   m_list;
+        linked_list  m_list;
         SearchMethod m_search_method;
 
     public:
@@ -33,10 +33,10 @@ namespace Piccolo
         }
 
         // Non-copy
-        FreeListAllocator(const FreeListAllocator&) = delete;
+        FreeListAllocator(const FreeListAllocator&)            = delete;
         FreeListAllocator& operator=(const FreeListAllocator&) = delete;
-        FreeListAllocator(FreeListAllocator&&) = delete;
-        FreeListAllocator& operator=(FreeListAllocator&&) = delete;
+        FreeListAllocator(FreeListAllocator&&)                 = delete;
+        FreeListAllocator& operator=(FreeListAllocator&&)      = delete;
 
         FreeListAllocator(const SearchMethod searchMethod = BEST)
         {
@@ -85,9 +85,9 @@ namespace Piccolo
             if (best->m_value >= size + padding + sizeof(linked_list::Node*) + 1)
             {
                 linked_list::Node* splittedNode = reinterpret_cast<linked_list::Node*>(reinterpret_cast<char*>(best) + sizeof(Header) + size + padding);
-                splittedNode->m_value          = best->m_value - (size + padding + sizeof(Header));
-                splittedNode->m_next           = best->m_next;
-                best->m_next                   = splittedNode;
+                splittedNode->m_value           = best->m_value - (size + padding + sizeof(Header));
+                splittedNode->m_next            = best->m_next;
+                best->m_next                    = splittedNode;
             }
             else
             {
@@ -114,7 +114,7 @@ namespace Piccolo
             Header* header = reinterpret_cast<Header*>(reinterpret_cast<char*>(ptr) - sizeof(Header));
 
             linked_list::Node* node = reinterpret_cast<linked_list::Node*>(header);
-            node->m_value          = header->m_size;
+            node->m_value           = header->m_size;
 
             linked_list::Node* prevIt = nullptr;
             linked_list::Node* it     = m_list.m_head;
@@ -146,9 +146,9 @@ namespace Piccolo
         void init()
         {
             linked_list::Node* head = reinterpret_cast<linked_list::Node*>(this->m_start_address);
-            head->m_value          = this->m_size - sizeof(Header);
-            head->m_next           = nullptr;
-            m_list.m_head          = head;
+            head->m_value           = this->m_size - sizeof(Header);
+            head->m_next            = nullptr;
+            m_list.m_head           = head;
         }
 
         void coalescence(linked_list::Node* prev, linked_list::Node* curr)
@@ -167,4 +167,4 @@ namespace Piccolo
         }
     };
 
-} // namespace Piccolo
+} // namespace ArchViz

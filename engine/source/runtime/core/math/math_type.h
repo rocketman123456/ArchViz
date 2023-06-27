@@ -2,7 +2,7 @@
 
 #include <Eigen/Eigen>
 
-namespace Piccolo
+namespace ArchViz
 {
     using FVector2 = Eigen::Vector2f;
     using FVector3 = Eigen::Vector3f;

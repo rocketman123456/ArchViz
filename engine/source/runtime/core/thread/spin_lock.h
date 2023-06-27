@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-namespace Piccolo
+namespace ArchViz
 {
     class SpinLock
     {
@@ -25,4 +25,4 @@ namespace Piccolo
         }
         void unlock() { m_atomic_flag.clear(std::memory_order_release); }
     };
-} // namespace Piccolo
+} // namespace ArchViz

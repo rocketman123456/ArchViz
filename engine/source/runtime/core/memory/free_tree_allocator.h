@@ -6,7 +6,7 @@
 #include <cassert>
 #include <memory>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T, size_t BlockSize>
     class FreeTreeAllocator : public Allocator<T, BlockSize>
@@ -100,10 +100,7 @@ namespace Piccolo
             coalescence(node);
         }
 
-        void reset() override
-        {
-            init();
-        }
+        void reset() override { init(); }
 
     private:
         void init()
@@ -160,4 +157,4 @@ namespace Piccolo
         }
     };
 
-} // namespace Piccolo
+} // namespace ArchViz

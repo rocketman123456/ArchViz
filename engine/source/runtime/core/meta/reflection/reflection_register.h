@@ -1,5 +1,6 @@
 #pragma once
-namespace Piccolo
+
+namespace ArchViz
 {
     namespace Reflection
     {
@@ -10,4 +11,4 @@ namespace Piccolo
             static void metaUnregister();
         };
     } // namespace Reflection
-} // namespace Piccolo
+} // namespace ArchViz

@@ -6,9 +6,7 @@
 #include "runtime/core/math/vector3.h"
 #include "runtime/core/math/vector4.h"
 
-// TODO :
-
-namespace Piccolo
+namespace ArchViz
 {
     /** Class encapsulating a standard 4x4 homogeneous matrix.
     @remarks
@@ -898,4 +896,4 @@ namespace Piccolo
     Matrix4x4 operator*(float scalar, const Matrix4x4& rhs);
 
     Vector4 operator*(const Vector4& v, const Matrix4x4& mat);
-} // namespace Piccolo
+} // namespace ArchViz

@@ -8,7 +8,7 @@
 #include <limits>
 #include <memory>
 
-namespace Piccolo
+namespace ArchViz
 {
     constexpr std::size_t Log2(std::size_t x) { return x == 1 ? 0 : 1 + Log2(x / 2); }
 
@@ -31,10 +31,10 @@ namespace Piccolo
         std::array<Node*, std::numeric_limits<std::size_t>::digits - s_log2_header> m_buckets = {};
 
         // Non-copy
-        BuddyAllocator(const BuddyAllocator&) = delete;
+        BuddyAllocator(const BuddyAllocator&)            = delete;
         BuddyAllocator& operator=(const BuddyAllocator&) = delete;
-        BuddyAllocator(BuddyAllocator&&) = delete;
-        BuddyAllocator& operator=(BuddyAllocator&&) = delete;
+        BuddyAllocator(BuddyAllocator&&)                 = delete;
+        BuddyAllocator& operator=(BuddyAllocator&&)      = delete;
 
         BuddyAllocator()
         {
@@ -204,4 +204,4 @@ namespace Piccolo
     //     (void)a2;
     //     return false;
     // }
-} // namespace Piccolo
+} // namespace ArchViz

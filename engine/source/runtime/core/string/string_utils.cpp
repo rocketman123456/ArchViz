@@ -1,6 +1,6 @@
 #include "runtime/core/string/string_utils.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     void split_multi_char(const std::string& in, const std::string& token, std::vector<std::string>& out)
     {
@@ -184,4 +184,4 @@ namespace Piccolo
             return false;
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

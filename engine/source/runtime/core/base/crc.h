@@ -1,9 +1,8 @@
 #pragma once
-
 #include <cstdint>
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     constexpr std::size_t LUT_SIZE = 256;
 

@@ -1,7 +1,7 @@
 #include "runtime/platform/file_system/memory_file/memory_file_system.h"
 #include "runtime/platform/file_system/basic/file_utils.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     MemoryFileSystem::MemoryFileSystem(const std::string& vpath, const std::string& rpath) : FileSystem(vpath, rpath) {}
 
@@ -14,4 +14,4 @@ namespace Piccolo
     }
 
     bool MemoryFileSystem::close(FilePtr file) { return file->close(); }
-} // namespace Piccolo
+} // namespace ArchViz

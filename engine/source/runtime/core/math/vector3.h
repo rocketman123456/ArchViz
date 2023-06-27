@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-namespace Piccolo
+namespace ArchViz
 {
     REFLECTION_TYPE(Vector3)
     CLASS(Vector3, Fields)
@@ -459,4 +459,4 @@ namespace Piccolo
         static const Vector3 NEGATIVE_UNIT_Z;
         static const Vector3 UNIT_SCALE;
     };
-} // namespace Piccolo
+} // namespace ArchViz

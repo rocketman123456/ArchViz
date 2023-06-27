@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace Piccolo
+namespace ArchViz
 {
     void* buddySpace;
     int   numOfEntries;
@@ -188,9 +188,9 @@ namespace Piccolo
             cout << "NULL" << endl;
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz
 
-namespace Piccolo
+namespace ArchViz
 {
 #define CACHE_NAMELEN (20)    // maximum length of cache name
 #define CACHE_CACHE_ORDER (0) // cache_cache order
@@ -1141,4 +1141,4 @@ namespace Piccolo
     6 - object passed by func slab_cache_free does not exists in cache_cache
     7 - invalid pointer passed for object dealocation
     */
-} // namespace Piccolo
+} // namespace ArchViz

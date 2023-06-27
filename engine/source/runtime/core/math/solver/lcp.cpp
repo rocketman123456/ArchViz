@@ -1,6 +1,6 @@
 #include "runtime/core/math/solver/lcp.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     VectorN lcp_gauss_seidel(const MatrixMxN& A, const VectorN& b)
     {
@@ -21,4 +21,4 @@ namespace Piccolo
         }
         return x;
     }
-} // namespace Piccolo
+} // namespace ArchViz

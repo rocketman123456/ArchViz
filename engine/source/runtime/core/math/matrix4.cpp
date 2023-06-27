@@ -1,9 +1,8 @@
 
 #include "runtime/core/math/matrix4.h"
 
-namespace Piccolo
+namespace ArchViz
 {
-
     const Matrix4x4 Matrix4x4::ZERO({{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}});
 
     const Matrix4x4 Matrix4x4::ZEROAFFINE({{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 1}});
@@ -185,4 +184,4 @@ namespace Piccolo
         rotation = Quaternion(mat_q);
         position = Vector3(m_rows[0][3], m_rows[1][3], m_rows[2][3]);
     }
-} // namespace Piccolo
+} // namespace ArchViz

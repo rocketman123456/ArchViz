@@ -1,6 +1,6 @@
 #
-set(PRECOMPILE_TOOLS_PATH "${GAMES106_ROOT_DIR}/engine/bin")
-set(ENGINE_PRECOMPILE_PARAMS_IN_PATH "${GAMES106_ROOT_DIR}/cmake/precompile/precompile.json.in")
+set(PRECOMPILE_TOOLS_PATH "${ARCHVIZ_ROOT_DIR}/engine/bin")
+set(ENGINE_PRECOMPILE_PARAMS_IN_PATH "${ARCHVIZ_ROOT_DIR}/cmake/precompile/precompile.json.in")
 set(ENGINE_PRECOMPILE_PARAMS_PATH "${PRECOMPILE_TOOLS_PATH}/precompile.json")
 configure_file(${ENGINE_PRECOMPILE_PARAMS_IN_PATH} ${ENGINE_PRECOMPILE_PARAMS_PATH})
 
@@ -36,7 +36,7 @@ endif()
 set(PARSER_INPUT ${CMAKE_BINARY_DIR}/parser_header.h)
 
 # ## BUILDING ====================================================================================
-set(PRECOMPILE_TARGET "EnginePreCompile")
+set(PRECOMPILE_TARGET "ArchVizPreCompile")
 
 # Called first time when building target
 add_custom_target(${PRECOMPILE_TARGET} ALL
@@ -46,23 +46,15 @@ add_custom_target(${PRECOMPILE_TARGET} ALL
   # ${CMAKE_COMMAND} -E touch ${PRECOMPILE_PARAM_IN_PATH}a
 
   # If more than one COMMAND is specified they will be executed in order...
-  COMMAND
-  ${CMAKE_COMMAND} -E echo "************************************************************* "
-  COMMAND
-  ${CMAKE_COMMAND} -E echo "**** [Precompile] BEGIN "
-  COMMAND
-  ${CMAKE_COMMAND} -E echo "************************************************************* "
+  COMMAND ${CMAKE_COMMAND} -E echo "************************************************************* "
+  COMMAND ${CMAKE_COMMAND} -E echo "**** [Precompile] BEGIN "
+  COMMAND ${CMAKE_COMMAND} -E echo "************************************************************* "
 
-  COMMAND
-  ${PRECOMPILE_PARSER} "${ENGINE_PRECOMPILE_PARAMS_PATH}" "${PARSER_INPUT}" "${ENGINE_ROOT_DIR}/source" ${sys_include} "Piccolo" 0
+  COMMAND ${PRECOMPILE_PARSER} "${ENGINE_PRECOMPILE_PARAMS_PATH}" "${PARSER_INPUT}" "${ENGINE_ROOT_DIR}/source" ${sys_include} "ArchViz" 0
 
   # ## BUILDING ====================================================================================
-  COMMAND
-  ${CMAKE_COMMAND} -E echo "************************************************************* "
-  COMMAND
-  ${CMAKE_COMMAND} -E echo "**** [Precompile] Finish "
-  COMMAND
-  ${CMAKE_COMMAND} -E echo "************************************************************* "
-  COMMAND
-  ${CMAKE_COMMAND} -E echo ""
+  COMMAND ${CMAKE_COMMAND} -E echo "************************************************************* "
+  COMMAND ${CMAKE_COMMAND} -E echo "**** [Precompile] Finish "
+  COMMAND ${CMAKE_COMMAND} -E echo "************************************************************* "
+  COMMAND ${CMAKE_COMMAND} -E echo ""
 )

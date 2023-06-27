@@ -17,7 +17,7 @@
 /// TODO: ===--- Should those be template or constructor parameters? ---===
 /// TODO: ===-----------------------------------------------------------===
 
-namespace Piccolo
+namespace ArchViz
 {
     template<std::size_t ChunkSize, std::size_t ChunksPerBlock = 32>
     class MemoryPool
@@ -31,8 +31,8 @@ namespace Piccolo
         MemoryPool(const MemoryPool&) = delete;
 
         MemoryPool(MemoryPool&& other) :
-            m_chunks {std::exchange(other.m_chunks, 0)}, m_next_chunk {std::exchange(other.m_next_chunk, nullptr)}, m_allocated_blocks {
-                                                                                                                        std::move(other.m_allocated_blocks)}
+            m_chunks {std::exchange(other.m_chunks, 0)}, m_next_chunk {std::exchange(other.m_next_chunk, nullptr)},
+            m_allocated_blocks {std::move(other.m_allocated_blocks)}
         {}
 
         MemoryPool& operator=(MemoryPool other)
@@ -157,4 +157,4 @@ namespace Piccolo
            << ", blocks: " << pool.allocated_blocks() << ", chunk capacit: " << pool.chunk_capacity() << ", full: " << (pool.full() ? "yes" : "no");
         return os;
     }
-} // namespace Piccolo
+} // namespace ArchViz

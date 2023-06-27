@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     using FileBuffer = std::vector<std::byte>;
 
@@ -61,4 +61,4 @@ namespace Piccolo
     };
 
     using FilePtr = std::shared_ptr<File>;
-} // namespace Piccolo
+} // namespace ArchViz

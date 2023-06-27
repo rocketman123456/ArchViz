@@ -6,7 +6,7 @@
 #include <memory>
 #include <stack>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<size_t BlockSize, size_t ReservedBlocks = 0>
     class Pool
@@ -124,4 +124,4 @@ namespace Piccolo
             pool_->deallocate(ptr);
         }
     };
-} // namespace Piccolo
+} // namespace ArchViz

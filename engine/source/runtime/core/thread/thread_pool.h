@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace Piccolo
+namespace ArchViz
 {
     class ThreadPool
     {
@@ -98,6 +98,4 @@ namespace Piccolo
 
         inline static const unsigned int K = 2;
     };
-
-    extern ThreadPool g_thread_pool;
-} // namespace Piccolo
+} // namespace ArchViz

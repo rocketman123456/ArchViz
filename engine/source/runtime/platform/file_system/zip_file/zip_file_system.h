@@ -4,7 +4,7 @@
 
 #include <zip.h>
 
-namespace Piccolo
+namespace ArchViz
 {
     class ZipFileSystem : public FileSystem
     {
@@ -20,4 +20,4 @@ namespace Piccolo
     private:
         zip_t* m_zip {nullptr};
     };
-}
+} // namespace ArchViz

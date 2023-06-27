@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 
-namespace Piccolo
+namespace ArchViz
 {
     template<class T>
     class MoveAllocator
@@ -77,4 +77,4 @@ namespace Piccolo
             std::memcpy(buffer, old, sizeof(T));
         }
     };
-}
+} // namespace ArchViz
