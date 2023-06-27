@@ -8,9 +8,16 @@
 
 namespace ArchViz
 {
+    void AssetManager::initialize(std::shared_ptr<VFS> vfs)
+    {
+        m_vfs = vfs;
+        ASSERT(m_vfs);
+    }
+
     void AssetManager::initialize(std::shared_ptr<ConfigManager> config_manager)
     {
         m_config_manager = config_manager;
+        ASSERT(m_config_manager);
     }
 
     std::filesystem::path AssetManager::getFullPath(const std::string& relative_path) const
@@ -48,28 +55,28 @@ namespace ArchViz
 
     void AssetManager::readVFSTextFile(const std::filesystem::path& file_path, std::string& content) const
     {
-        auto file = g_runtime_global_context.m_vfs->open(file_path.string(), File::read_text);
+        auto file = m_vfs->open(file_path.string(), File::read_text);
         file->read(content);
         file->close();
     }
 
     void AssetManager::readVFSBinaryFile(const std::filesystem::path& file_path, std::vector<std::byte>& content) const
     {
-        auto file = g_runtime_global_context.m_vfs->open(file_path.string(), File::read_bin);
+        auto file = m_vfs->open(file_path.string(), File::read_bin);
         file->read(content);
         file->close();
     }
 
     void AssetManager::writeVFSTextFile(const std::filesystem::path& file_path, const std::string& content) const
     {
-        auto file = g_runtime_global_context.m_vfs->open(file_path.string(), File::write_text);
+        auto file = m_vfs->open(file_path.string(), File::write_text);
         file->write(content);
         file->close();
     }
 
     void AssetManager::writeVFSBinaryFile(const std::filesystem::path& file_path, const std::vector<std::byte>& content) const
     {
-        auto file = g_runtime_global_context.m_vfs->open(file_path.string(), File::write_bin);
+        auto file = m_vfs->open(file_path.string(), File::write_bin);
         file->write(content);
         file->close();
     }

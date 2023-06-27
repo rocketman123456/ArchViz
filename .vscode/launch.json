@@ -34,26 +34,6 @@
             "terminal": "integrated"
         },
         {
-            "name": "(lldb) vfs_test",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/bin/unit_test/vfs_test",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/bin",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "lldb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true,
-                    "preLaunchTask": "test"
-                }
-            ]
-        },
-        {
             "name": "(macosx) log_test",
             "type": "lldb",
             "request": "launch",
