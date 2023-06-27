@@ -57,7 +57,7 @@ target_link_libraries(${TARGET_NAME} ${LLVM_clang_lib})
 # target_link_libraries(${TARGET_NAME} clang)
 
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:${TARGET_NAME}>/" "${ENGINE_ROOT_DIR}/bin"
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${TARGET_NAME}>" "${ENGINE_ROOT_DIR}/bin"
 )
 
 # copy resources on post build

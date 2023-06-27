@@ -1,0 +1,14 @@
+{
+    "configs": [
+        {
+            "vpath": "asset",
+            "rpath": "asset-test",
+            "type": "native"
+        },
+        {
+            "vpath": "asset",
+            "rpath": "asset",
+            "type": "native"
+        }
+    ]
+}

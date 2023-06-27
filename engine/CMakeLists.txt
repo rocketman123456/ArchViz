@@ -25,8 +25,12 @@ set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/3rd_party")
 # file(COPY "${ENGINE_ROOT_DIR}/shader/include/" DESTINATION "${CMAKE_BINARY_DIR}/shader/include/")
 # endif()
 
+if(EXISTS ${ENGINE_ROOT_DIR}/config/)
+    file(COPY "${ENGINE_ROOT_DIR}/config/" DESTINATION "${BINARY_ROOT_DIR}/config")
+endif()
+
 if(EXISTS ${ENGINE_ROOT_DIR}/template/)
-file(COPY "${ENGINE_ROOT_DIR}/template/" DESTINATION "${CMAKE_BINARY_DIR}/template")
+    file(COPY "${ENGINE_ROOT_DIR}/template/" DESTINATION "${BINARY_ROOT_DIR}/template")
 endif()
 
 # set(SHADER_COMPILE_TARGET PiccoloShaderCompile)
