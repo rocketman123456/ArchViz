@@ -37,6 +37,8 @@ target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog_header_only)
 target_link_libraries(${TARGET_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
+target_link_libraries(${TARGET_NAME} PUBLIC volk::volk_headers)
+target_link_libraries(${TARGET_NAME} PUBLIC volk::volk)
 
 # target_link_libraries(${TARGET_NAME} PUBLIC soloud)
 # target_link_libraries(${TARGET_NAME} PUBLIC imgui)
@@ -47,7 +49,6 @@ target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
 # target_link_libraries(${TARGET_NAME} PUBLIC lz4::lz4)
 # target_link_libraries(${TARGET_NAME} PUBLIC nlohmann_json::nlohmann_json)
 # target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
-# target_link_libraries(${TARGET_NAME} PUBLIC volk::volk_headers) # volk::volk
 # target_link_libraries(${TARGET_NAME} PUBLIC unofficial::vulkan-memory-allocator::vulkan-memory-allocator)
 # target_link_libraries(${TARGET_NAME} PUBLIC 
 #   glslang::OSDependent 
@@ -85,11 +86,11 @@ target_include_directories(
   $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
 )
 
-target_include_directories(
-  ${TARGET_NAME}
-  PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source/runtime>
-  $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
-)
+# target_include_directories(
+#   ${TARGET_NAME}
+#   PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source/runtime>
+#   $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
+# )
 
 # target_include_directories(
 #   ${TARGET_NAME}
