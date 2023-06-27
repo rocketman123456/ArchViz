@@ -41,6 +41,15 @@
             "args": [],
             "cwd": "${workspaceFolder}/bin",
             "terminal": "integrated"
+        },
+        {
+            "name": "(macosx) window_test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/window_test",
+            "args": [],
+            "cwd": "${workspaceFolder}/bin",
+            "terminal": "integrated"
         }
     ]
 }

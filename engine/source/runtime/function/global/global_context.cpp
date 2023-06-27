@@ -45,10 +45,10 @@ namespace ArchViz
         // m_world_manager = std::make_shared<WorldManager>();
         // m_world_manager->initialize();
 
-        // m_window_system = std::make_shared<WindowSystem>();
-        // WindowCreateInfo window_create_info;
-        // m_asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
-        // m_window_system->initialize(window_create_info);
+        m_window_system = std::make_shared<WindowSystem>();
+        WindowCreateInfo window_create_info;
+        m_asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
+        m_window_system->initialize(window_create_info);
 
         // m_input_system = std::make_shared<InputSystem>();
         // m_input_system->initialize();
