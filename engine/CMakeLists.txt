@@ -1,11 +1,10 @@
 set(ENGINE_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/3rd_party")
+set(ENGINE_ASSET_DIR "/asset")
+set(ENGINE_ASSET_TEST_DIR "/asset-test")
 
-# set(ENGINE_ASSET_DIR "/asset")
-# set(ENGINE_ASSET_TEST_DIR "/asset-test")
-
-# set(DEPLOY_CONFIG_DIR "configs/deployment")
-# set(DEVELOP_CONFIG_DIR "configs/development")
+set(DEPLOY_CONFIG_DIR "config/deployment")
+set(DEVELOP_CONFIG_DIR "config/development")
 
 # if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 #     add_compile_options("/MP")
@@ -41,9 +40,9 @@ add_subdirectory(3rd_party)
 
 add_subdirectory(source/meta_parser)
 add_subdirectory(source/runtime)
-# add_subdirectory(source/editor)
-# add_subdirectory(source/playground)
 add_subdirectory(source/unit_test)
+add_subdirectory(source/editor)
+# add_subdirectory(source/playground)
 
 set(CODEGEN_TARGET "ArchVizPreCompile")
 include(${ARCHVIZ_ROOT_DIR}/cmake/precompile/precompile.cmake)

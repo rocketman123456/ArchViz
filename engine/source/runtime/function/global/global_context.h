@@ -4,9 +4,9 @@
 
 namespace ArchViz
 {
-    class ConfigManager;
+    // class LogSystem;
     class FileService;
-    class LogSystem;
+    class ConfigManager;
     class AssetManager;
     // class PhysicsManager;
     // class InputSystem;
@@ -30,10 +30,10 @@ namespace ArchViz
         void shutdownSystems();
 
     public:
-        std::shared_ptr<LogSystem>      m_logger_system;
+        // std::shared_ptr<LogSystem>      m_log_system;
         std::shared_ptr<FileService>    m_file_service;
-        std::shared_ptr<AssetManager>   m_asset_manager;
         std::shared_ptr<ConfigManager>  m_config_manager;
+        std::shared_ptr<AssetManager>   m_asset_manager;
         // std::shared_ptr<WorldManager>   m_world_manager;
         // std::shared_ptr<PhysicsManager> m_physics_manager;
         // std::shared_ptr<InputSystem>    m_input_system;

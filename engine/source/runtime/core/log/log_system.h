@@ -20,9 +20,21 @@ namespace ArchViz
         };
 
     public:
+        static LogSystem& getInstance()
+        {
+            static LogSystem instance;
+            return instance;
+        }
+
+        LogSystem(LogSystem&&)           = delete;
+        LogSystem(const LogSystem&)      = delete;
+        void operator=(const LogSystem&) = delete;
+
+    protected:
         LogSystem();
         ~LogSystem();
 
+    public:
         template<typename... TARGS>
         void log(LogLevel level, TARGS&&... args)
         {
@@ -60,4 +72,4 @@ namespace ArchViz
         std::shared_ptr<spdlog::logger> m_logger;
     };
 
-} // namespace Piccolo
+} // namespace ArchViz

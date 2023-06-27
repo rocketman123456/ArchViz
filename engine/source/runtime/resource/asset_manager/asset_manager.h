@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -100,5 +101,11 @@ namespace ArchViz
         void writeVFSBinaryFile(const std::filesystem::path& file_path, const std::vector<std::byte>& content) const;
 
         std::filesystem::path getFullPath(const std::string& relative_path) const;
+
+    public:
+        void initialize(std::shared_ptr<ConfigManager> config_manager);
+
+    private:
+        std::shared_ptr<ConfigManager> m_config_manager;
     };
 } // namespace ArchViz

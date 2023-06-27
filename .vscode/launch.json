@@ -1,0 +1,66 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(windows) ArchVizEditor",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/PiccoloEditor.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "(macosx) ArchVizEditor",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/PiccoloEditor",
+            "args": [],
+            "cwd": "${workspaceFolder}/bin",
+            "terminal": "integrated"
+        },
+        {
+            "name": "(macosx) vfs_test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/vfs_test",
+            "args": [],
+            "cwd": "${workspaceFolder}/bin",
+            "terminal": "integrated"
+        },
+        {
+            "name": "(lldb) vfs_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/vfs_test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true,
+                    "preLaunchTask": "test"
+                }
+            ]
+        },
+        {
+            "name": "(macosx) log_test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/log_test",
+            "args": [],
+            "cwd": "${workspaceFolder}/bin",
+            "terminal": "integrated"
+        }
+    ]
+}

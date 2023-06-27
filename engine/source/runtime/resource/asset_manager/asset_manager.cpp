@@ -8,9 +8,14 @@
 
 namespace ArchViz
 {
+    void AssetManager::initialize(std::shared_ptr<ConfigManager> config_manager)
+    {
+        m_config_manager = config_manager;
+    }
+
     std::filesystem::path AssetManager::getFullPath(const std::string& relative_path) const
     {
-        return std::filesystem::absolute(g_runtime_global_context.m_config_manager->getRootFolder() / relative_path);
+        return std::filesystem::absolute(m_config_manager->getRootFolder() / relative_path);
     }
 
     void AssetManager::readTextFile(const std::filesystem::path& file_path, std::string& content) const

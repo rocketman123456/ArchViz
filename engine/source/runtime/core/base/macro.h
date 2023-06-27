@@ -5,9 +5,12 @@
 #include <chrono>
 #include <thread>
 
-#define LOG_HELPER(LOG_LEVEL, ...) g_runtime_global_context.m_logger_system->log(LOG_LEVEL, "[" + std::string(__FUNCTION__) + "] " + __VA_ARGS__);
-
-// #define LOG_HELPER(LOG_LEVEL, ...)
+#ifdef UNIT_TEST
+#define LOG_HELPER(LOG_LEVEL, ...)
+#else
+// #define LOG_HELPER(LOG_LEVEL, ...) g_runtime_global_context.m_log_system->log(LOG_LEVEL, "[" + std::string(__FUNCTION__) + "] " + __VA_ARGS__);
+#define LOG_HELPER(LOG_LEVEL, ...) LogSystem::getInstance().log(LOG_LEVEL, "[" + std::string(__FUNCTION__) + "] " + __VA_ARGS__);
+#endif
 
 #define LOG_DEBUG(...) LOG_HELPER(LogSystem::LogLevel::debug, __VA_ARGS__);
 

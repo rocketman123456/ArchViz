@@ -31,4 +31,4 @@ namespace ArchViz
         spdlog::drop_all();
     }
 
-} // namespace Piccolo
+} // namespace ArchViz
