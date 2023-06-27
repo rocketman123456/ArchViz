@@ -3,12 +3,17 @@
         {
             "vpath": "asset",
             "rpath": "asset-test",
-            "type": "native"
+            "type": "native",
+            "ignores": []
         },
         {
             "vpath": "asset",
             "rpath": "asset",
-            "type": "native"
+            "type": "native",
+            "ignores": [
+                "data",
+                "model-glTF"
+            ]
         }
     ]
 }

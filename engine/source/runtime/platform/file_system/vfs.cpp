@@ -30,17 +30,17 @@ namespace ArchViz
         {
             auto root  = std::string(""); // g_runtime_global_context.m_config_manager->getRootFolder().string();
             auto rpath = combine_path(root, fs.m_rpath);
-            m_fs.emplace_back(std::make_shared<NativeFileSystem>(fs.m_vpath, rpath));
+            m_fs.emplace_back(std::make_shared<NativeFileSystem>(fs.m_vpath, rpath, fs));
         }
         else if (fs.m_type == "memory")
         {
-            m_fs.emplace_back(std::make_shared<MemoryFileSystem>(fs.m_vpath, fs.m_rpath));
+            m_fs.emplace_back(std::make_shared<MemoryFileSystem>(fs.m_vpath, fs.m_rpath, fs));
         }
         else if (fs.m_type == "compress-zip")
         {
             auto root  = std::string(""); // g_runtime_global_context.m_config_manager->getRootFolder().string();
             auto rpath = combine_path(root, fs.m_rpath);
-            m_fs.emplace_back(std::make_shared<ZipFileSystem>(fs.m_vpath, rpath));
+            m_fs.emplace_back(std::make_shared<ZipFileSystem>(fs.m_vpath, rpath, fs));
         }
     }
 

@@ -7,7 +7,7 @@ namespace ArchViz
     class MemoryFileSystem : public FileSystem
     {
     public:
-        MemoryFileSystem(const std::string& vpath, const std::string& rpath);
+        MemoryFileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config);
         virtual ~MemoryFileSystem() = default;
 
         virtual void buildFSCache() override;

@@ -9,7 +9,7 @@ namespace ArchViz
     class ZipFileSystem : public FileSystem
     {
     public:
-        ZipFileSystem(const std::string& vpath, const std::string& rpath);
+        ZipFileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config);
         virtual ~ZipFileSystem();
 
         virtual void buildFSCache() override;

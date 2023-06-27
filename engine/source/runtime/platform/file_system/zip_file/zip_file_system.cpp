@@ -12,7 +12,7 @@
 
 namespace ArchViz
 {
-    ZipFileSystem::ZipFileSystem(const std::string& vpath, const std::string& rpath) : FileSystem(vpath, rpath)
+    ZipFileSystem::ZipFileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config) : FileSystem(vpath, rpath, config)
     {
         // normalize path
         m_vpath = get_normalized_path(vpath);

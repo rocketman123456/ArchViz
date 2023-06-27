@@ -12,7 +12,7 @@
 
 namespace ArchViz
 {
-    NativeFileSystem::NativeFileSystem(const std::string& vpath, const std::string& rpath) : FileSystem(vpath, rpath)
+    NativeFileSystem::NativeFileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config) : FileSystem(vpath, rpath, config)
     {
         if (!std::filesystem::exists(rpath))
         {

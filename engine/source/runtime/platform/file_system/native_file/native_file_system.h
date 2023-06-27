@@ -6,7 +6,7 @@ namespace ArchViz
     class NativeFileSystem : public FileSystem
     {
     public:
-        NativeFileSystem(const std::string& vpath, const std::string& rpath);
+        NativeFileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config);
         virtual ~NativeFileSystem() = default;
 
         virtual void buildFSCache() override;

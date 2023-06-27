@@ -3,7 +3,7 @@
 
 namespace ArchViz
 {
-    MemoryFileSystem::MemoryFileSystem(const std::string& vpath, const std::string& rpath) : FileSystem(vpath, rpath) {}
+    MemoryFileSystem::MemoryFileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config) : FileSystem(vpath, rpath, config) {}
 
     void MemoryFileSystem::buildFSCache() {}
 

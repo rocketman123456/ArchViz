@@ -1,17 +1,30 @@
 #pragma once
-#include "runtime/platform/file_system/basic/file.h"
-
+#include "runtime/core/meta/reflection/reflection.h"
 #include "runtime/core/thread/thread_pool.h"
+
+#include "runtime/platform/file_system/basic/file.h"
 
 #include <algorithm>
 #include <future>
 
 namespace ArchViz
 {
+    REFLECTION_TYPE(FSConfig)
+    CLASS(FSConfig, Fields)
+    {
+        REFLECTION_BODY(FSConfig)
+    public:
+        std::string m_vpath;
+        std::string m_rpath;
+        std::string m_type;
+        // TODO : add ignore sub dir support
+        std::vector<std::string> m_ignores;
+    };
+
     class FileSystem
     {
     public:
-        FileSystem(const std::string& vpath, const std::string& rpath) : m_vpath {vpath}, m_rpath {rpath} {}
+        FileSystem(const std::string& vpath, const std::string& rpath, const FSConfig& config) : m_vpath {vpath}, m_rpath {rpath}, m_config(config) {}
         virtual ~FileSystem() = default;
 
         bool isFileExist(const std::string& file_name) const
@@ -78,6 +91,8 @@ namespace ArchViz
     public:
         std::string m_vpath;
         std::string m_rpath;
+
+        FSConfig m_config;
 
         std::vector<std::string> m_vfiles;
         std::vector<std::string> m_vdirs;
