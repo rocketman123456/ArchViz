@@ -8,13 +8,13 @@
 
 namespace ArchViz
 {
-    void AssetManager::initialize(std::shared_ptr<VFS> vfs)
+    void AssetManager::setVFS(std::shared_ptr<VFS> vfs)
     {
         m_vfs = vfs;
         ASSERT(m_vfs);
     }
 
-    void AssetManager::initialize(std::shared_ptr<ConfigManager> config_manager)
+    void AssetManager::setConfigManager(std::shared_ptr<ConfigManager> config_manager)
     {
         m_config_manager = config_manager;
         ASSERT(m_config_manager);

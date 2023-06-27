@@ -1,7 +1,7 @@
 add_executable(vfs_test vfs_test.cpp)
 
 set_target_properties(vfs_test PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "vfs_test")
-set_target_properties(vfs_test PROPERTIES FOLDER "Engine")
+# set_target_properties(vfs_test PROPERTIES FOLDER "Engine")
 
 target_include_directories(vfs_test PUBLIC ${ENGINE_ROOT_DIR}/source)
 target_compile_options(vfs_test PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/WX->")

@@ -1,7 +1,7 @@
 add_executable(log_test log_test.cpp)
 
 set_target_properties(log_test PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "log_test")
-set_target_properties(log_test PROPERTIES FOLDER "Engine")
+# set_target_properties(log_test PROPERTIES FOLDER "Engine")
 
 target_include_directories(log_test PUBLIC ${ENGINE_ROOT_DIR}/source)
 target_compile_options(log_test PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/WX->")

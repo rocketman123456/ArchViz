@@ -2,5 +2,15 @@
 
 namespace ArchViz
 {
+    void VulkanRHI::initialize(RHIInitInfo initialize_info)
+    {
+    }
 
+    void VulkanRHI::prepareContext()
+    {
+    }
+
+    void VulkanRHI::clear()
+    {
+    }
 }

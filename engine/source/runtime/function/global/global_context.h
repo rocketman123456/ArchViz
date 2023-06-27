@@ -4,21 +4,12 @@
 
 namespace ArchViz
 {
-    // class LogSystem;
+    class VFS;
     class FileService;
     class ConfigManager;
     class AssetManager;
-    // class PhysicsManager;
-    // class InputSystem;
-    // class WorldManager;
-    // class RenderSystem;
     class WindowSystem;
-    // class ParticleManager;
-    // class DebugDrawManager;
-    // class RenderDebugConfig;
-    class VFS;
-
-    // struct EngineInitParams;
+    class RenderSystem;
 
     /// Manage the lifetime and creation/destruction order of all global system
     class RuntimeGlobalContext
@@ -30,18 +21,11 @@ namespace ArchViz
         void shutdownSystems();
 
     public:
-        // std::shared_ptr<LogSystem>      m_log_system;
         std::shared_ptr<FileService>    m_file_service;
         std::shared_ptr<ConfigManager>  m_config_manager;
         std::shared_ptr<AssetManager>   m_asset_manager;
-        // std::shared_ptr<WorldManager>   m_world_manager;
-        // std::shared_ptr<PhysicsManager> m_physics_manager;
-        // std::shared_ptr<InputSystem>    m_input_system;
         std::shared_ptr<WindowSystem>   m_window_system;
-        // std::shared_ptr<RenderSystem>   m_render_system;
-        // std::shared_ptr<ParticleManager>   m_particle_manager;
-        // std::shared_ptr<DebugDrawManager>  m_debugdraw_manager;
-        // std::shared_ptr<RenderDebugConfig> m_render_debug_config;
+        std::shared_ptr<RenderSystem>   m_render_system;
         std::shared_ptr<VFS> m_vfs;
     };
 

@@ -10,13 +10,8 @@
 
 // #include "runtime/engine.h"
 #include "runtime/function/window/window_system.h"
-// #include "runtime/function/framework/world/world_manager.h"
-// #include "runtime/function/input/input_system.h"
-// #include "runtime/function/physics/physics_manager.h"
-// #include "runtime/function/render/render_system.h"
-// #include "runtime/function/particle/particle_manager.h"
-// #include "runtime/function/render/debugdraw/debug_draw_manager.h"
-// #include "runtime/function/render/render_debug_config.h"
+
+#include "runtime/function/render/render_system.h"
 
 namespace ArchViz
 {
@@ -32,12 +27,14 @@ namespace ArchViz
         m_file_service = std::make_shared<FileService>();
 
         m_asset_manager = std::make_shared<AssetManager>();
-        m_asset_manager->initialize(m_config_manager);
+        m_asset_manager->setConfigManager(m_config_manager);
 
         VFSConfig config;
         m_asset_manager->loadAsset<VFSConfig>("config/config.vfs.json", config);
         m_vfs = std::make_shared<VFS>();
         m_vfs->mount(config);
+
+        m_asset_manager->setVFS(m_vfs);
 
         // m_physics_manager = std::make_shared<PhysicsManager>();
         // m_physics_manager->initialize();
@@ -56,10 +53,12 @@ namespace ArchViz
         // m_particle_manager = std::make_shared<ParticleManager>();
         // m_particle_manager->initialize();
 
-        // m_render_system = std::make_shared<RenderSystem>();
-        // RenderSystemInitInfo render_init_info;
-        // render_init_info.window_system = m_window_system;
-        // m_render_system->initialize(render_init_info);
+        m_render_system = std::make_shared<RenderSystem>();
+        RenderSystemInitInfo render_init_info;
+        render_init_info.window_system = m_window_system;
+        m_render_system->setConfigManager(m_config_manager);
+        m_render_system->setAssetManager(m_asset_manager);
+        m_render_system->initialize(render_init_info);
 
         // m_debugdraw_manager = std::make_shared<DebugDrawManager>();
         // m_debugdraw_manager->initialize();
@@ -73,12 +72,12 @@ namespace ArchViz
 
         // m_debugdraw_manager.reset();
 
-        // m_render_system->clear();
-        // m_render_system.reset();
+        m_render_system->clear();
+        m_render_system.reset();
 
         // m_particle_manager.reset();
 
-        // m_window_system.reset();
+        m_window_system.reset();
 
         // m_world_manager->clear();
         // m_world_manager.reset();

@@ -19,14 +19,14 @@ int main(int argc, char** argv)
     config_manager->initialize(config_file_path.generic_string());
 
     std::shared_ptr<AssetManager> asset_manager = std::make_shared<AssetManager>();
-    asset_manager->initialize(config_manager);
+    asset_manager->setConfigManager(config_manager);
 
     VFSConfig config;
     asset_manager->loadAsset<VFSConfig>("config/config.vfs.json", config);
     std::shared_ptr<VFS> vfs = std::make_shared<VFS>();
     vfs->mount(config);
 
-    asset_manager->initialize(vfs);
+    asset_manager->setVFS(vfs);
 
     return 0;
 }

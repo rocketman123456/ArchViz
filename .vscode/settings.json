@@ -89,7 +89,8 @@
         "span": "cpp",
         "thread": "cpp",
         "variant": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "shared_mutex": "cpp"
     },
     "cmake.automaticReconfigure": false
 }

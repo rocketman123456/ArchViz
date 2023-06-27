@@ -103,8 +103,8 @@ namespace ArchViz
         std::filesystem::path getFullPath(const std::string& relative_path) const;
 
     public:
-        void initialize(std::shared_ptr<ConfigManager> config_manager);
-        void initialize(std::shared_ptr<VFS> vfs);
+        void setConfigManager(std::shared_ptr<ConfigManager> config_manager);
+        void setVFS(std::shared_ptr<VFS> vfs);
 
     private:
         std::shared_ptr<ConfigManager> m_config_manager;
