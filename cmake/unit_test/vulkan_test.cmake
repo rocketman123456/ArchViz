@@ -1,6 +1,6 @@
 add_executable(vulkan_test vulkan_test.cpp)
 
-set_target_properties(vulkan_test PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "window_test")
+set_target_properties(vulkan_test PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "vulkan_test")
 # set_target_properties(vulkan_test PROPERTIES FOLDER "Engine")
 
 target_include_directories(vulkan_test PUBLIC ${ENGINE_ROOT_DIR}/source)

@@ -15,5 +15,15 @@ namespace ArchViz
         void clear() override;
 
     private:
+        void createInstance();
+        void setupDebugMessenger();
+
+    private:
+        VkInstance m_instance;
+        VkDebugUtilsMessengerEXT m_debugMessenger;
+
+        const std::vector<const char*> s_validationLayers = {"VK_LAYER_KHRONOS_validation"};
+
+        const bool s_enableValidationLayers = false;
     };
 } // namespace ArchViz

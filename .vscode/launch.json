@@ -60,6 +60,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "(windows) vulkan_test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/vulkan_test.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "internalConsole"
+        },
+        {
             "name": "(macosx) ArchVizEditor",
             "type": "lldb",
             "request": "launch",
