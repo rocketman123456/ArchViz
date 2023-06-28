@@ -37,7 +37,8 @@ target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
 target_link_libraries(${TARGET_NAME} PUBLIC volk::volk_headers)
 target_link_libraries(${TARGET_NAME} PUBLIC volk::volk)
-# target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
+# target_link_libraries(${TARGET_NAME} PUBLIC zip)
+target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
 # target_link_libraries(${TARGET_NAME} PUBLIC unofficial::vulkan-memory-allocator::vulkan-memory-allocator)
 
 target_link_libraries(${TARGET_NAME} PUBLIC 
