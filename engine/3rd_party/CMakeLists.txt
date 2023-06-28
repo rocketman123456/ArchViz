@@ -7,5 +7,10 @@ if(NOT TARGET json11)
 endif()
 
 if(NOT TARGET glfw)
-    add_subdirectory(glfw)
+    # add_subdirectory(glfw)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glfw.cmake)
+endif()
+
+if(NOT TARGET libzip)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/libzip.cmake)
 endif()

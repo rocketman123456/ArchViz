@@ -4,3 +4,6 @@
 [submodule "engine/3rd_party/glfw"]
 	path = engine/3rd_party/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "engine/3rd_party/libzip"]
+	path = engine/3rd_party/libzip
+	url = https://github.com/nih-at/libzip.git
