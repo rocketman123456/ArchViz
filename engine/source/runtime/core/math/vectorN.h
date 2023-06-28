@@ -19,7 +19,7 @@ namespace ArchViz
     public:
         VectorN() : m_data {} {}
 
-        VectorN(int N) { m_data.resize(N); }
+        VectorN(std::size_t N) { m_data.resize(N); }
 
         VectorN(const VectorN& rhs)
         {
@@ -39,9 +39,9 @@ namespace ArchViz
 
         std::size_t n() const { return m_data.size(); }
 
-        float operator[](const int idx) const { return m_data[idx]; }
+        float operator[](const std::size_t idx) const { return m_data[idx]; }
 
-        float& operator[](const int idx) { return m_data[idx]; }
+        float& operator[](const std::size_t idx) { return m_data[idx]; }
 
         /// Pointer accessor for direct copying
         float* ptr() { return m_data.data(); }

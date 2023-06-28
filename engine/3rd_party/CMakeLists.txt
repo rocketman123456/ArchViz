@@ -14,3 +14,7 @@ endif()
 if(NOT TARGET libzip)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/libzip.cmake)
 endif()
+
+if(NOT TARGET volk)
+    add_subdirectory(volk)
+endif()

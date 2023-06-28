@@ -4,8 +4,9 @@ namespace ArchViz
 {
     VectorN lcp_gauss_seidel(const MatrixMxN& A, const VectorN& b)
     {
-        const int N = b.n();
-        VectorN   x(N);
+        const size_t N = b.n();
+
+        VectorN x(N);
         x.zero();
 
         for (int iter = 0; iter < N; iter++)

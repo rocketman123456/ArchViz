@@ -7,3 +7,9 @@
 [submodule "engine/3rd_party/libzip"]
 	path = engine/3rd_party/libzip
 	url = https://github.com/nih-at/libzip.git
+[submodule "engine/3rd_party/VulkanMemoryAllocator"]
+	path = engine/3rd_party/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "engine/3rd_party/volk"]
+	path = engine/3rd_party/volk
+	url = https://github.com/zeux/volk.git

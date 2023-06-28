@@ -1,0 +1,19 @@
+{
+    "configs": [
+        {
+            "vpath": "asset",
+            "rpath": "asset-test",
+            "type": "native",
+            "ignores": []
+        },
+        {
+            "vpath": "asset",
+            "rpath": "asset",
+            "type": "native",
+            "ignores": [
+                "data",
+                "model-glTF"
+            ]
+        }
+    ]
+}
