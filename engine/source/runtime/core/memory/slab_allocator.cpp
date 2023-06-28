@@ -4,6 +4,10 @@
 #include <cstring>
 #include <iostream>
 #include <mutex>
+#include <cmath>
+
+constexpr int BLOCK_SIZE         = 4096;
+constexpr int CACHE_L1_LINE_SIZE = 64;
 
 using namespace std;
 
@@ -26,7 +30,7 @@ namespace ArchViz
         block_num--;                                    // prvi blok ide za potrebe buddy alokatora
 
         int i        = 1;
-        numOfEntries = log2(block_num) + 1;
+        numOfEntries = log2f(block_num) + 1;
 
         freeList = (void**)buddySpace;
         for (i = 0; i < numOfEntries; i++)

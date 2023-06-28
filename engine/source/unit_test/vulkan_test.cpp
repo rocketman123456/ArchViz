@@ -18,7 +18,6 @@ int main(int argc, char** argv)
 {
     std::filesystem::path executable_path(argv[0]);
     std::filesystem::path config_file_path = executable_path.parent_path() / "../ArchVizEditor.ini";
-    cout << config_file_path << endl;
 
     std::shared_ptr<ConfigManager> config_manager = std::make_shared<ConfigManager>();
     config_manager->initialize(config_file_path.generic_string());

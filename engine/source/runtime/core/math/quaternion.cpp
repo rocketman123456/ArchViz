@@ -8,7 +8,7 @@ namespace ArchViz
     const Quaternion Quaternion::ZERO(0, 0, 0, 0);
     const Quaternion Quaternion::IDENTITY(1, 0, 0, 0);
 
-    const float Quaternion::k_epsilon = 1e-03;
+    const float Quaternion::k_epsilon = 1e-03f;
 
     Quaternion Quaternion::operator*(const Quaternion& rhs) const
     {

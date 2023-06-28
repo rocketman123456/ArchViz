@@ -1,14 +1,13 @@
 #pragma once
 
 #include <volk.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 
 #include <vector>
 
 namespace ArchViz
 {
     struct QueueFamilyIndices;
+    struct SwapChainSupportDetails;
 
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
@@ -16,5 +15,14 @@ namespace ArchViz
 
     bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
 
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-}
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
+
+    bool isSwapChainAdequate(VkPhysicalDevice device, VkSurfaceKHR surface, bool extensions_supported);
+
+    bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
+
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions);
+
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
+
+} // namespace ArchViz

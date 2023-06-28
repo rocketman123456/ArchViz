@@ -1,7 +1,11 @@
 #pragma once
 #include "runtime/function/render/rhi/rhi.h"
 
+#include <volk.h>
+
+#include <cstdint>
 #include <optional>
+#include <vector>
 
 namespace ArchViz
 {
@@ -11,8 +15,14 @@ namespace ArchViz
         std::optional<uint32_t> m_present_family;
         std::optional<uint32_t> m_compute_family;
 
-        // bool isComplete() { return m_graphics_family.has_value() && m_present_family.has_value() && m_compute_family.has_value(); }
-        bool isComplete() { return m_graphics_family.has_value() && m_compute_family.has_value(); }
+        bool isComplete() { return m_graphics_family.has_value() && m_present_family.has_value() && m_compute_family.has_value(); }
+    };
+
+    struct SwapChainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR        capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR>   presentModes;
     };
 
     class VulkanRHI : public RHI
@@ -30,17 +40,30 @@ namespace ArchViz
         void createInstance();
         void setupDebugMessenger();
         void pickPhysicalDevice();
-
-        bool isDeviceSuitable(VkPhysicalDevice device);
+        void createLogicalDevice();
+        void createSurface();
 
     private:
-        VkInstance m_instance;
+        RHIInitInfo m_initialize_info;
+
+        VkInstance               m_instance;
         VkDebugUtilsMessengerEXT m_debug_messenger;
 
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
 
-        const std::vector<const char*> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+        QueueFamilyIndices m_indices;
 
-        const bool s_enable_validation_layers = false;
+        VkDevice m_device;
+
+        VkSurfaceKHR m_surface;
+
+        VkQueue m_graphics_queue;
+        VkQueue m_compute_queue;
+        VkQueue m_present_queue;
+
+        const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+        const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+        const bool m_enable_validation_layers = false;
     };
 } // namespace ArchViz

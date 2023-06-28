@@ -3,9 +3,6 @@
 
 #include <stdlib.h>
 
-#define BLOCK_SIZE (4096)
-#define CACHE_L1_LINE_SIZE (64)
-
 namespace ArchViz
 {
     void buddy_init(void* space, int block_num); // allocate buddy
