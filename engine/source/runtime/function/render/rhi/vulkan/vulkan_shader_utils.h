@@ -6,15 +6,19 @@
 #include <array>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 namespace ArchViz
 {
+    class ConfigManager;
+    class AssetManager;
+
     class VulkanShaderUtils
     {
     public:
-        static VkShaderModule createShaderModuleFromFile(VkDevice device, const std::string& shader_file);
-        static VkShaderModule createShaderModuleFromCode(VkDevice device, const std::string& shader_code, const std::string& shader_type);
-        static VkShaderModule createShaderModule(VkDevice device, const std::vector<unsigned char>& shader_code);
+        static std::vector<uint32_t> createShaderModuleFromFile(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager);
+        static std::vector<uint32_t> createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager);
+        static VkShaderModule createShaderModule(VkDevice device, const std::vector<uint32_t>& shader_code);
 
     private:
         static std::unordered_map<uint32_t, VkSampler> m_mipmap_sampler_map;

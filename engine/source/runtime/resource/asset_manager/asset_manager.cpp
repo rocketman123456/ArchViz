@@ -2,7 +2,7 @@
 
 #include "runtime/resource/config_manager/config_manager.h"
 
-#include "runtime/function/global/global_context.h"
+#include "runtime/platform/file_system/vfs.h"
 
 #include <filesystem>
 

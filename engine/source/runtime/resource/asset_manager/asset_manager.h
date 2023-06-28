@@ -2,7 +2,6 @@
 
 #include "runtime/core/base/macro.h"
 #include "runtime/core/meta/serializer/serializer.h"
-#include "runtime/platform/file_system/vfs.h"
 
 #include <filesystem>
 #include <fstream>
@@ -16,6 +15,9 @@
 
 namespace ArchViz
 {
+    class ConfigManager;
+    class VFS;
+
     class AssetManager
     {
     public:

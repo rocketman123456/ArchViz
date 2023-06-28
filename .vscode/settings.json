@@ -111,7 +111,11 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "valarray": "cpp"
     },
-    "cmake.automaticReconfigure": false
+    "cmake.automaticReconfigure": false,
+    "C_Cpp.default.includePath": [
+        "C:\\Users\\RoccketSky\\Desktop\\Engine\\ArchViz\\engine\\source"
+    ]
 }

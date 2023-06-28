@@ -1,8 +1,6 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_shader_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_header_includer.h"
 
-#include "runtime/function/global/global_context.h"
-
 #include "runtime/core/base/macro.h"
 #include "runtime/core/string/string_utils.h"
 
@@ -53,15 +51,15 @@ namespace ArchViz
         return EShLangVertex;
     }
 
-    VkShaderModule VulkanShaderUtils::createShaderModuleFromFile(VkDevice device, const std::string& shader_file)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager)
     {
-        std::filesystem::path asset_path       = g_runtime_global_context.m_config_manager->getRootFolder();
-        std::filesystem::path shader_file_path = asset_path / "shader" / "glsl" / shader_file;
-        std::filesystem::path include_path     = asset_path / "shader" / "include";
+        std::filesystem::path root_path        = config_manager->getRootFolder();
+        std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
+        std::filesystem::path include_path     = root_path / "shader" / "include";
         LOG_DEBUG("open shader: " + shader_file_path.generic_string());
 
         std::string shader_code = "";
-        g_runtime_global_context.m_asset_manager->readTextFile(shader_file_path, shader_code);
+        asset_manager->readTextFile(shader_file_path, shader_code);
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_file.c_str());
 
@@ -130,7 +128,7 @@ namespace ArchViz
         bool SpvToolsDisassembler = false;
         bool SpvToolsValidate     = false;
 
-        std::vector<unsigned int> spirv;
+        std::vector<uint32_t> spirv;
         if (program->getIntermediate(stage))
         {
             spv::SpvBuildLogger logger;
@@ -153,17 +151,17 @@ namespace ArchViz
         delete program;
 
         // copy data to unsigned char;
-        std::vector<unsigned char> spirv_char;
-        spirv_char.resize(spirv.size() * sizeof(unsigned int));
-        memcpy(spirv_char.data(), spirv.data(), spirv_char.size());
+        // std::vector<unsigned char> spirv_char;
+        // spirv_char.resize(spirv.size() * sizeof(unsigned int));
+        // memcpy(spirv_char.data(), spirv.data(), spirv_char.size());
 
-        return createShaderModule(device, spirv_char);
+        return spirv;
     }
 
-    VkShaderModule VulkanShaderUtils::createShaderModuleFromCode(VkDevice device, const std::string& shader_code, const std::string& shader_type)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager)
     {
-        std::filesystem::path asset_path   = g_runtime_global_context.m_config_manager->getRootFolder();
-        std::filesystem::path include_path = asset_path / "shader" / "include";
+        std::filesystem::path root_path   = config_manager->getRootFolder();
+        std::filesystem::path include_path = root_path / "shader" / "include";
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_type.c_str());
 
@@ -181,7 +179,7 @@ namespace ArchViz
         glslang::TProgram* program = new glslang::TProgram;
         glslang::TShader*  shader  = new glslang::TShader(stage);
 
-        const char* file_names[]   = {shader_file.c_str()};
+        const char* file_names[]   = {shader_type.c_str()};
         const char* shader_codes[] = {shader_code.c_str()};
         shader->setStringsWithLengthsAndNames(shader_codes, NULL, file_names, 1);
 
@@ -232,7 +230,7 @@ namespace ArchViz
         bool SpvToolsDisassembler = false;
         bool SpvToolsValidate     = false;
 
-        std::vector<unsigned int> spirv;
+        std::vector<uint32_t> spirv;
         if (program->getIntermediate(stage))
         {
             spv::SpvBuildLogger logger;
@@ -255,18 +253,18 @@ namespace ArchViz
         delete program;
 
         // copy data to unsigned char;
-        std::vector<unsigned char> spirv_char;
-        spirv_char.resize(spirv.size() * sizeof(unsigned int));
-        memcpy(spirv_char.data(), spirv.data(), spirv_char.size());
+        // std::vector<unsigned char> spirv_char;
+        // spirv_char.resize(spirv.size() * sizeof(unsigned int));
+        // memcpy(spirv_char.data(), spirv.data(), spirv_char.size());
 
-        return createShaderModule(device, spirv_char);
+        return spirv;
     }
 
-    VkShaderModule VulkanShaderUtils::createShaderModule(VkDevice device, const std::vector<unsigned char>& shader_code)
+    VkShaderModule VulkanShaderUtils::createShaderModule(VkDevice device, const std::vector<uint32_t>& shader_code)
     {
         VkShaderModuleCreateInfo shader_module_create_info {};
         shader_module_create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        shader_module_create_info.codeSize = shader_code.size();
+        shader_module_create_info.codeSize = shader_code.size() * sizeof(uint32_t);
         shader_module_create_info.pCode    = reinterpret_cast<const uint32_t*>(shader_code.data());
 
         VkShaderModule shader_module;
