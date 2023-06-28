@@ -17,7 +17,7 @@ namespace ArchViz
 
     public:
         uint8_t calculate(const char* string);
-        uint8_t calculate(const uint8_t* data_in, const int length);
+        uint8_t calculate(const uint8_t* data_in, const size_t length);
         void    printLookupTable();
 
     private:
@@ -99,7 +99,7 @@ namespace ArchViz
 
     public:
         uint16_t calculate(const char* string);
-        uint16_t calculate(const uint8_t* data_in, const int length);
+        uint16_t calculate(const uint8_t* data_in, const size_t length);
         void     printLookupTable();
 
     private:
@@ -265,7 +265,7 @@ namespace ArchViz
 
     public:
         uint32_t calculate(const char* string);
-        uint32_t calculate(const uint8_t* data_in, const int length);
+        uint32_t calculate(const uint8_t* data_in, const size_t length);
         void     printLookupTable();
 
     private:

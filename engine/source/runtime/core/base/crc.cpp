@@ -39,7 +39,7 @@ namespace ArchViz
         return calculate((const uint8_t*)string, length);
     }
 
-    uint8_t CRC8::calculate(const uint8_t* data, const int length)
+    uint8_t CRC8::calculate(const uint8_t* data, const size_t length)
     {
         uint8_t crc  = this->init_value;
         uint8_t byte = 0;
@@ -134,7 +134,7 @@ namespace ArchViz
         return calculate((const uint8_t*)string, length);
     }
 
-    uint16_t CRC16::calculate(const uint8_t* data, const int length)
+    uint16_t CRC16::calculate(const uint8_t* data, const size_t length)
     {
         uint16_t crc  = this->init_value;
         uint8_t  byte = 0;
@@ -228,7 +228,7 @@ namespace ArchViz
         return calculate((const uint8_t*)string, length);
     }
 
-    uint32_t CRC32::calculate(const uint8_t* data, const int length)
+    uint32_t CRC32::calculate(const uint8_t* data, const size_t length)
     {
         uint32_t crc  = this->init_value;
         uint8_t  byte = 0;
