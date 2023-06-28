@@ -31,3 +31,6 @@
 [submodule "engine/3rd_party/mustache"]
 	path = engine/3rd_party/mustache
 	url = https://github.com/kainjow/Mustache.git
+[submodule "engine/3rd_party/eigen"]
+	path = engine/3rd_party/eigen
+	url = https://gitlab.com/libeigen/eigen.git
