@@ -1,8 +1,20 @@
 #pragma once
 #include "runtime/function/render/rhi/rhi.h"
 
+#include <optional>
+
 namespace ArchViz
 {
+    struct QueueFamilyIndices
+    {
+        std::optional<uint32_t> m_graphics_family;
+        std::optional<uint32_t> m_present_family;
+        std::optional<uint32_t> m_compute_family;
+
+        // bool isComplete() { return m_graphics_family.has_value() && m_present_family.has_value() && m_compute_family.has_value(); }
+        bool isComplete() { return m_graphics_family.has_value() && m_compute_family.has_value(); }
+    };
+
     class VulkanRHI : public RHI
     {
     public:
@@ -17,13 +29,18 @@ namespace ArchViz
     private:
         void createInstance();
         void setupDebugMessenger();
+        void pickPhysicalDevice();
+
+        bool isDeviceSuitable(VkPhysicalDevice device);
 
     private:
         VkInstance m_instance;
-        VkDebugUtilsMessengerEXT m_debugMessenger;
+        VkDebugUtilsMessengerEXT m_debug_messenger;
 
-        const std::vector<const char*> s_validationLayers = {"VK_LAYER_KHRONOS_validation"};
+        VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
 
-        const bool s_enableValidationLayers = false;
+        const std::vector<const char*> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+
+        const bool s_enable_validation_layers = false;
     };
 } // namespace ArchViz

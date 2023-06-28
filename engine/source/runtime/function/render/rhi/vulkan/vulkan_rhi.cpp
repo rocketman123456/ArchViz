@@ -34,7 +34,7 @@ namespace ArchViz
             LOG_FATAL("failed to initialize volk!");
         }
 
-        if (s_enableValidationLayers && !checkValidationLayerSupport(s_validationLayers))
+        if (s_enable_validation_layers && !checkValidationLayerSupport(s_validation_layers))
         {
             LOG_FATAL("validation layers requested, but not available!");
         }
@@ -51,15 +51,15 @@ namespace ArchViz
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
 
-        auto extensions = getRequiredExtensions(s_enableValidationLayers);
+        auto extensions = getRequiredExtensions(s_enable_validation_layers);
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-        if (s_enableValidationLayers)
+        if (s_enable_validation_layers)
         {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(s_validationLayers.size());
-            createInfo.ppEnabledLayerNames = s_validationLayers.data();
+            createInfo.enabledLayerCount = static_cast<uint32_t>(s_validation_layers.size());
+            createInfo.ppEnabledLayerNames = s_validation_layers.data();
 
             populateDebugMessengerCreateInfo(debugCreateInfo);
             createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
@@ -80,21 +80,57 @@ namespace ArchViz
 
     void VulkanRHI::setupDebugMessenger()
     {
-        if (!s_enableValidationLayers) return;
+        if (!s_enable_validation_layers) return;
 
         VkDebugUtilsMessengerCreateInfoEXT createInfo;
         populateDebugMessengerCreateInfo(createInfo);
 
-        if (CreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger) != VK_SUCCESS)
+        if (CreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debug_messenger) != VK_SUCCESS)
         {
             LOG_FATAL("failed to set up debug messenger!");
-            // throw std::runtime_error("failed to set up debug messenger!");
+        }
+    }
+
+    bool VulkanRHI::isDeviceSuitable(VkPhysicalDevice device)
+    {
+        QueueFamilyIndices indices = findQueueFamilies(device);
+
+        return indices.isComplete();
+    }
+
+    void VulkanRHI::pickPhysicalDevice()
+    {
+        uint32_t device_count = 0;
+        vkEnumeratePhysicalDevices(m_instance, &device_count, nullptr);
+
+        if (device_count == 0)
+        {
+            LOG_FATAL("failed to find GPUs with Vulkan support!");
+        }
+
+        std::vector<VkPhysicalDevice> devices(device_count);
+        vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
+
+        for (const auto& device : devices)
+        {
+            if (isDeviceSuitable(device))
+            {
+                m_physical_device = device;
+                break;
+            }
+        }
+
+        if (m_physical_device == VK_NULL_HANDLE)
+        {
+            LOG_FATAL("failed to find a suitable GPU!");
         }
     }
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
         createInstance();
+        setupDebugMessenger();
+        pickPhysicalDevice();
     }
 
     void VulkanRHI::prepareContext()
@@ -103,9 +139,9 @@ namespace ArchViz
 
     void VulkanRHI::clear()
     {
-        if (s_enableValidationLayers)
+        if (s_enable_validation_layers)
         {
-            DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
+            DestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
         }
 
         vkDestroyInstance(m_instance, nullptr);

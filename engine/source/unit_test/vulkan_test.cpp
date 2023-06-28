@@ -47,8 +47,6 @@ int main(int argc, char** argv)
     render_system->setAssetManager(asset_manager);
     render_system->initialize(render_init_info);
 
-    std::array<int, 2> window_size = window_system->getWindowSize();
-
     while (!window_system->shouldClose())
     {
         window_system->pollEvents();
