@@ -59,7 +59,8 @@ namespace ArchViz
         LOG_DEBUG("open shader: " + shader_file_path.generic_string());
 
         std::string shader_code = "";
-        asset_manager->readTextFile(shader_file_path, shader_code);
+        //asset_manager->readTextFile(shader_file_path, shader_code);
+        asset_manager->readVFSTextFile(shader_file, shader_code);
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_file.c_str());
 

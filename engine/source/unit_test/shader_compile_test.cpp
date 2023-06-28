@@ -30,8 +30,8 @@ int main(int argc, char** argv)
 
     asset_manager->setVFS(vfs);
 
-    std::vector<uint32_t> vert = VulkanShaderUtils::createShaderModuleFromFile("triangle/triangle.vert", config_manager, asset_manager);
-    std::vector<uint32_t> frag = VulkanShaderUtils::createShaderModuleFromFile("triangle/triangle.frag", config_manager, asset_manager);
+    std::vector<uint32_t> vert = VulkanShaderUtils::createShaderModuleFromFile("shader/glsl/triangle/triangle.vert", config_manager, asset_manager);
+    std::vector<uint32_t> frag = VulkanShaderUtils::createShaderModuleFromFile("shader/glsl/triangle/triangle.frag", config_manager, asset_manager);
 
     return 0;
 }
