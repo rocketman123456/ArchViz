@@ -28,3 +28,6 @@
 [submodule "engine/3rd_party/imgui"]
 	path = engine/3rd_party/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "engine/3rd_party/mustache"]
+	path = engine/3rd_party/mustache
+	url = https://github.com/kainjow/Mustache.git
