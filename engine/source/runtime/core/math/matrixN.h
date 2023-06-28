@@ -15,7 +15,7 @@ namespace ArchViz
         MatrixMxN()  = default;
         ~MatrixMxN() = default;
 
-        MatrixMxN(int M, int N)
+        MatrixMxN(std::size_t M, std::size_t N)
         {
             m_rows.resize(M);
             for (auto& row : m_rows)

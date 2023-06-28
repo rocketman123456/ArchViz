@@ -5,3 +5,7 @@
 if(NOT TARGET json11)
     add_subdirectory(json11)
 endif()
+
+if(NOT TARGET glfw)
+    add_subdirectory(glfw)
+endif()

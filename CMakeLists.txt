@@ -8,18 +8,20 @@ project(${NAME} VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(BUILD_SHARED_LIBS OFF)
 
 include(CMakeDependentOption)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
 find_package(libzip CONFIG REQUIRED)
 find_package(volk CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(unofficial-vulkan-memory-allocator CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
+# find_package(glfw3 CONFIG REQUIRED)
 
 # find_package(Lua REQUIRED)
 

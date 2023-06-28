@@ -8,18 +8,51 @@
             "name": "(windows) ArchVizEditor",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/PiccoloEditor.exe",
+            "program": "${workspaceFolder}/bin/ArchVizEditor.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
-            "console": "integratedTerminal"
+            "console": "internalConsole"
+        },
+        {
+            "name": "(windows) log_test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/log_test.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "internalConsole"
+        },
+        {
+            "name": "(windows) vfs_test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/vfs_test.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "internalConsole"
+        },
+        {
+            "name": "(windows) window_test",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/window_test.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "internalConsole"
         },
         {
             "name": "(macosx) ArchVizEditor",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/PiccoloEditor",
+            "program": "${workspaceFolder}/bin/ArchVizEditor",
             "args": [],
             "cwd": "${workspaceFolder}/bin",
             "terminal": "integrated"

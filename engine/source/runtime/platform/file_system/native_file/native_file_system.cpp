@@ -35,7 +35,7 @@ namespace ArchViz
             {
                 std::filesystem::path path = directory_entry;
 
-                auto path_str  = path.string();
+                auto path_str  = path.generic_string(); // string();
                 auto vpath_str = Path::getRelativePath(m_rpath, path).string();
                 vpath_str      = get_normalized_path(vpath_str);
                 vpath_str      = m_vpath + "/" + vpath_str;
@@ -46,7 +46,7 @@ namespace ArchViz
             {
                 std::filesystem::path path = directory_entry;
 
-                auto path_str  = path.string();
+                auto path_str  = path.generic_string(); // string();
                 auto vpath_str = Path::getRelativePath(m_rpath, path).string();
                 vpath_str      = get_normalized_path(vpath_str);
                 vpath_str      = m_vpath + "/" + vpath_str;

@@ -90,7 +90,27 @@
         "thread": "cpp",
         "variant": "cpp",
         "numeric": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "filesystem": "cpp",
+        "forward_list": "cpp",
+        "ranges": "cpp",
+        "stop_token": "cpp",
+        "xfacet": "cpp",
+        "xhash": "cpp",
+        "xiosbase": "cpp",
+        "xlocale": "cpp",
+        "xlocbuf": "cpp",
+        "xlocinfo": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xlocnum": "cpp",
+        "xloctime": "cpp",
+        "xmemory": "cpp",
+        "xstddef": "cpp",
+        "xstring": "cpp",
+        "xtr1common": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp"
     },
     "cmake.automaticReconfigure": false
 }
