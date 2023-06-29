@@ -105,6 +105,15 @@
             "args": [],
             "cwd": "${workspaceFolder}/bin",
             "terminal": "integrated"
+        },
+        {
+            "name": "(macosx) vulkan_test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/unit_test/vulkan_test",
+            "args": [],
+            "cwd": "${workspaceFolder}/bin",
+            "terminal": "integrated"
         }
     ]
 }

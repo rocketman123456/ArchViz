@@ -2,6 +2,6 @@
 
 namespace ArchViz
 {
-    class CubicCurve
+    class BezierCurve
     {};
 } // namespace ArchViz

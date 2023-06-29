@@ -38,6 +38,9 @@ build/
 # Ignore macOS .DS_Store
 .DS_Store
 
+.vscode/setting.json
+.vscode/c_cpp_properties.json
+
 # Assets that are part of the asset pack and should not be stored in the repo
 engine/asset/data/models/**
 engine/asset/data/textures/**

@@ -9,6 +9,9 @@
 
 namespace ArchViz
 {
+    class VulkanDevice;
+    class VulkanSwapChain;
+
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> m_graphics_family;
@@ -52,7 +55,8 @@ namespace ArchViz
         VkInstance               m_instance;
         VkDebugUtilsMessengerEXT m_debug_messenger;
 
-        VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
+        VkPhysicalDevice              m_physical_device = VK_NULL_HANDLE;
+        std::shared_ptr<VulkanDevice> m_vulkan_device;
 
         QueueFamilyIndices m_indices;
 

@@ -117,6 +117,8 @@
     },
     "cmake.automaticReconfigure": false,
     "C_Cpp.default.includePath": [
-        "C:\\Users\\RoccketSky\\Desktop\\Engine\\ArchViz\\engine\\source"
-    ]
+        "C:/Users/RoccketSky/Desktop/Engine/ArchViz/engine/source",
+        "~/Program/CppCode/ArchViz/engine/source"
+    ],
+    "dotnetAcquisitionExtension.installTimeoutValue": 180
 }

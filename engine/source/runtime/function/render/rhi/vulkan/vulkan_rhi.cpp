@@ -1,5 +1,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 
 #include "runtime/function/window/window_system.h"
 
@@ -9,6 +11,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <memory>
 #include <set>
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance                                instance,
@@ -136,6 +139,8 @@ namespace ArchViz
         {
             LOG_FATAL("failed to find a suitable GPU!");
         }
+
+        m_vulkan_device = std::make_shared<VulkanDevice>(m_physical_device);
     }
 
     void VulkanRHI::createLogicalDevice()
@@ -196,7 +201,7 @@ namespace ArchViz
 
         VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(swap_chain_support.formats);
         VkPresentModeKHR   present_mode   = chooseSwapPresentMode(swap_chain_support.presentModes);
-        VkExtent2D         extent        = chooseSwapExtent(swap_chain_support.capabilities, m_initialize_info.window_system->getWindow());
+        VkExtent2D         extent         = chooseSwapExtent(swap_chain_support.capabilities, m_initialize_info.window_system->getWindow());
 
         uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
         if (swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
@@ -277,10 +282,7 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createGraphicsPipeline()
-    {
-        
-    }
+    void VulkanRHI::createGraphicsPipeline() {}
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {

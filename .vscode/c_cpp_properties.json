@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${default}",
-                "C:\\vcpkg\\installed\\x64-windows\\include"
+                "C:\\vcpkg\\installed\\x64-windows\\include",
+                "~/Program/Library/vcpkg/installed/x64-osx/include"
             ],
             "defines": [
                 "_DEBUG",

@@ -1,6 +1,152 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
+
+#include "runtime/core/base/macro.h"
 
 namespace ArchViz
 {
+    void VulkanSwapChain::initSurface(GLFWwindow* window)
+    {
+        m_window = window;
+        if (glfwCreateWindowSurface(m_instance, window, nullptr, &m_surface) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create window surface!");
+        }
+    }
 
-}
+    void VulkanSwapChain::connect(VkInstance instance, VkPhysicalDevice physical_device, VkDevice device)
+    {
+        m_instance        = instance;
+        m_physical_device = physical_device;
+        m_device          = device;
+    }
+
+    void VulkanSwapChain::create(uint32_t& width, uint32_t& height, bool vsync, bool fullscreen)
+    {
+        SwapChainSupportDetails swap_chain_support = querySwapChainSupport(m_physical_device, m_surface);
+
+        VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(swap_chain_support.formats);
+        VkPresentModeKHR   present_mode   = chooseSwapPresentMode(swap_chain_support.presentModes);
+        VkExtent2D         extent         = chooseSwapExtent(swap_chain_support.capabilities, m_window);
+
+        uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
+        if (swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
+        {
+            image_count = swap_chain_support.capabilities.maxImageCount;
+        }
+
+        VkExtent2D swapchainExtent = {};
+        // If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
+        if (swap_chain_support.capabilities.currentExtent.width == (uint32_t)-1)
+        {
+            // If the surface size is undefined, the size is set to
+            // the size of the images requested.
+            m_swap_chain_extent.width  = width;
+            m_swap_chain_extent.height = height;
+        }
+        else
+        {
+            // If the surface size is defined, the swap chain size must match
+            m_swap_chain_extent = swap_chain_support.capabilities.currentExtent;
+            width               = swap_chain_support.capabilities.currentExtent.width;
+            height              = swap_chain_support.capabilities.currentExtent.height;
+        }
+
+        VkSwapchainCreateInfoKHR create_info {};
+        create_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        create_info.surface          = m_surface;
+        create_info.minImageCount    = image_count;
+        create_info.imageFormat      = surface_format.format;
+        create_info.imageColorSpace  = surface_format.colorSpace;
+        create_info.imageExtent      = extent;
+        create_info.imageArrayLayers = 1;
+        create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        QueueFamilyIndices indices              = findQueueFamilies(m_physical_device, m_surface);
+        uint32_t           queueFamilyIndices[] = {indices.m_graphics_family.value(), indices.m_present_family.value()};
+
+        if (indices.m_graphics_family != indices.m_present_family)
+        {
+            create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+            create_info.queueFamilyIndexCount = 2;
+            create_info.pQueueFamilyIndices   = queueFamilyIndices;
+        }
+        else
+        {
+            create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        }
+
+        create_info.preTransform   = swap_chain_support.capabilities.currentTransform;
+        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        create_info.presentMode    = present_mode;
+        create_info.clipped        = VK_TRUE;
+
+        VkSwapchainKHR old_swap_chain = m_swap_chain;
+        create_info.oldSwapchain      = old_swap_chain;
+
+        if (vkCreateSwapchainKHR(m_device, &create_info, nullptr, &m_swap_chain) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create swap chain!");
+        }
+
+        if (old_swap_chain != VK_NULL_HANDLE)
+        {
+            for (uint32_t i = 0; i < image_count; i++)
+            {
+                vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
+            }
+            vkDestroySwapchainKHR(m_device, old_swap_chain, nullptr);
+        }
+
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, nullptr);
+        m_images.resize(image_count);
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, m_images.data());
+
+        m_swap_chain_image_format = surface_format.format;
+        m_swap_chain_extent       = extent;
+
+        m_buffers.resize(m_images.size());
+
+        for (size_t i = 0; i < m_images.size(); i++)
+        {
+            VkImageViewCreateInfo create_info {};
+            create_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            create_info.image                           = m_images[i];
+            create_info.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+            create_info.format                          = m_swap_chain_image_format;
+            create_info.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.a                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            create_info.subresourceRange.baseMipLevel   = 0;
+            create_info.subresourceRange.levelCount     = 1;
+            create_info.subresourceRange.baseArrayLayer = 0;
+            create_info.subresourceRange.layerCount     = 1;
+
+            m_buffers[i].image = m_images[i];
+
+            if (vkCreateImageView(m_device, &create_info, nullptr, &m_buffers[i].view) != VK_SUCCESS)
+            {
+                LOG_FATAL("failed to create image views!");
+            }
+        }
+    }
+
+    void VulkanSwapChain::cleanup()
+    {
+        if (m_swap_chain != VK_NULL_HANDLE)
+        {
+            for (uint32_t i = 0; i < m_image_count; i++)
+            {
+                vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
+            }
+        }
+        if (m_surface != VK_NULL_HANDLE)
+        {
+            vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
+            vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        }
+    }
+} // namespace ArchViz
