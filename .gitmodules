@@ -34,3 +34,12 @@
 [submodule "engine/3rd_party/eigen"]
 	path = engine/3rd_party/eigen
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "engine/3rd_party/stb"]
+	path = engine/3rd_party/stb
+	url = https://github.com/nothings/stb.git
+[submodule "engine/3rd_party/tinygltf"]
+	path = engine/3rd_party/tinygltf
+	url = https://github.com/syoyo/tinygltf.git
+[submodule "engine/3rd_party/tinyobjloader"]
+	path = engine/3rd_party/tinyobjloader
+	url = https://github.com/tinyobjloader/tinyobjloader.git

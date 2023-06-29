@@ -1,14 +1,13 @@
 #pragma once
 #include "runtime/core/log/log_system.h"
-// #include "runtime/function/global/global_context.h"
 
 #include <chrono>
 #include <thread>
+#include <cassert>
 
 #ifdef UNIT_TEST
 #define LOG_HELPER(LOG_LEVEL, ...)
 #else
-// #define LOG_HELPER(LOG_LEVEL, ...) g_runtime_global_context.m_log_system->log(LOG_LEVEL, "[" + std::string(__FUNCTION__) + "] " + __VA_ARGS__);
 #define LOG_HELPER(LOG_LEVEL, ...) LogSystem::getInstance().log(LOG_LEVEL, "[" + std::string(__FUNCTION__) + "] " + __VA_ARGS__);
 #endif
 
