@@ -11,7 +11,7 @@ namespace ArchViz
      */
     VulkanDevice::VulkanDevice(VkPhysicalDevice physical_device)
     {
-        ASSERT(physicalDevice);
+        ASSERT(physical_device);
         this->m_physical_device = physical_device;
 
         // Store Properties features, limits and properties of the physical device for later use

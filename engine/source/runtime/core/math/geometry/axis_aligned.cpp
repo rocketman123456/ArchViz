@@ -1,4 +1,4 @@
-#include "runtime/core/math/axis_aligned.h"
+#include "runtime/core/math/geometry/axis_aligned.h"
 
 namespace ArchViz
 {

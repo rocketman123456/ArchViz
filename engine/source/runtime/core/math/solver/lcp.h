@@ -1,6 +1,6 @@
 #pragma once
-#include "runtime/core/math/matrixN.h"
-#include "runtime/core/math/vectorN.h"
+#include "runtime/core/math/matrix/matrixN.h"
+#include "runtime/core/math/vector/vectorN.h"
 
 namespace ArchViz
 {

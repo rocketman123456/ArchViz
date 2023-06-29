@@ -1,10 +1,10 @@
 #pragma once
 
 #include "runtime/core/math/math.h"
-#include "runtime/core/math/matrix3.h"
+#include "runtime/core/math/matrix/matrix3.h"
 #include "runtime/core/math/quaternion.h"
-#include "runtime/core/math/vector3.h"
-#include "runtime/core/math/vector4.h"
+#include "runtime/core/math/vector/vector3.h"
+#include "runtime/core/math/vector/vector4.h"
 
 namespace ArchViz
 {

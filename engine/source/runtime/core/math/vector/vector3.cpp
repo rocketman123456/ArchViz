@@ -1,4 +1,4 @@
-#include "runtime/core/math/vector3.h"
+#include "runtime/core/math/vector/vector3.h"
 
 namespace ArchViz
 {

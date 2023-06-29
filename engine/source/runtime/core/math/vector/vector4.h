@@ -1,6 +1,6 @@
 #pragma once
 #include "runtime/core/math/math.h"
-#include "runtime/core/math/vector3.h"
+#include "runtime/core/math/vector/vector3.h"
 #include "runtime/core/meta/reflection/reflection.h"
 
 #include <cassert>

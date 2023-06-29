@@ -1,4 +1,4 @@
-#include "runtime/core/math/matrix2.h"
+#include "runtime/core/math/matrix/matrix2.h"
 
 namespace ArchViz
 {

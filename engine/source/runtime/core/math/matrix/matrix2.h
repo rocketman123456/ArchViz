@@ -1,6 +1,6 @@
 #pragma once
 #include "runtime/core/math/math.h"
-#include "runtime/core/math/vector2.h"
+#include "runtime/core/math/vector/vector2.h"
 
 #include <vector>
 

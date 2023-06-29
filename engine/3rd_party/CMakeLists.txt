@@ -22,3 +22,11 @@ endif()
 if(NOT TARGET mustache)
     add_subdirectory(mustache)
 endif()
+
+if(NOT TARGET tinygltf)
+    add_subdirectory(tinygltf)
+endif()
+
+if(NOT TARGET tinyobjloader)
+    add_subdirectory(tinyobjloader)
+endif()
