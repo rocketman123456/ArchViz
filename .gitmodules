@@ -43,3 +43,6 @@
 [submodule "engine/3rd_party/tinyobjloader"]
 	path = engine/3rd_party/tinyobjloader
 	url = https://github.com/tinyobjloader/tinyobjloader.git
+[submodule "engine/3rd_party/Vulkan-Headers"]
+	path = engine/3rd_party/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "runtime/core/math/math_type.h"
-#include "runtime/core/math/matrix4.h"
-#include "runtime/core/math/vector4.h"
+#include "runtime/core/math/matrix/matrix4.h"
+#include "runtime/core/math/vector/vector4.h"
 
 #include <array>
 

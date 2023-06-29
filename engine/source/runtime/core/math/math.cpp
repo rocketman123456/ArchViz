@@ -1,5 +1,5 @@
 #include "runtime/core/math/math.h"
-#include "runtime/core/math/matrix4.h"
+#include "runtime/core/math/matrix/matrix4.h"
 
 namespace ArchViz
 {

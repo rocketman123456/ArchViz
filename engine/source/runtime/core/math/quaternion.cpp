@@ -1,7 +1,7 @@
 #include "runtime/core/math/quaternion.h"
-#include "runtime/core/math/matrix3.h"
-#include "runtime/core/math/matrix4.h"
-#include "runtime/core/math/vector3.h"
+#include "runtime/core/math/matrix/matrix3.h"
+#include "runtime/core/math/matrix/matrix4.h"
+#include "runtime/core/math/vector/vector3.h"
 
 namespace ArchViz
 {

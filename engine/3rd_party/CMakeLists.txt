@@ -10,13 +10,17 @@ endif()
 #     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/libzip.cmake)
 # endif()
 
-# if(NOT TARGET glfw)
-#     # add_subdirectory(glfw)
-#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glfw.cmake)
-# endif()
+if(NOT TARGET glfw)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glfw.cmake)
+endif()
+
+if(NOT TARGET vulkan_headers)
+    add_subdirectory(Vulkan-Headers)
+endif()
 
 if(NOT TARGET volk)
     add_subdirectory(volk)
+    target_include_directories(volk PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)
 endif()
 
 if(NOT TARGET mustache)
