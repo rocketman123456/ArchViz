@@ -44,22 +44,22 @@ namespace ArchViz
         size_t read(FilePtr file, std::string& buffer) { return file->read(buffer); }
         size_t write(FilePtr file, const std::string& buffer) { return file->write(buffer); }
 
-        std::future<size_t> readAsync(std::shared_ptr<ThreadPool> tp, FilePtr file, std::vector<std::byte>& buffer)
+        std::future<size_t> readAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, std::vector<std::byte>& buffer)
         {
             return tp->enqueue_task([file, &buffer]() { return file->read(buffer); });
         }
 
-        std::future<size_t> writeAsync(std::shared_ptr<ThreadPool> tp, FilePtr file, const std::vector<std::byte>& buffer)
+        std::future<size_t> writeAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, const std::vector<std::byte>& buffer)
         {
             return tp->enqueue_task([file, &buffer]() { return file->write(buffer); });
         }
 
-        std::future<size_t> readAsync(std::shared_ptr<ThreadPool> tp, FilePtr file, std::string& buffer)
+        std::future<size_t> readAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, std::string& buffer)
         {
             return tp->enqueue_task([file, &buffer]() { return file->read(buffer); });
         }
 
-        std::future<size_t> writeAsync(std::shared_ptr<ThreadPool> tp, FilePtr file, const std::string& buffer)
+        std::future<size_t> writeAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, const std::string& buffer)
         {
             return tp->enqueue_task([file, &buffer]() { return file->write(buffer); });
         }

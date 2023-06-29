@@ -19,8 +19,8 @@ namespace ArchViz
         size_t read(FilePtr file, std::vector<std::byte>& buffer);
         size_t write(FilePtr file, const std::vector<std::byte>& buffer);
 
-        std::future<size_t> readAsync(std::shared_ptr<ThreadPool> tp, FilePtr file, std::vector<std::byte>& buffer);
-        std::future<size_t> writeAsync(std::shared_ptr<ThreadPool> tp, FilePtr file, const std::vector<std::byte>& buffer);
+        std::future<size_t> readAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, std::vector<std::byte>& buffer);
+        std::future<size_t> writeAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, const std::vector<std::byte>& buffer);
 
     private:
         void mountFS(const FSConfig& fs);

@@ -48,9 +48,9 @@ namespace ArchViz
 
         VkApplicationInfo appInfo {};
         appInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName   = "Hello Triangle";
+        appInfo.pApplicationName   = "ArchViz";
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName        = "No Engine";
+        appInfo.pEngineName        = "ArchViz Engine";
         appInfo.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
         appInfo.apiVersion         = VK_API_VERSION_1_0;
 
@@ -165,6 +165,9 @@ namespace ArchViz
         create_info.pEnabledFeatures      = &device_features;
         create_info.enabledExtensionCount = 0;
 
+        create_info.enabledExtensionCount   = static_cast<uint32_t>(m_device_extensions.size());
+        create_info.ppEnabledExtensionNames = m_device_extensions.data();
+
         if (m_enable_validation_layers)
         {
             create_info.enabledLayerCount   = static_cast<uint32_t>(m_validation_layers.size());
@@ -187,6 +190,98 @@ namespace ArchViz
         vkGetDeviceQueue(m_device, indices.m_present_family.value(), 0, &m_present_queue);
     }
 
+    void VulkanRHI::createSwapChain()
+    {
+        SwapChainSupportDetails swap_chain_support = querySwapChainSupport(m_physical_device, m_surface);
+
+        VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(swap_chain_support.formats);
+        VkPresentModeKHR   present_mode   = chooseSwapPresentMode(swap_chain_support.presentModes);
+        VkExtent2D         extent        = chooseSwapExtent(swap_chain_support.capabilities, m_initialize_info.window_system->getWindow());
+
+        uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
+        if (swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
+        {
+            image_count = swap_chain_support.capabilities.maxImageCount;
+        }
+
+        VkSwapchainCreateInfoKHR create_info {};
+        create_info.sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        create_info.surface = m_surface;
+
+        create_info.minImageCount    = image_count;
+        create_info.imageFormat      = surface_format.format;
+        create_info.imageColorSpace  = surface_format.colorSpace;
+        create_info.imageExtent      = extent;
+        create_info.imageArrayLayers = 1;
+        create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        QueueFamilyIndices indices              = findQueueFamilies(m_physical_device, m_surface);
+        uint32_t           queueFamilyIndices[] = {indices.m_graphics_family.value(), indices.m_present_family.value()};
+
+        if (indices.m_graphics_family != indices.m_present_family)
+        {
+            create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+            create_info.queueFamilyIndexCount = 2;
+            create_info.pQueueFamilyIndices   = queueFamilyIndices;
+        }
+        else
+        {
+            create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        }
+
+        create_info.preTransform   = swap_chain_support.capabilities.currentTransform;
+        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        create_info.presentMode    = present_mode;
+        create_info.clipped        = VK_TRUE;
+
+        create_info.oldSwapchain = VK_NULL_HANDLE;
+
+        if (vkCreateSwapchainKHR(m_device, &create_info, nullptr, &m_swap_chain) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create swap chain!");
+        }
+
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, nullptr);
+        m_swap_chain_images.resize(image_count);
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, m_swap_chain_images.data());
+
+        m_swap_chain_image_format = surface_format.format;
+        m_swap_chain_extent       = extent;
+    }
+
+    void VulkanRHI::createImageViews()
+    {
+        m_swap_chain_image_views.resize(m_swap_chain_images.size());
+
+        for (size_t i = 0; i < m_swap_chain_images.size(); i++)
+        {
+            VkImageViewCreateInfo create_info {};
+            create_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            create_info.image                           = m_swap_chain_images[i];
+            create_info.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+            create_info.format                          = m_swap_chain_image_format;
+            create_info.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.a                    = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            create_info.subresourceRange.baseMipLevel   = 0;
+            create_info.subresourceRange.levelCount     = 1;
+            create_info.subresourceRange.baseArrayLayer = 0;
+            create_info.subresourceRange.layerCount     = 1;
+
+            if (vkCreateImageView(m_device, &create_info, nullptr, &m_swap_chain_image_views[i]) != VK_SUCCESS)
+            {
+                LOG_FATAL("failed to create image views!");
+            }
+        }
+    }
+
+    void VulkanRHI::createGraphicsPipeline()
+    {
+        
+    }
+
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
         m_initialize_info = initialize_info;
@@ -196,12 +291,21 @@ namespace ArchViz
         createSurface();
         pickPhysicalDevice();
         createLogicalDevice();
+        createSwapChain();
+        createImageViews();
+        createGraphicsPipeline();
     }
 
     void VulkanRHI::prepareContext() {}
 
     void VulkanRHI::clear()
     {
+        for (auto image_view : m_swap_chain_image_views)
+        {
+            vkDestroyImageView(m_device, image_view, nullptr);
+        }
+
+        vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
         vkDestroyDevice(m_device, nullptr);
 
         if (m_enable_validation_layers)

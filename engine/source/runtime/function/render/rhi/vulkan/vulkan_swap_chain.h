@@ -27,6 +27,7 @@ namespace ArchViz
 
     public:
         VkFormat        m_color_format;
+        VkExtent2D      m_extend;
         VkColorSpaceKHR m_color_space;
         VkSwapchainKHR  m_swap_chain = VK_NULL_HANDLE;
         uint32_t        m_image_count;

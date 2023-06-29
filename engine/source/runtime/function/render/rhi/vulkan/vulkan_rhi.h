@@ -39,9 +39,12 @@ namespace ArchViz
     private:
         void createInstance();
         void setupDebugMessenger();
+        void createSurface();
         void pickPhysicalDevice();
         void createLogicalDevice();
-        void createSurface();
+        void createSwapChain();
+        void createImageViews();
+        void createGraphicsPipeline();
 
     private:
         RHIInitInfo m_initialize_info;
@@ -60,6 +63,13 @@ namespace ArchViz
         VkQueue m_graphics_queue;
         VkQueue m_compute_queue;
         VkQueue m_present_queue;
+
+        VkSwapchainKHR m_swap_chain;
+        VkFormat       m_swap_chain_image_format;
+        VkExtent2D     m_swap_chain_extent;
+
+        std::vector<VkImage>     m_swap_chain_images;
+        std::vector<VkImageView> m_swap_chain_image_views;
 
         const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
         const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
