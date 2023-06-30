@@ -2,7 +2,6 @@
 #include "runtime/function/render/rhi/rhi.h"
 
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 
 #include <volk.h>
 
@@ -16,6 +15,8 @@ namespace ArchViz
     class ConfigManager;
     class VulkanDevice;
     class VulkanSwapChain;
+    class VulkanPipeline;
+    class VulkanRenderPass;
 
     class VulkanRHI : public RHI
     {
@@ -39,6 +40,7 @@ namespace ArchViz
         void createLogicalDevice();
         void createSwapChain();
         void createImageViews();
+        void createRenderPass();
         void createGraphicsPipeline();
 
     private:
@@ -54,15 +56,10 @@ namespace ArchViz
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice         m_device          = VK_NULL_HANDLE;
 
-        // QueueFamilyIndices m_indices;
-
-        // VkQueue m_graphics_queue;
-        // VkQueue m_compute_queue;
-        // VkQueue m_present_queue;
-
         std::shared_ptr<VulkanDevice>    m_vulkan_device;
         std::shared_ptr<VulkanSwapChain> m_vulkan_swap_chain;
 
+        VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;
 
         const bool m_enable_validation_layers = false;

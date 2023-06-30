@@ -26,6 +26,43 @@ namespace ArchViz
 
     void VulkanSwapChain::create(uint32_t width, uint32_t height, bool vsync, bool fullscreen)
     {
+        uint32_t format_count;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device, m_surface, &format_count, NULL);
+        ASSERT(format_count > 0);
+
+        std::vector<VkSurfaceFormatKHR> surface_formats(format_count);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device, m_surface, &format_count, surface_formats.data());
+
+        if ((format_count == 1) && (surface_formats[0].format == VK_FORMAT_UNDEFINED))
+        {
+            m_color_format = VK_FORMAT_B8G8R8A8_UNORM;
+            m_color_space  = surface_formats[0].colorSpace;
+        }
+        else
+        {
+            // iterate over the list of available surface format and
+            // check for the presence of VK_FORMAT_B8G8R8A8_UNORM
+            bool found_B8G8R8A8_UNORM = false;
+            for (auto&& surface_format : surface_formats)
+            {
+                if (surface_format.format == VK_FORMAT_B8G8R8A8_UNORM)
+                {
+                    m_color_format       = surface_format.format;
+                    m_color_space        = surface_format.colorSpace;
+                    found_B8G8R8A8_UNORM = true;
+                    break;
+                }
+            }
+
+            // in case VK_FORMAT_B8G8R8A8_UNORM is not available
+            // select the first available color format
+            if (!found_B8G8R8A8_UNORM)
+            {
+                m_color_format = surface_formats[0].format;
+                m_color_space  = surface_formats[0].colorSpace;
+            }
+        }
+
         SwapChainSupportDetails swap_chain_support = querySwapChainSupport(m_physical_device, m_surface);
 
         VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(swap_chain_support.formats);

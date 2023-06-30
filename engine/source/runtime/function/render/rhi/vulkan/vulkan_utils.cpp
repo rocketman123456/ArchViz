@@ -3,6 +3,7 @@
 
 #include "runtime/core/base/macro.h"
 
+#include <iostream>
 #include <set>
 #include <string>
 
@@ -13,8 +14,8 @@ namespace ArchViz
                                                         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
                                                         void*                                       pUserData)
     {
-        LOG_ERROR("validation layer: {}", pCallbackData->pMessage);
-        // std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+        LOG_ERROR("[Vulkan] validation layer: {}", pCallbackData->pMessage);
+        std::cerr << "[Vulkan] validation layer: " << pCallbackData->pMessage << std::endl;
         return VK_FALSE;
     }
 
@@ -159,6 +160,11 @@ namespace ArchViz
             if (queue_family.queueFlags & VK_QUEUE_COMPUTE_BIT) // if support compute command queue
             {
                 indices.m_compute_family = i;
+            }
+
+            if (queue_family.queueFlags & VK_QUEUE_TRANSFER_BIT)
+            {
+                indices.m_transfer_family = i;
             }
 
             VkBool32 present_support = false;

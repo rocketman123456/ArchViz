@@ -87,7 +87,7 @@ namespace ArchViz
             {
                 for (auto ext : extensions)
                 {
-                    LOG_DEBUG("supported vulkan extensions: {}", ext.extensionName);
+                    //LOG_DEBUG("supported vulkan extensions: {}", ext.extensionName);
                     m_supported_extensions.push_back(ext.extensionName);
                 }
             }

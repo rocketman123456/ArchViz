@@ -30,6 +30,7 @@ namespace ArchViz
         VkSwapchainKHR  m_swap_chain = VK_NULL_HANDLE;
         VkExtent2D      m_swap_chain_extent;
         VkFormat        m_swap_chain_image_format;
+        VkFormat        m_color_format;
         VkColorSpaceKHR m_color_space;
         uint32_t        m_image_count;
         uint32_t        m_queue_node_index = UINT32_MAX;
