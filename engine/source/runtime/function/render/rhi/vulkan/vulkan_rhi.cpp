@@ -1,7 +1,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
 #include "runtime/function/window/window_system.h"
 
@@ -37,6 +37,18 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 namespace ArchViz
 {
+    void VulkanRHI::setConfigManager(std::shared_ptr<ConfigManager> config_manager)
+    {
+        ASSERT(config_manager);
+        m_config_manager = config_manager;
+    }
+
+    void VulkanRHI::setAssetManager(std::shared_ptr<AssetManager> asset_manager)
+    {
+        ASSERT(asset_manager);
+        m_asset_manager = asset_manager;
+    }
+
     void VulkanRHI::createInstance()
     {
         if (volkInitialize() != VK_SUCCESS)
@@ -104,10 +116,10 @@ namespace ArchViz
 
     void VulkanRHI::createSurface()
     {
-        if (glfwCreateWindowSurface(m_instance, m_initialize_info.window_system->getWindow(), nullptr, &m_surface) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create window surface!");
-        }
+        m_vulkan_swap_chain = std::make_shared<VulkanSwapChain>();
+        m_vulkan_swap_chain->connect(m_instance, VK_NULL_HANDLE, VK_NULL_HANDLE);
+        m_vulkan_swap_chain->initSurface(m_initialize_info.window_system->getWindow());
+        m_surface = m_vulkan_swap_chain->m_surface;
     }
 
     void VulkanRHI::pickPhysicalDevice()
@@ -193,96 +205,36 @@ namespace ArchViz
         vkGetDeviceQueue(m_device, indices.m_graphics_family.value(), 0, &m_graphics_queue);
         vkGetDeviceQueue(m_device, indices.m_compute_family.value(), 0, &m_compute_queue);
         vkGetDeviceQueue(m_device, indices.m_present_family.value(), 0, &m_present_queue);
+
+        m_vulkan_device->m_logical_device = m_device;
     }
 
     void VulkanRHI::createSwapChain()
     {
-        SwapChainSupportDetails swap_chain_support = querySwapChainSupport(m_physical_device, m_surface);
+        uint32_t width  = m_initialize_info.window_system->getWindowSize()[0];
+        uint32_t height = m_initialize_info.window_system->getWindowSize()[1];
 
-        VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(swap_chain_support.formats);
-        VkPresentModeKHR   present_mode   = chooseSwapPresentMode(swap_chain_support.presentModes);
-        VkExtent2D         extent         = chooseSwapExtent(swap_chain_support.capabilities, m_initialize_info.window_system->getWindow());
-
-        uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
-        if (swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
-        {
-            image_count = swap_chain_support.capabilities.maxImageCount;
-        }
-
-        VkSwapchainCreateInfoKHR create_info {};
-        create_info.sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        create_info.surface = m_surface;
-
-        create_info.minImageCount    = image_count;
-        create_info.imageFormat      = surface_format.format;
-        create_info.imageColorSpace  = surface_format.colorSpace;
-        create_info.imageExtent      = extent;
-        create_info.imageArrayLayers = 1;
-        create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-        QueueFamilyIndices indices              = findQueueFamilies(m_physical_device, m_surface);
-        uint32_t           queueFamilyIndices[] = {indices.m_graphics_family.value(), indices.m_present_family.value()};
-
-        if (indices.m_graphics_family != indices.m_present_family)
-        {
-            create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
-            create_info.queueFamilyIndexCount = 2;
-            create_info.pQueueFamilyIndices   = queueFamilyIndices;
-        }
-        else
-        {
-            create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        }
-
-        create_info.preTransform   = swap_chain_support.capabilities.currentTransform;
-        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        create_info.presentMode    = present_mode;
-        create_info.clipped        = VK_TRUE;
-
-        create_info.oldSwapchain = VK_NULL_HANDLE;
-
-        if (vkCreateSwapchainKHR(m_device, &create_info, nullptr, &m_swap_chain) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create swap chain!");
-        }
-
-        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, nullptr);
-        m_swap_chain_images.resize(image_count);
-        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, m_swap_chain_images.data());
-
-        m_swap_chain_image_format = surface_format.format;
-        m_swap_chain_extent       = extent;
+        m_vulkan_swap_chain->connect(m_instance, m_physical_device, m_device);
+        m_vulkan_swap_chain->create(width, height, false, false);
     }
 
-    void VulkanRHI::createImageViews()
+    void VulkanRHI::createImageViews() {}
+
+    void VulkanRHI::createGraphicsPipeline()
     {
-        m_swap_chain_image_views.resize(m_swap_chain_images.size());
+        ShaderModuleConfig config;
+        config.m_vert_shader = "shader/glsl/shader_base.vert";
+        config.m_frag_shader = "shader/glsl/shader_base.frag";
 
-        for (size_t i = 0; i < m_swap_chain_images.size(); i++)
-        {
-            VkImageViewCreateInfo create_info {};
-            create_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            create_info.image                           = m_swap_chain_images[i];
-            create_info.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
-            create_info.format                          = m_swap_chain_image_format;
-            create_info.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.a                    = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
-            create_info.subresourceRange.baseMipLevel   = 0;
-            create_info.subresourceRange.levelCount     = 1;
-            create_info.subresourceRange.baseArrayLayer = 0;
-            create_info.subresourceRange.layerCount     = 1;
+        VulkanShader shader(config);
 
-            if (vkCreateImageView(m_device, &create_info, nullptr, &m_swap_chain_image_views[i]) != VK_SUCCESS)
-            {
-                LOG_FATAL("failed to create image views!");
-            }
-        }
+        shader.m_device         = m_vulkan_device;
+        shader.m_config_manager = m_config_manager;
+        shader.m_asset_manager  = m_asset_manager;
+
+        shader.initialize();
+        shader.clear();
     }
-
-    void VulkanRHI::createGraphicsPipeline() {}
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
@@ -302,20 +254,16 @@ namespace ArchViz
 
     void VulkanRHI::clear()
     {
-        for (auto image_view : m_swap_chain_image_views)
-        {
-            vkDestroyImageView(m_device, image_view, nullptr);
-        }
+        m_vulkan_swap_chain->cleanup();
+        m_vulkan_swap_chain.reset();
 
-        vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
-        vkDestroyDevice(m_device, nullptr);
+        m_vulkan_device.reset();
 
         if (m_enable_validation_layers)
         {
             DestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
         }
 
-        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         vkDestroyInstance(m_instance, nullptr);
     }
 } // namespace ArchViz

@@ -4,6 +4,8 @@
 
 #include "runtime/core/base/macro.h"
 
+#include <set>
+
 namespace ArchViz
 {
     void VulkanSwapChain::initSurface(GLFWwindow* window)
@@ -22,7 +24,7 @@ namespace ArchViz
         m_device          = device;
     }
 
-    void VulkanSwapChain::create(uint32_t& width, uint32_t& height, bool vsync, bool fullscreen)
+    void VulkanSwapChain::create(uint32_t width, uint32_t height, bool vsync, bool fullscreen)
     {
         SwapChainSupportDetails swap_chain_support = querySwapChainSupport(m_physical_device, m_surface);
 
@@ -49,8 +51,6 @@ namespace ArchViz
         {
             // If the surface size is defined, the swap chain size must match
             m_swap_chain_extent = swap_chain_support.capabilities.currentExtent;
-            width               = swap_chain_support.capabilities.currentExtent.width;
-            height              = swap_chain_support.capabilities.currentExtent.height;
         }
 
         VkSwapchainCreateInfoKHR create_info {};
@@ -63,14 +63,19 @@ namespace ArchViz
         create_info.imageArrayLayers = 1;
         create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        QueueFamilyIndices indices              = findQueueFamilies(m_physical_device, m_surface);
-        uint32_t           queueFamilyIndices[] = {indices.m_graphics_family.value(), indices.m_present_family.value()};
+        m_indices                            = findQueueFamilies(m_physical_device, m_surface);
+        std::set<uint32_t>    queue_families = {m_indices.m_graphics_family.value(), m_indices.m_present_family.value(), m_indices.m_compute_family.value()};
+        std::vector<uint32_t> families;
+        for (auto family : queue_families)
+        {
+            families.push_back(family);
+        }
 
-        if (indices.m_graphics_family != indices.m_present_family)
+        if (families.size() > 1)
         {
             create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
-            create_info.queueFamilyIndexCount = 2;
-            create_info.pQueueFamilyIndices   = queueFamilyIndices;
+            create_info.queueFamilyIndexCount = static_cast<uint32_t>(families.size());
+            create_info.pQueueFamilyIndices   = families.data();
         }
         else
         {

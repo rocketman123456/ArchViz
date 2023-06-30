@@ -185,7 +185,7 @@ namespace ArchViz
         void setThreadCount(uint32_t count)
         {
             m_threads.clear();
-            for (auto i = 0; i < count; i++)
+            for (uint32_t i = 0; i < count; i++)
             {
                 m_threads.push_back(make_unique<Thread>());
             }

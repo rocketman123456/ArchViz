@@ -29,6 +29,8 @@ namespace ArchViz
         rhi_init_info.window_system = init_info.window_system;
 
         m_rhi = std::make_shared<VulkanRHI>();
+        m_rhi->setConfigManager(m_config_manager);
+        m_rhi->setAssetManager(m_asset_manager);
         m_rhi->initialize(rhi_init_info);
     }
 

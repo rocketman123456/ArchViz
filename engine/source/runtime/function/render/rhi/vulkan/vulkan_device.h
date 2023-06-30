@@ -16,9 +16,9 @@ namespace ArchViz
 
     public:
         /** @brief Physical device representation */
-        VkPhysicalDevice m_physical_device;
+        VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         /** @brief Logical device representation (application's view of the device) */
-        VkDevice m_logical_device;
+        VkDevice m_logical_device = VK_NULL_HANDLE;
         /** @brief Properties of the physical device including limits that the application can check against */
         VkPhysicalDeviceProperties m_properties;
         /** @brief Features of the physical device that an application can use to check if a feature is supported */

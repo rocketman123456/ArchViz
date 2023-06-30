@@ -2,9 +2,6 @@
 #include "runtime/function/render/render_data.h"
 #include "runtime/function/render/render_type.h"
 
-#include "runtime/resource/asset_manager/asset_manager.h"
-#include "runtime/resource/config_manager/config_manager.h"
-
 #include <array>
 #include <memory>
 #include <optional>
@@ -13,6 +10,8 @@ namespace ArchViz
 {
     class WindowSystem;
     class RHI;
+    class ConfigManager;
+    class AssetManager;
 
     struct RenderSystemInitInfo
     {
