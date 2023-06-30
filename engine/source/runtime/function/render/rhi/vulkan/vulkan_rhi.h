@@ -1,6 +1,7 @@
 #pragma once
 #include "runtime/function/render/rhi/rhi.h"
 
+#include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 
 #include <volk.h>
@@ -49,25 +50,24 @@ namespace ArchViz
 
         VkInstance               m_instance;
         VkDebugUtilsMessengerEXT m_debug_messenger;
+        VkSurfaceKHR             m_surface;
 
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice         m_device          = VK_NULL_HANDLE;
 
-        QueueFamilyIndices m_indices;
+        // QueueFamilyIndices m_indices;
 
-        VkSurfaceKHR m_surface;
-
-        VkQueue m_graphics_queue;
-        VkQueue m_compute_queue;
-        VkQueue m_present_queue;
+        // VkQueue m_graphics_queue;
+        // VkQueue m_compute_queue;
+        // VkQueue m_present_queue;
 
         std::shared_ptr<VulkanDevice>    m_vulkan_device;
         std::shared_ptr<VulkanSwapChain> m_vulkan_swap_chain;
 
         VkPipelineLayout m_pipeline_layout;
 
-        const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
-        const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        // const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+        // const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
         const bool m_enable_validation_layers = false;
     };

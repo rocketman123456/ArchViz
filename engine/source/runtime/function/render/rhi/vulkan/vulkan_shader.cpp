@@ -36,7 +36,7 @@ namespace ArchViz
         if (file.size() > 0)
         {
             std::vector<uint32_t> spv = VulkanShaderUtils::createShaderModuleFromFile(file, m_config_manager, m_asset_manager);
-            shader                    = VulkanShaderUtils::createShaderModule(m_device->m_logical_device, spv);
+            shader                    = VulkanShaderUtils::createShaderModule(m_device->m_device, spv);
         }
     }
 
@@ -44,7 +44,7 @@ namespace ArchViz
     {
         if (shader != VK_NULL_HANDLE)
         {
-            vkDestroyShaderModule(m_device->m_logical_device, shader, nullptr);
+            vkDestroyShaderModule(m_device->m_device, shader, nullptr);
             shader = VK_NULL_HANDLE;
         }
     }

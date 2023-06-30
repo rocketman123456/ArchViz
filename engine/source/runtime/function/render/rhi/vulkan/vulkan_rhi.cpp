@@ -152,89 +152,17 @@ namespace ArchViz
 
     void VulkanRHI::pickPhysicalDevice()
     {
-        uint32_t device_count = 0;
-        vkEnumeratePhysicalDevices(m_instance, &device_count, nullptr);
+        m_vulkan_device = std::make_shared<VulkanDevice>(m_enable_validation_layers);
+        m_vulkan_device->connect(m_instance, m_surface);
+        m_vulkan_device->initialize();
 
-        if (device_count == 0)
-        {
-            LOG_FATAL("failed to find GPUs with Vulkan support!");
-        }
-
-        std::vector<VkPhysicalDevice> devices(device_count);
-        vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
-
-        for (const auto& device : devices)
-        {
-            bool suitable  = isDeviceSuitable(device, m_surface);
-            bool extension = checkDeviceExtensionSupport(device, m_device_extensions);
-            bool adequate  = isSwapChainAdequate(device, m_surface, extension);
-            if (suitable && extension && adequate)
-            {
-                m_physical_device = device;
-                break;
-            }
-        }
-
-        if (m_physical_device == VK_NULL_HANDLE)
-        {
-            LOG_FATAL("failed to find a suitable GPU!");
-        }
-
-        m_vulkan_device = std::make_shared<VulkanDevice>(m_physical_device);
+        m_physical_device = m_vulkan_device->m_physical_device;
+        m_device = m_vulkan_device->m_device;
     }
 
     void VulkanRHI::createLogicalDevice()
     {
-        QueueFamilyIndices indices = findQueueFamilies(m_physical_device, m_surface);
-
-        std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-        std::set<uint32_t> unique_queue_families = {indices.m_graphics_family.value(), indices.m_compute_family.value(), indices.m_present_family.value()};
-
-        float queuePriority = 1.0f;
-        for (uint32_t queueFamily : unique_queue_families)
-        {
-            VkDeviceQueueCreateInfo queue_create_info {};
-            queue_create_info.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-            queue_create_info.queueFamilyIndex = queueFamily;
-            queue_create_info.queueCount       = 1;
-            queue_create_info.pQueuePriorities = &queuePriority;
-            queue_create_infos.push_back(queue_create_info);
-        }
-
-        VkPhysicalDeviceFeatures device_features {};
-
-        VkDeviceCreateInfo create_info {};
-        create_info.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        create_info.pQueueCreateInfos     = queue_create_infos.data();
-        create_info.queueCreateInfoCount  = static_cast<uint32_t>(queue_create_infos.size());
-        create_info.pEnabledFeatures      = &device_features;
-        create_info.enabledExtensionCount = 0;
-
-        create_info.enabledExtensionCount   = static_cast<uint32_t>(m_device_extensions.size());
-        create_info.ppEnabledExtensionNames = m_device_extensions.data();
-
-        if (m_enable_validation_layers)
-        {
-            create_info.enabledLayerCount   = static_cast<uint32_t>(m_validation_layers.size());
-            create_info.ppEnabledLayerNames = m_validation_layers.data();
-        }
-        else
-        {
-            create_info.enabledLayerCount = 0;
-        }
-
-        if (vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create logical device!");
-        }
-
-        volkLoadDevice(m_device);
-
-        vkGetDeviceQueue(m_device, indices.m_graphics_family.value(), 0, &m_graphics_queue);
-        vkGetDeviceQueue(m_device, indices.m_compute_family.value(), 0, &m_compute_queue);
-        vkGetDeviceQueue(m_device, indices.m_present_family.value(), 0, &m_present_queue);
-
-        m_vulkan_device->m_logical_device = m_device;
+        m_device = m_vulkan_device->m_device;
     }
 
     void VulkanRHI::createSwapChain()
@@ -285,6 +213,7 @@ namespace ArchViz
         m_vulkan_swap_chain->cleanup();
         m_vulkan_swap_chain.reset();
 
+        m_vulkan_device->cleanup();
         m_vulkan_device.reset();
 
         if (m_enable_validation_layers)

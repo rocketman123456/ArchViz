@@ -1,5 +1,7 @@
 #pragma once
 
+#include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
+
 #include <volk.h>
 
 #include <cstdint>
@@ -11,35 +13,40 @@ namespace ArchViz
     class VulkanDevice
     {
     public:
-        explicit VulkanDevice(VkPhysicalDevice physical_device);
-        ~VulkanDevice();
+        explicit VulkanDevice(bool enable_validation) : m_enable_validation_layers(enable_validation) {}
+
+        void connect(VkInstance instance, VkSurfaceKHR surface);
+        void initialize();
+        void cleanup();
+
+    private:
+        void pickPhysicalDevice();
+        void createLogicalDevice();
 
     public:
-        /** @brief Physical device representation */
+        bool             m_enable_validation_layers;
+        VkInstance       m_instance;
+        VkSurfaceKHR     m_surface;
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
-        /** @brief Logical device representation (application's view of the device) */
-        VkDevice m_logical_device = VK_NULL_HANDLE;
-        /** @brief Properties of the physical device including limits that the application can check against */
-        VkPhysicalDeviceProperties m_properties;
-        /** @brief Features of the physical device that an application can use to check if a feature is supported */
-        VkPhysicalDeviceFeatures m_features;
-        /** @brief Features that have been enabled for use on the physical device */
-        VkPhysicalDeviceFeatures m_enabled_features;
-        /** @brief Memory types and heaps of the physical device */
-        VkPhysicalDeviceMemoryProperties m_memory_properties;
-        /** @brief Queue family properties of the physical device */
+        VkDevice         m_device  = VK_NULL_HANDLE;
+
+        VkPhysicalDeviceProperties           m_properties;
+        VkPhysicalDeviceFeatures             m_features;
+        VkPhysicalDeviceFeatures             m_enabled_features;
+        VkPhysicalDeviceMemoryProperties     m_memory_properties;
         std::vector<VkQueueFamilyProperties> m_queue_family_properties;
-        /** @brief List of extensions supported by the device */
-        std::vector<std::string> m_supported_extensions;
-        /** @brief Default command pool for the graphics queue family index */
+        std::vector<std::string>             m_supported_extensions;
+
         VkCommandPool m_command_pool = VK_NULL_HANDLE;
-        /** @brief Contains queue family indices */
-        struct QueueFamilyIndices
-        {
-            uint32_t m_graphics;
-            uint32_t m_compute;
-            uint32_t m_transfer;
-        } m_queue_family_indices;
+
+        QueueFamilyIndices m_indices;
+
+        VkQueue m_graphics_queue;
+        VkQueue m_compute_queue;
+        VkQueue m_present_queue;
+
+        const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+        const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
         // TODO
     };
