@@ -45,9 +45,6 @@ namespace ArchViz
         VkQueue m_compute_queue;
         VkQueue m_present_queue;
 
-        const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
-        const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-
         // TODO
     };
 } // namespace ArchViz

@@ -41,11 +41,10 @@ namespace ArchViz
         void createImageViews();
         void createGraphicsPipeline();
 
-    public:
+    private:
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
 
-    private:
         RHIInitInfo m_initialize_info;
 
         VkInstance               m_instance;
@@ -65,9 +64,6 @@ namespace ArchViz
         std::shared_ptr<VulkanSwapChain> m_vulkan_swap_chain;
 
         VkPipelineLayout m_pipeline_layout;
-
-        // const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
-        // const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
         const bool m_enable_validation_layers = false;
     };

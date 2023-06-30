@@ -49,7 +49,7 @@ namespace ArchViz
         for (const auto& device : devices)
         {
             bool suitable  = isDeviceSuitable(device, m_surface);
-            bool extension = checkDeviceExtensionSupport(device, m_device_extensions);
+            bool extension = checkDeviceExtensionSupport(device, VulkanConstants::device_extensions);
             bool adequate  = isSwapChainAdequate(device, m_surface, extension);
             if (suitable && extension && adequate)
             {
@@ -122,13 +122,13 @@ namespace ArchViz
         create_info.pEnabledFeatures      = &device_features;
         create_info.enabledExtensionCount = 0;
 
-        create_info.enabledExtensionCount   = static_cast<uint32_t>(m_device_extensions.size());
-        create_info.ppEnabledExtensionNames = m_device_extensions.data();
+        create_info.enabledExtensionCount   = static_cast<uint32_t>(VulkanConstants::device_extensions.size());
+        create_info.ppEnabledExtensionNames = VulkanConstants::device_extensions.data();
 
         if (m_enable_validation_layers)
         {
-            create_info.enabledLayerCount   = static_cast<uint32_t>(m_validation_layers.size());
-            create_info.ppEnabledLayerNames = m_validation_layers.data();
+            create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
+            create_info.ppEnabledLayerNames = VulkanConstants::validation_layers.data();
         }
         else
         {

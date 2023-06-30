@@ -84,7 +84,7 @@ namespace ArchViz
             LOG_FATAL("failed to initialize volk!");
         }
 
-        if (m_enable_validation_layers && !checkValidationLayerSupport(m_validation_layers))
+        if (m_enable_validation_layers && !checkValidationLayerSupport(VulkanConstants::validation_layers))
         {
             LOG_FATAL("validation layers requested, but not available!");
         }
@@ -108,8 +108,8 @@ namespace ArchViz
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
         if (m_enable_validation_layers)
         {
-            create_info.enabledLayerCount   = static_cast<uint32_t>(m_validation_layers.size());
-            create_info.ppEnabledLayerNames = m_validation_layers.data();
+            create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
+            create_info.ppEnabledLayerNames = VulkanConstants::validation_layers.data();
 
             populateDebugMessengerCreateInfo(debugCreateInfo);
             create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;

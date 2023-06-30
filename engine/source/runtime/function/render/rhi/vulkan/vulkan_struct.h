@@ -7,6 +7,12 @@
 
 namespace ArchViz
 {
+    struct VulkanConstants
+    {
+        static const std::vector<const char*> validation_layers;
+        static const std::vector<const char*> device_extensions;
+    };
+
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> m_graphics_family;

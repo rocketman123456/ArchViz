@@ -44,7 +44,6 @@ namespace ArchViz
 
         std::shared_ptr<VulkanDevice> m_device;
 
-    private:
         ShaderModuleConfig m_config;
 
         VkShaderModule m_vert_shader = VK_NULL_HANDLE;
