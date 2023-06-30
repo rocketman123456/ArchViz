@@ -297,6 +297,27 @@ namespace ArchViz
             LOG_FATAL("failed to create pipeline layout!")
         }
 
+        VkGraphicsPipelineCreateInfo pipeline_info {};
+        pipeline_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipeline_info.stageCount          = 2;
+        pipeline_info.pStages             = shaderStages;
+        pipeline_info.pVertexInputState   = &vertex_input_info;
+        pipeline_info.pInputAssemblyState = &input_assembly;
+        pipeline_info.pViewportState      = &viewport_state;
+        pipeline_info.pRasterizationState = &rasterizer;
+        pipeline_info.pMultisampleState   = &multisampling;
+        pipeline_info.pColorBlendState    = &color_blending;
+        pipeline_info.pDynamicState       = &dynamic_state;
+        pipeline_info.layout              = m_pipeline_layout;
+        pipeline_info.renderPass          = m_render_pass;
+        pipeline_info.subpass             = 0;
+        pipeline_info.basePipelineHandle  = VK_NULL_HANDLE;
+
+        if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_pipeline) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create graphics pipeline!");
+        }
+
         shader.clear();
     }
 
@@ -321,7 +342,9 @@ namespace ArchViz
 
     void VulkanRHI::clear()
     {
+        vkDestroyPipeline(m_device, m_pipeline, nullptr);
         vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
+        vkDestroyRenderPass(m_device, m_render_pass, nullptr);
 
         m_vulkan_swap_chain->cleanup();
         m_vulkan_swap_chain.reset();

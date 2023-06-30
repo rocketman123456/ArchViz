@@ -51,7 +51,9 @@ namespace ArchViz
         return EShLangVertex;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromVFS(const std::string&             shader_file,
+                                                                        std::shared_ptr<ConfigManager> config_manager,
+                                                                        std::shared_ptr<AssetManager>  asset_manager)
     {
         std::filesystem::path root_path        = config_manager->getRootFolder();
         std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
@@ -59,7 +61,7 @@ namespace ArchViz
         LOG_DEBUG("open shader: " + shader_file_path.generic_string());
 
         std::string shader_code = "";
-        //asset_manager->readTextFile(shader_file_path, shader_code);
+        // asset_manager->readTextFile(shader_file_path, shader_code);
         asset_manager->readVFSTextFile(shader_file, shader_code);
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_file.c_str());
@@ -159,9 +161,120 @@ namespace ArchViz
         return spirv;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string&             shader_file,
+                                                                        std::shared_ptr<ConfigManager> config_manager,
+                                                                        std::shared_ptr<AssetManager>  asset_manager)
     {
-        std::filesystem::path root_path   = config_manager->getRootFolder();
+        std::filesystem::path root_path        = config_manager->getRootFolder();
+        std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
+        std::filesystem::path include_path     = root_path / "shader" / "include";
+        LOG_DEBUG("open shader: " + shader_file_path.generic_string());
+
+        std::string shader_code = "";
+        // asset_manager->readTextFile(shader_file_path, shader_code);
+        asset_manager->readTextFile(shader_file, shader_code);
+
+        EShLanguage stage = shaderLanguageStageFromFileName(shader_file.c_str());
+
+        VulkanHeaderIncluder includer;
+        includer.pushExternalLocalDirectory(include_path.generic_string());
+
+        auto client          = glslang::EShClientVulkan;
+        auto client_version  = glslang::EShTargetVulkan_1_0;
+        auto target_language = glslang::EShTargetSpv;
+        auto target_version  = glslang::EShTargetSpv_1_0;
+        auto messages        = EShMsgDefault;
+
+        glslang::InitializeProcess();
+
+        glslang::TProgram* program = new glslang::TProgram;
+        glslang::TShader*  shader  = new glslang::TShader(stage);
+
+        const char* file_names[]   = {shader_file.c_str()};
+        const char* shader_codes[] = {shader_code.c_str()};
+        shader->setStringsWithLengthsAndNames(shader_codes, NULL, file_names, 1);
+
+        std::string              preamble_str = "";
+        std::vector<std::string> processes    = {};
+
+        shader->setPreamble(preamble_str.c_str());
+        shader->addProcesses(processes);
+
+        shader->setEnvInput(glslang::EShSourceGlsl, stage, client, 100);
+        shader->setEnvClient(client, client_version);
+        shader->setEnvTarget(target_language, target_version);
+
+        const TBuiltInResource* resources      = GetDefaultResources();
+        const int               defaultVersion = 100;
+        std::string             str;
+
+        if (!shader->preprocess(resources, defaultVersion, ENoProfile, false, false, messages, &str, includer))
+        {
+            LOG_ERROR(shader->getInfoLog());
+            LOG_ERROR(shader->getInfoDebugLog());
+            throw std::runtime_error(shader->getInfoLog());
+        }
+
+        if (!shader->parse(resources, defaultVersion, false, messages, includer))
+        {
+            LOG_ERROR(shader->getInfoLog());
+            LOG_ERROR(shader->getInfoDebugLog());
+            throw std::runtime_error(shader->getInfoLog());
+        }
+
+        program->addShader(shader);
+
+        if (!program->link(messages))
+        {
+            LOG_ERROR(program->getInfoLog());
+            LOG_ERROR(program->getInfoDebugLog());
+            throw std::runtime_error(program->getInfoLog());
+        }
+
+        if (!program->mapIO())
+        {
+            LOG_ERROR(program->getInfoLog());
+            LOG_ERROR(program->getInfoDebugLog());
+            throw std::runtime_error(program->getInfoLog());
+        }
+
+        bool SpvToolsDisassembler = false;
+        bool SpvToolsValidate     = false;
+
+        std::vector<uint32_t> spirv;
+        if (program->getIntermediate(stage))
+        {
+            spv::SpvBuildLogger logger;
+            glslang::SpvOptions spvOptions;
+            spvOptions.stripDebugInfo   = true;
+            spvOptions.disableOptimizer = true;
+            spvOptions.optimizeSize     = true;
+            spvOptions.disassemble      = SpvToolsDisassembler;
+            spvOptions.validate         = SpvToolsValidate;
+            glslang::GlslangToSpv(*program->getIntermediate((EShLanguage)stage), spirv, &logger, &spvOptions);
+        }
+        else
+        {
+            throw std::runtime_error("cannot find target shader");
+        }
+
+        glslang::FinalizeProcess();
+
+        delete shader;
+        delete program;
+
+        // copy data to unsigned char;
+        // std::vector<unsigned char> spirv_char;
+        // spirv_char.resize(spirv.size() * sizeof(unsigned int));
+        // memcpy(spirv_char.data(), spirv.data(), spirv_char.size());
+
+        return spirv;
+    }
+
+    std::vector<uint32_t>
+    VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager)
+    {
+        std::filesystem::path root_path    = config_manager->getRootFolder();
         std::filesystem::path include_path = root_path / "shader" / "include";
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_type.c_str());

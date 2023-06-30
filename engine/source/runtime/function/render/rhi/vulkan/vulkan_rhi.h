@@ -61,6 +61,7 @@ namespace ArchViz
 
         VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;
+        VkPipeline       m_pipeline;
 
         const bool m_enable_validation_layers = false;
     };
