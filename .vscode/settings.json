@@ -113,7 +113,8 @@
         "xutility": "cpp",
         "regex": "cpp",
         "valarray": "cpp",
-        "alignedvector3": "cpp"
+        "alignedvector3": "cpp",
+        "typeindex": "cpp"
     },
     "cmake.automaticReconfigure": false,
     "C_Cpp.default.includePath": [

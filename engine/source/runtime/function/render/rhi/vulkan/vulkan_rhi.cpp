@@ -11,6 +11,18 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#if defined(__GNUC__)
+// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+#if defined(__linux__)
+#include <stdlib.h>
+#elif defined(__MACH__)
+// https://developer.apple.com/library/archive/documentation/Porting/Conceptual/PortingUnix/compiling/compiling.html
+#include <stdlib.h>
+#else
+#error Unknown Platform
+#endif
+#endif
+
 #include <memory>
 #include <set>
 
@@ -51,6 +63,22 @@ namespace ArchViz
 
     void VulkanRHI::createInstance()
     {
+#if defined(__GNUC__)
+        // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+#if defined(__linux__)
+        char const* vk_layer_path = ARCHVIZ_XSTR(PICCOLO_VK_LAYER_PATH);
+        setenv("VK_LAYER_PATH", vk_layer_path, 1);
+#elif defined(__MACH__)
+        // https://developer.apple.com/library/archive/documentation/Porting/Conceptual/PortingUnix/compiling/compiling.html
+        char const* vk_layer_path    = ARCHVIZ_XSTR(ARCHVIZ_VK_LAYER_PATH);
+        char const* vk_icd_filenames = ARCHVIZ_XSTR(ARCHVIZ_VK_ICD_FILENAMES);
+        setenv("VK_LAYER_PATH", vk_layer_path, 1);
+        setenv("VK_ICD_FILENAMES", vk_icd_filenames, 1);
+#else
+#error Unknown Platform
+#endif
+#endif
+
         if (volkInitialize() != VK_SUCCESS)
         {
             LOG_FATAL("failed to initialize volk!");
@@ -61,17 +89,17 @@ namespace ArchViz
             LOG_FATAL("validation layers requested, but not available!");
         }
 
-        VkApplicationInfo appInfo {};
-        appInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName   = "ArchViz";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName        = "ArchViz Engine";
-        appInfo.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion         = VK_API_VERSION_1_0;
+        VkApplicationInfo app_info {};
+        app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        app_info.pApplicationName   = "ArchViz";
+        app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        app_info.pEngineName        = "ArchViz Engine";
+        app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
+        app_info.apiVersion         = VK_API_VERSION_1_0;
 
         VkInstanceCreateInfo create_info {};
         create_info.sType            = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        create_info.pApplicationInfo = &appInfo;
+        create_info.pApplicationInfo = &app_info;
 
         auto extensions                     = getRequiredExtensions(m_enable_validation_layers);
         create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());

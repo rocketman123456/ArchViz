@@ -64,12 +64,7 @@ namespace ArchViz
         std::shared_ptr<VulkanDevice>    m_vulkan_device;
         std::shared_ptr<VulkanSwapChain> m_vulkan_swap_chain;
 
-        // VkSwapchainKHR m_swap_chain;
-        // VkFormat       m_swap_chain_image_format;
-        // VkExtent2D     m_swap_chain_extent;
-
-        // std::vector<VkImage>     m_swap_chain_images;
-        // std::vector<VkImageView> m_swap_chain_image_views;
+        VkPipelineLayout m_pipeline_layout;
 
         const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
         const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
