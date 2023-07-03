@@ -21,7 +21,7 @@ namespace ArchViz
         createLogicalDevice();
     }
 
-    void VulkanDevice::cleanup()
+    void VulkanDevice::clear()
     {
         if (m_command_pool)
         {

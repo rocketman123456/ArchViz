@@ -114,12 +114,14 @@
         "regex": "cpp",
         "valarray": "cpp",
         "alignedvector3": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "hash_map": "cpp"
     },
     "cmake.automaticReconfigure": false,
     "C_Cpp.default.includePath": [
-        "C:/Users/RoccketSky/Desktop/Engine/ArchViz/engine/source",
-        "~/Program/CppCode/ArchViz/engine/source"
+        "${workspaceFolder}/engine/3rd_party/volk",
+        "${workspaceFolder}/engine/source",
+        "~/Library/vcpkg/install/x64-osx/include"
     ],
     "dotnetAcquisitionExtension.installTimeoutValue": 180
 }

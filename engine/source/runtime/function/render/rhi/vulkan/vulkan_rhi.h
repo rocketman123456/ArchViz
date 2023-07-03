@@ -56,8 +56,10 @@ namespace ArchViz
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice         m_device          = VK_NULL_HANDLE;
 
-        std::shared_ptr<VulkanDevice>    m_vulkan_device;
-        std::shared_ptr<VulkanSwapChain> m_vulkan_swap_chain;
+        std::shared_ptr<VulkanDevice>     m_vulkan_device;
+        std::shared_ptr<VulkanSwapChain>  m_vulkan_swap_chain;
+        std::shared_ptr<VulkanPipeline>   m_vulkan_pipeline;
+        std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
 
         VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;

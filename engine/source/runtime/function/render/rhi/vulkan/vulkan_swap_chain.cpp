@@ -176,7 +176,7 @@ namespace ArchViz
         }
     }
 
-    void VulkanSwapChain::cleanup()
+    void VulkanSwapChain::clear()
     {
         if (m_swap_chain != VK_NULL_HANDLE)
         {

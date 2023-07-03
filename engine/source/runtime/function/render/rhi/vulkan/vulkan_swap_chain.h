@@ -20,7 +20,7 @@ namespace ArchViz
         void initSurface(GLFWwindow* window);
         void connect(VkInstance instance, VkPhysicalDevice physical_device, VkDevice device);
         void create(uint32_t width, uint32_t height, bool vsync = false, bool fullscreen = false);
-        void cleanup();
+        void clear();
 
         // VkResult acquireNextImage(VkSemaphore presentCompleteSemaphore, uint32_t* imageIndex);
         // VkResult queuePresent(VkQueue queue, uint32_t imageIndex, VkSemaphore waitSemaphore = VK_NULL_HANDLE);

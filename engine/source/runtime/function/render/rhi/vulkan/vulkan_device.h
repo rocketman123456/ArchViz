@@ -17,7 +17,7 @@ namespace ArchViz
 
         void connect(VkInstance instance, VkSurfaceKHR surface);
         void initialize();
-        void cleanup();
+        void clear();
 
     private:
         void pickPhysicalDevice();
