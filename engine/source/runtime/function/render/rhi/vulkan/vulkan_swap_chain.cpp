@@ -8,23 +8,15 @@
 
 namespace ArchViz
 {
-    void VulkanSwapChain::initSurface(GLFWwindow* window)
-    {
-        m_window = window;
-        if (glfwCreateWindowSurface(m_instance, window, nullptr, &m_surface) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create window surface!");
-        }
-    }
-
-    void VulkanSwapChain::connect(VkInstance instance, VkPhysicalDevice physical_device, VkDevice device)
+    void VulkanSwapChain::connect(VkInstance instance, VkSurfaceKHR surface, VkPhysicalDevice physical_device, VkDevice device)
     {
         m_instance        = instance;
+        m_surface         = surface;
         m_physical_device = physical_device;
         m_device          = device;
     }
 
-    void VulkanSwapChain::create(uint32_t width, uint32_t height, bool vsync, bool fullscreen)
+    void VulkanSwapChain::initialize(uint32_t width, uint32_t height, bool vsync, bool fullscreen)
     {
         uint32_t format_count;
         vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device, m_surface, &format_count, NULL);
@@ -184,11 +176,8 @@ namespace ArchViz
             {
                 vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
             }
-        }
-        if (m_surface != VK_NULL_HANDLE)
-        {
+
             vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
-            vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         }
     }
 } // namespace ArchViz

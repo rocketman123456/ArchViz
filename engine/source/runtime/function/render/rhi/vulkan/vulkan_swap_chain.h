@@ -17,9 +17,8 @@ namespace ArchViz
         VulkanSwapChain()  = default;
         ~VulkanSwapChain() = default;
 
-        void initSurface(GLFWwindow* window);
-        void connect(VkInstance instance, VkPhysicalDevice physical_device, VkDevice device);
-        void create(uint32_t width, uint32_t height, bool vsync = false, bool fullscreen = false);
+        void connect(VkInstance instance, VkSurfaceKHR surface, VkPhysicalDevice physical_device, VkDevice device);
+        void initialize(uint32_t width, uint32_t height, bool vsync = false, bool fullscreen = false);
         void clear();
 
         // VkResult acquireNextImage(VkSemaphore presentCompleteSemaphore, uint32_t* imageIndex);

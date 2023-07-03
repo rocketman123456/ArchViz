@@ -17,6 +17,7 @@ namespace ArchViz
     class VulkanSwapChain;
     class VulkanPipeline;
     class VulkanRenderPass;
+    class VulkanInstance;
 
     class VulkanRHI : public RHI
     {
@@ -48,29 +49,33 @@ namespace ArchViz
 
         void createFramebuffers();
 
+        void createCommandPool();
+        void createCommandBuffer();
+
     private:
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
 
         RHIInitInfo m_initialize_info;
 
-        VkInstance               m_instance;
-        VkDebugUtilsMessengerEXT m_debug_messenger;
-        VkSurfaceKHR             m_surface;
+        // VkInstance               m_instance;
+        // VkDebugUtilsMessengerEXT m_debug_messenger;
+        // VkSurfaceKHR             m_surface;
 
-        VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
-        VkDevice         m_device          = VK_NULL_HANDLE;
-
+        std::shared_ptr<VulkanInstance>   m_vulkan_instance;
         std::shared_ptr<VulkanDevice>     m_vulkan_device;
         std::shared_ptr<VulkanSwapChain>  m_vulkan_swap_chain;
         std::shared_ptr<VulkanPipeline>   m_vulkan_pipeline;
         std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
 
-        std::vector<VkFramebuffer> swapChainFramebuffers;
+        std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
-        VkRenderPass     m_render_pass;
-        VkPipelineLayout m_pipeline_layout;
-        VkPipeline       m_pipeline;
+        // VkRenderPass     m_render_pass;
+        // VkPipelineLayout m_pipeline_layout;
+        // VkPipeline       m_pipeline;
+
+        VkCommandPool   m_command_pool;
+        VkCommandBuffer m_command_buffer;
 
         const bool m_enable_validation_layers = false;
     };

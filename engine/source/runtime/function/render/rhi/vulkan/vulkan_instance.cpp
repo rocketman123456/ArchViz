@@ -27,6 +27,8 @@ static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMesse
 
 namespace ArchViz
 {
+    VulkanInstance::VulkanInstance(bool validation) : m_validation(validation) {}
+
     void VulkanInstance::createInstance()
     {
 #if defined(__GNUC__)
@@ -50,7 +52,7 @@ namespace ArchViz
             LOG_FATAL("failed to initialize volk!");
         }
 
-        if (m_enable_validation_layers && !checkValidationLayerSupport(VulkanConstants::validation_layers))
+        if (m_validation && !checkValidationLayerSupport(VulkanConstants::validation_layers))
         {
             LOG_FATAL("validation layers requested, but not available!");
         }
@@ -67,12 +69,12 @@ namespace ArchViz
         create_info.sType            = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
 
-        auto extensions                     = getRequiredExtensions(m_enable_validation_layers);
+        auto extensions                     = getRequiredExtensions(m_validation);
         create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
-        if (m_enable_validation_layers)
+        if (m_validation)
         {
             create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
             create_info.ppEnabledLayerNames = VulkanConstants::validation_layers.data();
@@ -96,7 +98,7 @@ namespace ArchViz
 
     void VulkanInstance::setupDebugMessenger()
     {
-        if (!m_enable_validation_layers)
+        if (!m_validation)
             return;
 
         VkDebugUtilsMessengerCreateInfoEXT create_info;
@@ -108,15 +110,32 @@ namespace ArchViz
         }
     }
 
+    void VulkanInstance::initSurface()
+    {
+        if (glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create window surface!");
+        }
+    }
+
+    void VulkanInstance::connect(GLFWwindow* window)
+    {
+        ASSERT(window);
+        m_window = window;
+    }
+
     void VulkanInstance::initialize()
     {
         createInstance();
         setupDebugMessenger();
+        initSurface();
     }
 
     void VulkanInstance::clear()
     {
-        if (m_enable_validation_layers)
+        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+
+        if (m_validation)
         {
             DestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
         }
