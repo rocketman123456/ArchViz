@@ -36,12 +36,17 @@ namespace ArchViz
         void createInstance();
         void setupDebugMessenger();
         void createSurface();
+
         void pickPhysicalDevice();
         void createLogicalDevice();
+
         void createSwapChain();
         void createImageViews();
+
         void createRenderPass();
         void createGraphicsPipeline();
+
+        void createFramebuffers();
 
     private:
         std::shared_ptr<AssetManager>  m_asset_manager;
@@ -60,6 +65,8 @@ namespace ArchViz
         std::shared_ptr<VulkanSwapChain>  m_vulkan_swap_chain;
         std::shared_ptr<VulkanPipeline>   m_vulkan_pipeline;
         std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
+
+        std::vector<VkFramebuffer> swapChainFramebuffers;
 
         VkRenderPass     m_render_pass;
         VkPipelineLayout m_pipeline_layout;

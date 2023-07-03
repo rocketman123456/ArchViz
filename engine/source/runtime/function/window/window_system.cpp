@@ -58,6 +58,10 @@ namespace ArchViz
 
     std::array<int, 2> WindowSystem::getWindowSize() const { return std::array<int, 2>({m_width, m_height}); }
 
+    uint32_t WindowSystem::getWindowHeight() const { return m_height; }
+
+    uint32_t WindowSystem::getWindowWidth() const { return m_width; }
+
     void WindowSystem::setFocusMode(bool mode)
     {
         m_is_focus_mode = mode;

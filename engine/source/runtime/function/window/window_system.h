@@ -33,6 +33,8 @@ namespace ArchViz
         void               setTitle(const char* title);
         GLFWwindow*        getWindow() const;
         std::array<int, 2> getWindowSize() const;
+        uint32_t           getWindowHeight() const;
+        uint32_t           getWindowWidth() const;
 
         typedef std::function<void()>                   onResetFunc;
         typedef std::function<void(int, int, int, int)> onKeyFunc;

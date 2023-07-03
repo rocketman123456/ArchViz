@@ -1,33 +1,8 @@
-#include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_pipeline.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_render_pass.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
-#include "runtime/function/window/window_system.h"
-
 #include "runtime/core/base/macro.h"
-
-#include <volk.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#if defined(__GNUC__)
-// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
-#if defined(__linux__)
-#include <stdlib.h>
-#elif defined(__MACH__)
-// https://developer.apple.com/library/archive/documentation/Porting/Conceptual/PortingUnix/compiling/compiling.html
-#include <stdlib.h>
-#else
-#error Unknown Platform
-#endif
-#endif
-
-#include <memory>
-#include <set>
 
 static VkResult CreateDebugUtilsMessengerEXT(VkInstance                                instance,
                                              const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
@@ -52,19 +27,7 @@ static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMesse
 
 namespace ArchViz
 {
-    void VulkanRHI::setConfigManager(std::shared_ptr<ConfigManager> config_manager)
-    {
-        ASSERT(config_manager);
-        m_config_manager = config_manager;
-    }
-
-    void VulkanRHI::setAssetManager(std::shared_ptr<AssetManager> asset_manager)
-    {
-        ASSERT(asset_manager);
-        m_asset_manager = asset_manager;
-    }
-
-    void VulkanRHI::createInstance()
+    void VulkanInstance::createInstance()
     {
 #if defined(__GNUC__)
         // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
@@ -131,7 +94,7 @@ namespace ArchViz
         volkLoadInstance(m_instance);
     }
 
-    void VulkanRHI::setupDebugMessenger()
+    void VulkanInstance::setupDebugMessenger()
     {
         if (!m_enable_validation_layers)
             return;
@@ -145,101 +108,14 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createSurface()
+    void VulkanInstance::initialize()
     {
-        m_vulkan_swap_chain = std::make_shared<VulkanSwapChain>();
-        m_vulkan_swap_chain->connect(m_instance, VK_NULL_HANDLE, VK_NULL_HANDLE);
-        m_vulkan_swap_chain->initSurface(m_initialize_info.window_system->getWindow());
-
-        m_surface = m_vulkan_swap_chain->m_surface;
-    }
-
-    void VulkanRHI::pickPhysicalDevice()
-    {
-        m_vulkan_device = std::make_shared<VulkanDevice>(m_enable_validation_layers);
-        m_vulkan_device->connect(m_instance, m_surface);
-        m_vulkan_device->initialize();
-
-        m_physical_device = m_vulkan_device->m_physical_device;
-    }
-
-    void VulkanRHI::createLogicalDevice() { m_device = m_vulkan_device->m_device; }
-
-    void VulkanRHI::createSwapChain()
-    {
-        uint32_t width  = m_initialize_info.window_system->getWindowWidth();
-        uint32_t height = m_initialize_info.window_system->getWindowHeight();
-
-        m_vulkan_swap_chain->connect(m_instance, m_vulkan_device->m_physical_device, m_vulkan_device->m_device);
-        m_vulkan_swap_chain->create(width, height, false, false);
-    }
-
-    void VulkanRHI::createImageViews() {}
-
-    void VulkanRHI::createRenderPass()
-    {
-        m_vulkan_render_pass = std::make_shared<VulkanRenderPass>();
-        m_vulkan_render_pass->setDevice(m_vulkan_device);
-        m_vulkan_render_pass->m_color_format = m_vulkan_swap_chain->m_swap_chain_image_format;
-        m_vulkan_render_pass->initialize();
-    }
-
-    void VulkanRHI::createGraphicsPipeline()
-    {
-        ShaderModuleConfig config;
-        config.m_vert_shader = "shader/glsl/shader_base.vert";
-        config.m_frag_shader = "shader/glsl/shader_base.frag";
-
-        std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
-
-        shader->m_device         = m_vulkan_device;
-        shader->m_config_manager = m_config_manager;
-        shader->m_asset_manager  = m_asset_manager;
-
-        m_vulkan_pipeline = std::make_shared<VulkanPipeline>();
-        m_vulkan_pipeline->setDevice(m_vulkan_device);
-        m_vulkan_pipeline->setShaderModule(shader);
-        m_vulkan_pipeline->setRenderPass(m_vulkan_render_pass->m_render_pass);
-        m_vulkan_pipeline->initialize();
-    }
-
-    void VulkanRHI::createFramebuffers() {}
-
-    void VulkanRHI::initialize(RHIInitInfo initialize_info)
-    {
-        m_initialize_info = initialize_info;
-
         createInstance();
         setupDebugMessenger();
-        createSurface();
-
-        pickPhysicalDevice();
-        createLogicalDevice();
-        createSwapChain();
-        createImageViews();
-
-        createRenderPass();
-        createGraphicsPipeline();
-
-        createFramebuffers();
     }
 
-    void VulkanRHI::prepareContext() {}
-
-    void VulkanRHI::clear()
+    void VulkanInstance::clear()
     {
-        m_vulkan_pipeline->clear();
-        m_vulkan_pipeline.reset();
-
-        m_vulkan_render_pass->clear();
-        m_vulkan_render_pass.reset();
-
-        m_vulkan_swap_chain->clear();
-        m_vulkan_swap_chain.reset();
-
-        m_vulkan_device->clear();
-        m_vulkan_device.reset();
-
         if (m_enable_validation_layers)
         {
             DestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
