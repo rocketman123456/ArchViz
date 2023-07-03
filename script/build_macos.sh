@@ -26,8 +26,7 @@ else
     exit 1
 fi
 
-# cmake -S . -B build -G "Xcode" -DCMAKE_TOOLCHAIN_FILE="~/Program/Library/vcpkg/scripts/buildsystems/vcpkg.cmake"
-cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="~/Program/Library/vcpkg/scripts/buildsystems/vcpkg.cmake"
-# cmake -S . -B build
+cmake -S . -B build -G "Xcode" -DCMAKE_TOOLCHAIN_FILE="~/Program/Library/vcpkg/scripts/buildsystems/vcpkg.cmake"
+# cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="~/Program/Library/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 cmake --build build --config "${CONFIG}"

@@ -49,6 +49,8 @@ int main(int argc, char** argv)
     while (!window_system->shouldClose())
     {
         window_system->pollEvents();
+
+        render_system->tick(0.01);
     }
 
     return 0;

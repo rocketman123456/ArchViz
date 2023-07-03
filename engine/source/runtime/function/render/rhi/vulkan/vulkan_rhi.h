@@ -52,15 +52,19 @@ namespace ArchViz
         void createCommandPool();
         void createCommandBuffer();
 
+        void createSyncObjects();
+
     private:
+        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+        void drawFrame();
+
+    private:
+        const bool m_enable_validation_layers = false;
+
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
 
         RHIInitInfo m_initialize_info;
-
-        // VkInstance               m_instance;
-        // VkDebugUtilsMessengerEXT m_debug_messenger;
-        // VkSurfaceKHR             m_surface;
 
         std::shared_ptr<VulkanInstance>   m_vulkan_instance;
         std::shared_ptr<VulkanDevice>     m_vulkan_device;
@@ -70,13 +74,11 @@ namespace ArchViz
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
-        // VkRenderPass     m_render_pass;
-        // VkPipelineLayout m_pipeline_layout;
-        // VkPipeline       m_pipeline;
-
         VkCommandPool   m_command_pool;
         VkCommandBuffer m_command_buffer;
 
-        const bool m_enable_validation_layers = false;
+        VkSemaphore m_image_available_semaphore;
+        VkSemaphore m_render_finished_semaphore;
+        VkFence     m_in_flight_fence;
     };
 } // namespace ArchViz

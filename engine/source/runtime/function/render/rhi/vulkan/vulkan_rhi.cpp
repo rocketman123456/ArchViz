@@ -177,6 +177,23 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createSyncObjects()
+    {
+        VkSemaphoreCreateInfo semaphore_info {};
+        semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        VkFenceCreateInfo fence_info {};
+        fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+        if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphore) != VK_SUCCESS ||
+            vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphore) != VK_SUCCESS ||
+            vkCreateFence(m_vulkan_device->m_device, &fence_info, nullptr, &m_in_flight_fence) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create synchronization objects for a frame!");
+        }
+    }
+
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
         m_initialize_info = initialize_info;
@@ -197,12 +214,114 @@ namespace ArchViz
 
         createCommandPool();
         createCommandBuffer();
+
+        createSyncObjects();
     }
 
-    void VulkanRHI::prepareContext() {}
+    void VulkanRHI::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index)
+    {
+        VkCommandBufferBeginInfo begin_info {};
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(command_buffer, &begin_info) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to begin recording command buffer!");
+        }
+
+        VkRenderPassBeginInfo render_pass_info {};
+        render_pass_info.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        render_pass_info.renderPass        = m_vulkan_render_pass->m_render_pass;
+        render_pass_info.framebuffer       = m_swap_chain_framebuffers[image_index];
+        render_pass_info.renderArea.offset = {0, 0};
+        render_pass_info.renderArea.extent = m_vulkan_swap_chain->m_swap_chain_extent;
+
+        VkClearValue clear_color         = {{{0.2f, 0.3f, 0.4f, 1.0f}}};
+        render_pass_info.clearValueCount = 1;
+        render_pass_info.pClearValues    = &clear_color;
+
+        vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+
+        {
+            vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline);
+
+            VkViewport viewport {};
+            viewport.x        = 0.0f;
+            viewport.y        = 0.0f;
+            viewport.width    = (float)m_vulkan_swap_chain->m_swap_chain_extent.width;
+            viewport.height   = (float)m_vulkan_swap_chain->m_swap_chain_extent.height;
+            viewport.minDepth = 0.0f;
+            viewport.maxDepth = 1.0f;
+            vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+
+            VkRect2D scissor {};
+            scissor.offset = {0, 0};
+            scissor.extent = m_vulkan_swap_chain->m_swap_chain_extent;
+            vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+
+            vkCmdDraw(command_buffer, 3, 1, 0, 0);
+        }
+
+        vkCmdEndRenderPass(command_buffer);
+
+        if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to record command buffer!");
+        }
+    }
+
+    void VulkanRHI::drawFrame()
+    {
+        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fence, VK_TRUE, UINT64_MAX);
+        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fence);
+
+        uint32_t image_index;
+        vkAcquireNextImageKHR(
+            m_vulkan_device->m_device, m_vulkan_swap_chain->m_swap_chain, UINT64_MAX, m_image_available_semaphore, VK_NULL_HANDLE, &image_index);
+
+        vkResetCommandBuffer(m_command_buffer, /*VkCommandBufferResetFlagBits*/ 0);
+        recordCommandBuffer(m_command_buffer, image_index);
+
+        VkSubmitInfo submit_info {};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore          wait_semaphores[]   = {m_image_available_semaphore};
+        VkPipelineStageFlags wait_stages[]       = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        VkSemaphore          signal_semaphores[] = {m_render_finished_semaphore};
+        submit_info.waitSemaphoreCount           = 1;
+        submit_info.pWaitSemaphores              = wait_semaphores;
+        submit_info.pWaitDstStageMask            = wait_stages;
+        submit_info.commandBufferCount           = 1;
+        submit_info.pCommandBuffers              = &m_command_buffer;
+        submit_info.signalSemaphoreCount         = 1;
+        submit_info.pSignalSemaphores            = signal_semaphores;
+
+        if (vkQueueSubmit(m_vulkan_device->m_graphics_queue, 1, &submit_info, m_in_flight_fence) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR present_info {};
+        VkSwapchainKHR   swap_chains[]  = {m_vulkan_swap_chain->m_swap_chain};
+        present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pWaitSemaphores    = signal_semaphores;
+        present_info.swapchainCount     = 1;
+        present_info.pSwapchains        = swap_chains;
+        present_info.pImageIndices      = &image_index;
+
+        vkQueuePresentKHR(m_vulkan_device->m_present_queue, &present_info);
+    }
+
+    void VulkanRHI::prepareContext() { drawFrame(); }
 
     void VulkanRHI::clear()
     {
+        vkDestroySemaphore(m_vulkan_device->m_device, m_render_finished_semaphore, nullptr);
+        vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphore, nullptr);
+        vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fence, nullptr);
+
+        vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
+
         for (auto framebuffer : m_swap_chain_framebuffers)
         {
             vkDestroyFramebuffer(m_vulkan_device->m_device, framebuffer, nullptr);
