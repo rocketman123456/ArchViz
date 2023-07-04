@@ -55,11 +55,11 @@ namespace ArchViz
             }
         }
 
-        SwapChainSupportDetails swap_chain_support = querySwapChainSupport(m_physical_device, m_surface);
+        SwapChainSupportDetails swap_chain_support = query_swap_chain_support(m_physical_device, m_surface);
 
-        VkSurfaceFormatKHR surface_format = chooseSwapSurfaceFormat(swap_chain_support.formats);
-        VkPresentModeKHR   present_mode   = chooseSwapPresentMode(swap_chain_support.presentModes);
-        VkExtent2D         extent         = chooseSwapExtent(swap_chain_support.capabilities, m_window);
+        VkSurfaceFormatKHR surface_format = choose_swap_surface_format(swap_chain_support.formats);
+        VkPresentModeKHR   present_mode   = choose_swap_present_mode(swap_chain_support.presentModes);
+        VkExtent2D         extent         = choose_swap_extent(swap_chain_support.capabilities, m_window);
 
         uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
         if (swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
@@ -92,7 +92,7 @@ namespace ArchViz
         create_info.imageArrayLayers = 1;
         create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        m_indices                            = findQueueFamilies(m_physical_device, m_surface);
+        m_indices                            = find_queue_families(m_physical_device, m_surface);
         std::set<uint32_t>    queue_families = {m_indices.m_graphics_family.value(), m_indices.m_present_family.value(), m_indices.m_compute_family.value()};
         std::vector<uint32_t> families;
         for (auto family : queue_families)

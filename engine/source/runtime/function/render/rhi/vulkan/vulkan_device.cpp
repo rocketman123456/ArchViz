@@ -54,9 +54,9 @@ namespace ArchViz
 
         for (const auto& device : devices)
         {
-            bool suitable  = isDeviceSuitable(device, m_surface);
-            bool extension = checkDeviceExtensionSupport(device, VulkanConstants::device_extensions);
-            bool adequate  = isSwapChainAdequate(device, m_surface, extension);
+            bool suitable  = is_device_suitable(device, m_surface);
+            bool extension = check_device_extension_support(device, VulkanConstants::device_extensions);
+            bool adequate  = is_swap_chain_adequate(device, m_surface, extension);
             if (suitable && extension && adequate)
             {
                 m_physical_device = device;
@@ -102,7 +102,7 @@ namespace ArchViz
 
     void VulkanDevice::createLogicalDevice()
     {
-        m_indices = findQueueFamilies(m_physical_device, m_surface);
+        m_indices = find_queue_families(m_physical_device, m_surface);
 
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
         std::set<uint32_t>                   unique_queue_families = {
