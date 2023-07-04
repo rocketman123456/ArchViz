@@ -1,2 +1,1 @@
-# GAMES106
-GAMES106 Homework
+# A Visualize Example based on Vulkan
