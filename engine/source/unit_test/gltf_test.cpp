@@ -69,6 +69,15 @@ bool loadModelFromString(tinygltf::Model& model, const std::string& content, con
     return res;
 }
 
+// TODO : use custom loader to use vfs for file management
+// void SetImageLoader(LoadImageDataFunction LoadImageData, void *user_data);
+// typedef bool (*WriteImageDataFunction)(const std::string *basepath,
+//                                        const std::string *filename,
+//                                        const Image *image, bool embedImages,
+//                                        const URICallbacks *uri_cb,
+//                                        std::string *out_uri,
+//                                        void *user_pointer);
+
 int main(int argc, char** argv)
 {
     std::filesystem::path executable_path(argv[0]);
