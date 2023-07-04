@@ -60,6 +60,7 @@ namespace ArchViz
 
     private:
         const bool m_enable_validation_layers = false;
+        const int  MAX_FRAMES_IN_FLIGHT       = 2;
 
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
@@ -75,10 +76,12 @@ namespace ArchViz
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
         VkCommandPool   m_command_pool;
-        VkCommandBuffer m_command_buffer;
+        //VkCommandBuffer m_command_buffer;
+        std::vector<VkCommandBuffer> m_command_buffers;
 
-        VkSemaphore m_image_available_semaphore;
-        VkSemaphore m_render_finished_semaphore;
-        VkFence     m_in_flight_fence;
+        std::vector<VkSemaphore> m_image_available_semaphores;
+        std::vector<VkSemaphore> m_render_finished_semaphores;
+        std::vector<VkFence>     m_in_flight_fences;
+        uint32_t                 m_current_frame = 0;
     };
 } // namespace ArchViz

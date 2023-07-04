@@ -19,6 +19,8 @@ namespace ArchViz
         void initialize();
         void clear();
 
+        void wait();
+
     private:
         void pickPhysicalDevice();
         void createLogicalDevice();

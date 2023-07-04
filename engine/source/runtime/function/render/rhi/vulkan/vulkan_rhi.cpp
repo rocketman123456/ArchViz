@@ -165,13 +165,15 @@ namespace ArchViz
 
     void VulkanRHI::createCommandBuffer()
     {
+        m_command_buffers.resize(MAX_FRAMES_IN_FLIGHT);
+
         VkCommandBufferAllocateInfo alloc_info {};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         alloc_info.commandPool        = m_command_pool;
         alloc_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        alloc_info.commandBufferCount = 1;
+        alloc_info.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
 
-        if (vkAllocateCommandBuffers(m_vulkan_device->m_device, &alloc_info, &m_command_buffer) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(m_vulkan_device->m_device, &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
         {
             LOG_FATAL("failed to allocate command buffers!");
         }
@@ -179,6 +181,10 @@ namespace ArchViz
 
     void VulkanRHI::createSyncObjects()
     {
+        m_image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        m_render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        m_in_flight_fences.resize(MAX_FRAMES_IN_FLIGHT);
+
         VkSemaphoreCreateInfo semaphore_info {};
         semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -186,11 +192,14 @@ namespace ArchViz
         fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphore) != VK_SUCCESS ||
-            vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphore) != VK_SUCCESS ||
-            vkCreateFence(m_vulkan_device->m_device, &fence_info, nullptr, &m_in_flight_fence) != VK_SUCCESS)
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            LOG_FATAL("failed to create synchronization objects for a frame!");
+            if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(m_vulkan_device->m_device, &fence_info, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS)
+            {
+                LOG_FATAL("failed to create synchronization objects for a frame!");
+            }
         }
     }
 
@@ -271,31 +280,35 @@ namespace ArchViz
 
     void VulkanRHI::drawFrame()
     {
-        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fence, VK_TRUE, UINT64_MAX);
-        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fence);
+        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
 
         uint32_t image_index;
-        vkAcquireNextImageKHR(
-            m_vulkan_device->m_device, m_vulkan_swap_chain->m_swap_chain, UINT64_MAX, m_image_available_semaphore, VK_NULL_HANDLE, &image_index);
+        vkAcquireNextImageKHR(m_vulkan_device->m_device,
+                              m_vulkan_swap_chain->m_swap_chain,
+                              UINT64_MAX,
+                              m_image_available_semaphores[m_current_frame],
+                              VK_NULL_HANDLE,
+                              &image_index);
 
-        vkResetCommandBuffer(m_command_buffer, /*VkCommandBufferResetFlagBits*/ 0);
-        recordCommandBuffer(m_command_buffer, image_index);
+        vkResetCommandBuffer(m_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
+        recordCommandBuffer(m_command_buffers[m_current_frame], image_index);
+
+        VkSemaphore          wait_semaphores[]   = {m_image_available_semaphores[m_current_frame]};
+        VkPipelineStageFlags wait_stages[]       = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        VkSemaphore          signal_semaphores[] = {m_render_finished_semaphores[m_current_frame]};
 
         VkSubmitInfo submit_info {};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.waitSemaphoreCount   = 1;
+        submit_info.pWaitSemaphores      = wait_semaphores;
+        submit_info.pWaitDstStageMask    = wait_stages;
+        submit_info.commandBufferCount   = 1;
+        submit_info.pCommandBuffers      = &m_command_buffers[m_current_frame];
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores    = signal_semaphores;
 
-        VkSemaphore          wait_semaphores[]   = {m_image_available_semaphore};
-        VkPipelineStageFlags wait_stages[]       = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        VkSemaphore          signal_semaphores[] = {m_render_finished_semaphore};
-        submit_info.waitSemaphoreCount           = 1;
-        submit_info.pWaitSemaphores              = wait_semaphores;
-        submit_info.pWaitDstStageMask            = wait_stages;
-        submit_info.commandBufferCount           = 1;
-        submit_info.pCommandBuffers              = &m_command_buffer;
-        submit_info.signalSemaphoreCount         = 1;
-        submit_info.pSignalSemaphores            = signal_semaphores;
-
-        if (vkQueueSubmit(m_vulkan_device->m_graphics_queue, 1, &submit_info, m_in_flight_fence) != VK_SUCCESS)
+        if (vkQueueSubmit(m_vulkan_device->m_graphics_queue, 1, &submit_info, m_in_flight_fences[m_current_frame]) != VK_SUCCESS)
         {
             LOG_FATAL("failed to submit draw command buffer!");
         }
@@ -310,15 +323,20 @@ namespace ArchViz
         present_info.pImageIndices      = &image_index;
 
         vkQueuePresentKHR(m_vulkan_device->m_present_queue, &present_info);
+
+        m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
     void VulkanRHI::prepareContext() { drawFrame(); }
 
     void VulkanRHI::clear()
     {
-        vkDestroySemaphore(m_vulkan_device->m_device, m_render_finished_semaphore, nullptr);
-        vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphore, nullptr);
-        vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fence, nullptr);
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphores[i], nullptr);
+            vkDestroySemaphore(m_vulkan_device->m_device, m_render_finished_semaphores[i], nullptr);
+            vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fences[i], nullptr);
+        }
 
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
 
@@ -341,12 +359,5 @@ namespace ArchViz
 
         m_vulkan_instance->clear();
         m_vulkan_instance.reset();
-
-        // if (m_enable_validation_layers)
-        // {
-        //     DestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
-        // }
-
-        // vkDestroyInstance(m_instance, nullptr);
     }
 } // namespace ArchViz

@@ -15,6 +15,12 @@ namespace ArchViz
         m_surface = surface;
     }
 
+    void VulkanDevice::wait()
+    {
+        ASSERT(m_device);
+        vkDeviceWaitIdle(m_device);
+    }
+
     void VulkanDevice::initialize()
     {
         pickPhysicalDevice();
@@ -23,11 +29,11 @@ namespace ArchViz
 
     void VulkanDevice::clear()
     {
-        if (m_command_pool)
+        if (m_command_pool != VK_NULL_HANDLE)
         {
             vkDestroyCommandPool(m_device, m_command_pool, nullptr);
         }
-        if (m_device)
+        if (m_device != VK_NULL_HANDLE)
         {
             vkDestroyDevice(m_device, nullptr);
         }
@@ -87,7 +93,7 @@ namespace ArchViz
             {
                 for (auto ext : extensions)
                 {
-                    //LOG_DEBUG("supported vulkan extensions: {}", ext.extensionName);
+                    // LOG_DEBUG("supported vulkan extensions: {}", ext.extensionName);
                     m_supported_extensions.push_back(ext.extensionName);
                 }
             }

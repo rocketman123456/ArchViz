@@ -178,6 +178,7 @@ namespace ArchViz
             }
 
             vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
+            m_swap_chain = VK_NULL_HANDLE;
         }
     }
 } // namespace ArchViz
