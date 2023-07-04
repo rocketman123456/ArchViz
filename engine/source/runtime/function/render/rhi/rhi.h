@@ -31,16 +31,13 @@ namespace ArchViz
 
         virtual void initialize(RHIInitInfo initialize_info) = 0;
         virtual void prepareContext()                        = 0;
+        virtual void render()                                = 0;
 
         virtual void createSwapChain()   = 0;
         virtual void recreateSwapChain() = 0;
 
-        // virtual void createSwapchainImageViews()     = 0;
-        // virtual void createFramebufferImageAndView() = 0;
-
         // // destory
         virtual void clear() = 0;
-        // virtual void clearSwapchain() = 0;
 
     private:
     };

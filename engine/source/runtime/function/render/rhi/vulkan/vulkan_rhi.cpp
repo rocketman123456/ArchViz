@@ -284,9 +284,10 @@ namespace ArchViz
 
     void VulkanRHI::drawFrame()
     {
-        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
-        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
+        // TODO : Although many drivers and platforms trigger VK_ERROR_OUT_OF_DATE_KHR automatically after a window resize, it is not guaranteed to happen.
+        // That's why we'll add some extra code to also handle resizes explicitly.
 
+        // handle swap chain recreation
         uint32_t image_index;
         VkResult result = vkAcquireNextImageKHR(m_vulkan_device->m_device,
                                                 m_vulkan_swap_chain->m_swap_chain,
@@ -351,7 +352,13 @@ namespace ArchViz
         m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void VulkanRHI::prepareContext() { drawFrame(); }
+    void VulkanRHI::prepareContext()
+    {
+        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
+    }
+
+    void VulkanRHI::render() { drawFrame(); }
 
     void VulkanRHI::clear()
     {

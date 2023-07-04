@@ -28,7 +28,7 @@ if(NOT TARGET mustache)
 endif()
 
 if(NOT TARGET tinygltf)
-    add_subdirectory(tinygltf)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tinygltf.cmake)
 endif()
 
 if(NOT TARGET tinyobjloader)

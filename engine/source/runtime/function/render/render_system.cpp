@@ -41,6 +41,9 @@ namespace ArchViz
 
         // prepare render command context
         m_rhi->prepareContext();
+
+        // render context
+        m_rhi->render();
     }
 
     void RenderSystem::processSwapData()

@@ -30,6 +30,7 @@ namespace ArchViz
 
         void initialize(RHIInitInfo initialize_info) override;
         void prepareContext() override;
+        void render() override;
 
         void clear() override;
 
