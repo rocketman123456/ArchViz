@@ -7,6 +7,7 @@
 
 #include "runtime/function/render/render_system.h"
 
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -46,11 +47,39 @@ int main(int argc, char** argv)
     render_system->setAssetManager(asset_manager);
     render_system->initialize(render_init_info);
 
+    using namespace std::chrono;
+
+    steady_clock::time_point last_time_point = steady_clock::now();
+    steady_clock::time_point current_time_point;
+
+    float    fps_alpha        = 1.f / 100;
+    uint64_t frame_count      = 0;
+    float    average_duration = 0;
+
     while (!window_system->shouldClose())
     {
+        current_time_point         = steady_clock::now();
+        duration<float> time_span  = duration_cast<duration<float>>(current_time_point - last_time_point);
+        float           delta_time = time_span.count();
+        last_time_point            = current_time_point;
+
+        frame_count++;
+        if (frame_count == 1)
+        {
+            average_duration = delta_time;
+        }
+        else
+        {
+            average_duration = average_duration * (1 - fps_alpha) + delta_time * fps_alpha;
+        }
+        float fps = static_cast<int>(1.f / average_duration);
+
+        std::string title = std::string("ArchViz - " + std::to_string(fps) + " FPS");
+
+        window_system->setTitle(title.c_str());
         window_system->pollEvents();
 
-        render_system->tick(0.01);
+        render_system->tick(delta_time);
     }
 
     return 0;
