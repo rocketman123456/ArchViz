@@ -305,6 +305,8 @@ namespace ArchViz
             LOG_FATAL("failed to acquire swap chain image!");
         }
 
+        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
+
         vkResetCommandBuffer(m_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(m_command_buffers[m_current_frame], image_index);
 
