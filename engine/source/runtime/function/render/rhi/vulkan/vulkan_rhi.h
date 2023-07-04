@@ -33,6 +33,9 @@ namespace ArchViz
 
         void clear() override;
 
+        void createSwapChain() override;
+        void recreateSwapChain() override;
+
     private:
         void createInstance();
         void setupDebugMessenger();
@@ -41,7 +44,7 @@ namespace ArchViz
         void pickPhysicalDevice();
         void createLogicalDevice();
 
-        void createSwapChain();
+        // void createSwapChain();
         void createImageViews();
 
         void createRenderPass();
@@ -62,6 +65,8 @@ namespace ArchViz
         const bool m_enable_validation_layers = false;
         const int  MAX_FRAMES_IN_FLIGHT       = 2;
 
+        bool m_framebuffer_resized = false;
+
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
 
@@ -75,8 +80,8 @@ namespace ArchViz
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
-        VkCommandPool   m_command_pool;
-        //VkCommandBuffer m_command_buffer;
+        VkCommandPool m_command_pool;
+        // VkCommandBuffer m_command_buffer;
         std::vector<VkCommandBuffer> m_command_buffers;
 
         std::vector<VkSemaphore> m_image_available_semaphores;

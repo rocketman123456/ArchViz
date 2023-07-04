@@ -18,6 +18,7 @@ namespace ArchViz
 
     void VulkanSwapChain::initialize(uint32_t width, uint32_t height, bool vsync, bool fullscreen)
     {
+        // create swap chain
         uint32_t format_count;
         vkGetPhysicalDeviceSurfaceFormatsKHR(m_physical_device, m_surface, &format_count, NULL);
         ASSERT(format_count > 0);
@@ -124,6 +125,7 @@ namespace ArchViz
             LOG_FATAL("failed to create swap chain!");
         }
 
+        // create image views
         if (old_swap_chain != VK_NULL_HANDLE)
         {
             for (uint32_t i = 0; i < image_count; i++)

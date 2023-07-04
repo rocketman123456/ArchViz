@@ -76,6 +76,31 @@ namespace ArchViz
         m_vulkan_swap_chain->initialize(width, height, false, false);
     }
 
+    void VulkanRHI::recreateSwapChain()
+    {
+        int width = 0, height = 0;
+        glfwGetFramebufferSize(m_initialize_info.window_system->getWindow(), &width, &height);
+        // for minimize
+        while (width == 0 || height == 0)
+        {
+            glfwGetFramebufferSize(m_initialize_info.window_system->getWindow(), &width, &height);
+            glfwWaitEvents();
+        }
+
+        m_vulkan_device->wait();
+
+        for (auto framebuffer : m_swap_chain_framebuffers)
+        {
+            vkDestroyFramebuffer(m_vulkan_device->m_device, framebuffer, nullptr);
+        }
+
+        m_vulkan_swap_chain->clear();
+
+        m_vulkan_swap_chain->initialize(width, height);
+        createImageViews();
+        createFramebuffers();
+    }
+
     void VulkanRHI::createImageViews() {}
 
     void VulkanRHI::createRenderPass()
@@ -263,12 +288,22 @@ namespace ArchViz
         vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
 
         uint32_t image_index;
-        vkAcquireNextImageKHR(m_vulkan_device->m_device,
-                              m_vulkan_swap_chain->m_swap_chain,
-                              UINT64_MAX,
-                              m_image_available_semaphores[m_current_frame],
-                              VK_NULL_HANDLE,
-                              &image_index);
+        VkResult result = vkAcquireNextImageKHR(m_vulkan_device->m_device,
+                                                m_vulkan_swap_chain->m_swap_chain,
+                                                UINT64_MAX,
+                                                m_image_available_semaphores[m_current_frame],
+                                                VK_NULL_HANDLE,
+                                                &image_index);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            recreateSwapChain();
+            return;
+        }
+        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            LOG_FATAL("failed to acquire swap chain image!");
+        }
 
         vkResetCommandBuffer(m_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(m_command_buffers[m_current_frame], image_index);
@@ -301,7 +336,15 @@ namespace ArchViz
         present_info.pSwapchains        = swap_chains;
         present_info.pImageIndices      = &image_index;
 
-        vkQueuePresentKHR(m_vulkan_device->m_present_queue, &present_info);
+        result = vkQueuePresentKHR(m_vulkan_device->m_present_queue, &present_info);
+        if (VK_ERROR_OUT_OF_DATE_KHR == result || VK_SUBOPTIMAL_KHR == result)
+        {
+            recreateSwapChain();
+        }
+        else if (result != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to present swap chain image!");
+        }
 
         m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
@@ -310,6 +353,8 @@ namespace ArchViz
 
     void VulkanRHI::clear()
     {
+        m_vulkan_device->wait();
+
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
             vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphores[i], nullptr);
