@@ -46,3 +46,6 @@
 [submodule "engine/3rd_party/Vulkan-Headers"]
 	path = engine/3rd_party/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "engine/3rd_party/json11"]
+	path = engine/3rd_party/json11
+	url = https://github.com/dropbox/json11.git
