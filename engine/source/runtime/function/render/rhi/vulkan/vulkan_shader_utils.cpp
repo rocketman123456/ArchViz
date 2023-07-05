@@ -30,10 +30,6 @@
 
 namespace ArchViz
 {
-    std::unordered_map<uint32_t, VkSampler> VulkanShaderUtils::m_mipmap_sampler_map;
-    VkSampler                               VulkanShaderUtils::m_nearest_sampler = VK_NULL_HANDLE;
-    VkSampler                               VulkanShaderUtils::m_linear_sampler  = VK_NULL_HANDLE;
-
     EShLanguage shaderLanguageStageFromFileName(const char* fileName)
     {
         if (end_with(fileName, ".vert"))
@@ -51,9 +47,7 @@ namespace ArchViz
         return EShLangVertex;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromVFS(const std::string&             shader_file,
-                                                                        std::shared_ptr<ConfigManager> config_manager,
-                                                                        std::shared_ptr<AssetManager>  asset_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromVFS(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager)
     {
         std::filesystem::path root_path        = config_manager->getRootFolder();
         std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
@@ -161,9 +155,7 @@ namespace ArchViz
         return spirv;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string&             shader_file,
-                                                                        std::shared_ptr<ConfigManager> config_manager,
-                                                                        std::shared_ptr<AssetManager>  asset_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager)
     {
         std::filesystem::path root_path        = config_manager->getRootFolder();
         std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
@@ -271,8 +263,7 @@ namespace ArchViz
         return spirv;
     }
 
-    std::vector<uint32_t>
-    VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager)
     {
         std::filesystem::path root_path    = config_manager->getRootFolder();
         std::filesystem::path include_path = root_path / "shader" / "include";

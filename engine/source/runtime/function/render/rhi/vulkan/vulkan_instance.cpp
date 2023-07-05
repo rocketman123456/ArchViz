@@ -4,10 +4,8 @@
 
 #include "runtime/core/base/macro.h"
 
-static VkResult create_debug_utils_messenger_ext(VkInstance                                instance,
-                                             const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                                             const VkAllocationCallbacks*              pAllocator,
-                                             VkDebugUtilsMessengerEXT*                 pDebugMessenger)
+static VkResult
+create_debug_utils_messenger_ext(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
     if (func != nullptr)
@@ -52,7 +50,7 @@ namespace ArchViz
             LOG_FATAL("failed to initialize volk!");
         }
 
-        if (m_validation && !check_validation_layer_support(VulkanConstants::validation_layers))
+        if (m_validation && !VulkanUtils::checkValidationLayerSupport(VulkanConstants::validation_layers))
         {
             LOG_FATAL("validation layers requested, but not available!");
         }
@@ -63,13 +61,13 @@ namespace ArchViz
         app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         app_info.pEngineName        = "ArchViz Engine";
         app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
-        app_info.apiVersion         = VK_API_VERSION_1_0;
+        app_info.apiVersion         = VK_API_VERSION_1_2;
 
         VkInstanceCreateInfo create_info {};
         create_info.sType            = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
 
-        auto extensions                     = get_required_extensions(m_validation);
+        auto extensions                     = VulkanUtils::getRequiredExtensions(m_validation);
         create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
 
@@ -79,7 +77,7 @@ namespace ArchViz
             create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
             create_info.ppEnabledLayerNames = VulkanConstants::validation_layers.data();
 
-            populate_debug_messenger_create_info(debugCreateInfo);
+            VulkanUtils::populateDebugMessengerCreateInfo(debugCreateInfo);
             create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
         }
         else
@@ -102,7 +100,7 @@ namespace ArchViz
             return;
 
         VkDebugUtilsMessengerCreateInfoEXT create_info;
-        populate_debug_messenger_create_info(create_info);
+        VulkanUtils::populateDebugMessengerCreateInfo(create_info);
 
         if (create_debug_utils_messenger_ext(m_instance, &create_info, nullptr, &m_debug_messenger) != VK_SUCCESS)
         {

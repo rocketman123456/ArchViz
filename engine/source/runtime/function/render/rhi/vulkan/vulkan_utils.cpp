@@ -9,28 +9,26 @@
 
 namespace ArchViz
 {
-    static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
-                                                        VkDebugUtilsMessageTypeFlagsEXT             messageType,
-                                                        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                                                        void*                                       pUserData)
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
+                                                         VkDebugUtilsMessageTypeFlagsEXT             messageType,
+                                                         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                         void*                                       pUserData)
     {
         LOG_ERROR("[Vulkan] validation layer: {}", pCallbackData->pMessage);
         std::cerr << "[Vulkan] validation layer: " << pCallbackData->pMessage << std::endl;
         return VK_FALSE;
     }
 
-    void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+    void VulkanUtils::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
     {
-        createInfo       = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        createInfo.messageSeverity =
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        createInfo.messageType =
-            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        createInfo.pfnUserCallback = DebugCallback;
+        createInfo                 = {};
+        createInfo.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType     = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = debug_callback;
     }
 
-    std::vector<const char*> get_required_extensions(bool enableValidationLayers)
+    std::vector<const char*> VulkanUtils::getRequiredExtensions(bool enableValidationLayers)
     {
         uint32_t     glfwExtensionCount = 0;
         const char** glfwExtensions;
@@ -46,7 +44,7 @@ namespace ArchViz
         return extensions;
     }
 
-    bool check_validation_layer_support(const std::vector<const char*>& validationLayers)
+    bool VulkanUtils::checkValidationLayerSupport(const std::vector<const char*>& validationLayers)
     {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -76,7 +74,7 @@ namespace ArchViz
         return true;
     }
 
-    bool check_device_extension_support(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions)
+    bool VulkanUtils::checkDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions)
     {
         uint32_t extension_count;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
@@ -94,7 +92,7 @@ namespace ArchViz
         return requiredExtensions.empty();
     }
 
-    SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice device, VkSurfaceKHR surface)
+    SwapChainSupportDetails VulkanUtils::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
     {
         SwapChainSupportDetails details;
 
@@ -121,25 +119,25 @@ namespace ArchViz
         return details;
     }
 
-    bool is_swap_chain_adequate(VkPhysicalDevice device, VkSurfaceKHR surface, bool extensions_supported)
+    bool VulkanUtils::isSwapChainAdequate(VkPhysicalDevice device, VkSurfaceKHR surface, bool extensions_supported)
     {
         bool swap_chain_adequate = false;
         if (extensions_supported)
         {
-            SwapChainSupportDetails swapChainSupport = query_swap_chain_support(device, surface);
+            SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface);
 
             swap_chain_adequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
         }
         return swap_chain_adequate;
     }
 
-    bool is_device_suitable(VkPhysicalDevice device, VkSurfaceKHR surface)
+    bool VulkanUtils::isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
     {
-        QueueFamilyIndices indices = find_queue_families(device, surface);
+        QueueFamilyIndices indices = findQueueFamilies(device, surface);
         return indices.isComplete();
     }
 
-    QueueFamilyIndices find_queue_families(VkPhysicalDevice device, VkSurfaceKHR surface)
+    QueueFamilyIndices VulkanUtils::findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
     {
         QueueFamilyIndices indices;
 
@@ -186,7 +184,7 @@ namespace ArchViz
         return indices;
     }
 
-    VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& available_formats)
+    VkSurfaceFormatKHR VulkanUtils::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& available_formats)
     {
         for (const auto& available_format : available_formats)
         {
@@ -198,7 +196,7 @@ namespace ArchViz
         return available_formats[0];
     }
 
-    VkPresentModeKHR choose_swap_present_mode(const std::vector<VkPresentModeKHR>& available_present_modes)
+    VkPresentModeKHR VulkanUtils::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& available_present_modes)
     {
         for (const auto& available_present_mode : available_present_modes)
         {
@@ -210,7 +208,7 @@ namespace ArchViz
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
+    VkExtent2D VulkanUtils::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
     {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
         {
@@ -229,4 +227,5 @@ namespace ArchViz
             return actualExtent;
         }
     }
+
 } // namespace ArchViz

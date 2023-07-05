@@ -20,10 +20,7 @@ namespace ArchViz
         std::optional<uint32_t> m_compute_family;
         std::optional<uint32_t> m_transfer_family;
 
-        bool isComplete()
-        {
-            return m_graphics_family.has_value() && m_present_family.has_value() && m_compute_family.has_value() && m_transfer_family.has_value();
-        }
+        bool isComplete() { return m_graphics_family.has_value() && m_present_family.has_value() && m_compute_family.has_value() && m_transfer_family.has_value(); }
     };
 
     struct SwapChainSupportDetails

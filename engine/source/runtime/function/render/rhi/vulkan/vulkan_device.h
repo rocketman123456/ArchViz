@@ -30,7 +30,7 @@ namespace ArchViz
         VkInstance       m_instance;
         VkSurfaceKHR     m_surface;
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
-        VkDevice         m_device  = VK_NULL_HANDLE;
+        VkDevice         m_device          = VK_NULL_HANDLE;
 
         VkPhysicalDeviceProperties           m_properties;
         VkPhysicalDeviceFeatures             m_features;

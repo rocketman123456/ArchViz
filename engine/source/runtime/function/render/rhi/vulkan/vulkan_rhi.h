@@ -3,6 +3,7 @@
 
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 
+// #include <vk_mem_alloc.h>
 #include <volk.h>
 
 #include <cstdint>
@@ -57,6 +58,8 @@ namespace ArchViz
         void createCommandBuffer();
 
         void createSyncObjects();
+
+        void createAssetAllocator();
 
     private:
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);

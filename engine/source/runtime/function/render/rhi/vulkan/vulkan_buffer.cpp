@@ -3,6 +3,4 @@
 #include "runtime/core/base/macro.h"
 
 namespace ArchViz
-{
-
-}
+{}

@@ -71,8 +71,7 @@ namespace ArchViz
         uint32_t width  = m_initialize_info.window_system->getWindowWidth();
         uint32_t height = m_initialize_info.window_system->getWindowHeight();
 
-        m_vulkan_swap_chain->connect(
-            m_vulkan_instance->m_instance, m_vulkan_instance->m_surface, m_vulkan_device->m_physical_device, m_vulkan_device->m_device);
+        m_vulkan_swap_chain->connect(m_vulkan_instance->m_instance, m_vulkan_instance->m_surface, m_vulkan_device->m_physical_device, m_vulkan_device->m_device);
         m_vulkan_swap_chain->initialize(width, height, false, false);
     }
 
@@ -207,6 +206,22 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createAssetAllocator()
+    {
+        // VmaVulkanFunctions vulkanFunctions    = {};
+        // vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
+        // vulkanFunctions.vkGetDeviceProcAddr   = &vkGetDeviceProcAddr;
+
+        // VmaAllocatorCreateInfo allocator_create_info = {};
+        // allocator_create_info.vulkanApiVersion       = m_vulkan_api_version;
+        // allocator_create_info.physicalDevice         = m_physical_device;
+        // allocator_create_info.device                 = m_device;
+        // allocator_create_info.instance               = m_instance;
+        // allocator_create_info.pVulkanFunctions       = &vulkanFunctions;
+
+        // vmaCreateAllocator(&allocator_create_info, &m_assets_allocator);
+    }
+
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
         m_initialize_info = initialize_info;
@@ -289,12 +304,7 @@ namespace ArchViz
 
         // handle swap chain recreation
         uint32_t image_index;
-        VkResult result = vkAcquireNextImageKHR(m_vulkan_device->m_device,
-                                                m_vulkan_swap_chain->m_swap_chain,
-                                                UINT64_MAX,
-                                                m_image_available_semaphores[m_current_frame],
-                                                VK_NULL_HANDLE,
-                                                &image_index);
+        VkResult result = vkAcquireNextImageKHR(m_vulkan_device->m_device, m_vulkan_swap_chain->m_swap_chain, UINT64_MAX, m_image_available_semaphores[m_current_frame], VK_NULL_HANDLE, &image_index);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {

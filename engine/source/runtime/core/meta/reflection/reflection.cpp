@@ -145,9 +145,9 @@ namespace ArchViz
 
         int TypeMeta::getFieldsList(FieldAccessor*& out_list)
         {
-            int count = m_fields.size();
+            size_t count = m_fields.size();
             out_list  = new FieldAccessor[count];
-            for (int i = 0; i < count; ++i)
+            for (size_t i = 0; i < count; ++i)
             {
                 out_list[i] = m_fields[i];
             }
@@ -156,9 +156,9 @@ namespace ArchViz
 
         int TypeMeta::getMethodsList(MethodAccessor*& out_list)
         {
-            int count = m_methods.size();
+            size_t count = m_methods.size();
             out_list  = new MethodAccessor[count];
-            for (int i = 0; i < count; ++i)
+            for (size_t i = 0; i < count; ++i)
             {
                 out_list[i] = m_methods[i];
             }

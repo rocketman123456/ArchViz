@@ -55,15 +55,9 @@ namespace ArchViz
         VulkanHeaderIncluder() : externalLocalDirectoryCount(0) {}
         virtual ~VulkanHeaderIncluder() override = default;
 
-        virtual IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t inclusionDepth) override
-        {
-            return readLocalPath(headerName, includerName, (int)inclusionDepth);
-        }
+        virtual IncludeResult* includeLocal(const char* headerName, const char* includerName, size_t inclusionDepth) override { return readLocalPath(headerName, includerName, (int)inclusionDepth); }
 
-        virtual IncludeResult* includeSystem(const char* headerName, const char* /*includerName*/, size_t /*inclusionDepth*/) override
-        {
-            return readSystemPath(headerName);
-        }
+        virtual IncludeResult* includeSystem(const char* headerName, const char* /*includerName*/, size_t /*inclusionDepth*/) override { return readSystemPath(headerName); }
 
         // Externally set directories. E.g., from a command-line -I<dir>.
         //  - Most-recently pushed are checked first.

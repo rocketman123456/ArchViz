@@ -1,5 +1,4 @@
 #pragma once
-#include "runtime/function/render/rhi/rhi_struct.h"
 
 #include <volk.h>
 #define GLFW_INCLUDE_NONE
