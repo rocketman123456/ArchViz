@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         {
             average_duration = average_duration * (1 - fps_alpha) + delta_time * fps_alpha;
         }
-        float fps = static_cast<int>(1.f / average_duration);
+        int fps = static_cast<int>(1.f / average_duration);
 
         std::string title = std::string("ArchViz - " + std::to_string(fps) + " FPS");
 

@@ -48,6 +48,31 @@ namespace ArchViz
         }
     }
 
+    void ConfigManager::clear()
+    {
+        m_key_binding.clear();
+
+        m_config_file_path.clear();
+        m_root_folder.clear();
+        m_asset_folder.clear();
+        m_template_folder.clear();
+
+        m_default_world_url.clear();
+        m_global_rendering_res_url.clear();
+        m_global_particle_res_url.clear();
+
+        m_editor_big_icon_path.clear();
+        m_editor_small_icon_path.clear();
+        m_editor_font_path.clear();
+    }
+
+    void ConfigManager::reload()
+    {
+        auto config_file_path = m_config_file_path;
+        clear();
+        initialize(config_file_path);
+    }
+
     void ConfigManager::setAssetConfig(const std::string& name, const std::string& value)
     {
         if (name == "BinaryRootFolder")
@@ -58,9 +83,9 @@ namespace ArchViz
         {
             m_asset_folder = m_root_folder / value;
         }
-        else if (name == "SchemaFolder")
+        else if (name == "TemplateFolder")
         {
-            m_schema_folder = m_root_folder / value;
+            m_template_folder = m_root_folder / value;
         }
         else if (name == "DefaultWorld")
         {
@@ -94,7 +119,7 @@ namespace ArchViz
 
     const std::filesystem::path& ConfigManager::getAssetFolder() const { return m_asset_folder; }
 
-    const std::filesystem::path& ConfigManager::getSchemaFolder() const { return m_schema_folder; }
+    const std::filesystem::path& ConfigManager::getTemplateFolder() const { return m_template_folder; }
 
     const std::filesystem::path& ConfigManager::getEditorBigIconPath() const { return m_editor_big_icon_path; }
 

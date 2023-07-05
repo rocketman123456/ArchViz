@@ -115,7 +115,8 @@
         "valarray": "cpp",
         "alignedvector3": "cpp",
         "typeindex": "cpp",
-        "hash_map": "cpp"
+        "hash_map": "cpp",
+        "tensor": "cpp"
     },
     "cmake.automaticReconfigure": false,
     "C_Cpp.default.includePath": [

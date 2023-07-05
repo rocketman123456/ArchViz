@@ -57,9 +57,11 @@ namespace ArchViz
             bool suitable  = VulkanUtils::isDeviceSuitable(device, m_surface);
             bool extension = VulkanUtils::checkDeviceExtensionSupport(device, VulkanConstants::device_extensions);
             bool adequate  = VulkanUtils::isSwapChainAdequate(device, m_surface, extension);
-            if (suitable && extension && adequate)
+            bool bindless  = VulkanUtils::checkBindlessSupport(device);
+            if (suitable && extension && adequate && bindless)
             {
-                m_physical_device = device;
+                m_bindless_support = bindless;
+                m_physical_device  = device;
                 break;
             }
         }
@@ -88,12 +90,13 @@ namespace ArchViz
         vkEnumerateDeviceExtensionProperties(m_physical_device, nullptr, &extension_count, nullptr);
         if (extension_count > 0)
         {
+            // LOG_DEBUG("[extension] supported vulkan extensions list:");
             std::vector<VkExtensionProperties> extensions(extension_count);
             if (vkEnumerateDeviceExtensionProperties(m_physical_device, nullptr, &extension_count, &extensions.front()) == VK_SUCCESS)
             {
                 for (auto ext : extensions)
                 {
-                    // LOG_DEBUG("supported vulkan extensions: {}", ext.extensionName);
+                    // LOG_DEBUG("    supported vulkan extensions: {}", ext.extensionName);
                     m_supported_extensions.push_back(ext.extensionName);
                 }
             }
@@ -120,15 +123,18 @@ namespace ArchViz
 
         VkPhysicalDeviceFeatures device_features {};
 
-        VkDeviceCreateInfo create_info {};
-        create_info.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        create_info.pQueueCreateInfos     = queue_create_infos.data();
-        create_info.queueCreateInfoCount  = static_cast<uint32_t>(queue_create_infos.size());
-        create_info.pEnabledFeatures      = &device_features;
-        create_info.enabledExtensionCount = 0;
+        VkPhysicalDeviceFeatures2 physical_features2 = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+        vkGetPhysicalDeviceFeatures2(m_physical_device, &physical_features2);
 
+        VkDeviceCreateInfo create_info {};
+        create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        create_info.pQueueCreateInfos       = queue_create_infos.data();
+        create_info.queueCreateInfoCount    = static_cast<uint32_t>(queue_create_infos.size());
+        create_info.pEnabledFeatures        = &device_features;
+        create_info.enabledExtensionCount   = 0;
         create_info.enabledExtensionCount   = static_cast<uint32_t>(VulkanConstants::device_extensions.size());
         create_info.ppEnabledExtensionNames = VulkanConstants::device_extensions.data();
+        create_info.pNext                   = &physical_features2;
 
         if (m_enable_validation_layers)
         {
@@ -138,6 +144,19 @@ namespace ArchViz
         else
         {
             create_info.enabledLayerCount = 0;
+        }
+
+        if (m_bindless_support)
+        {
+            VkPhysicalDeviceDescriptorIndexingFeatures indexing_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr};
+            VkPhysicalDeviceFeatures2                  device_features_2 {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_features};
+
+            vkGetPhysicalDeviceFeatures2(m_physical_device, &device_features_2);
+
+            indexing_features.descriptorBindingPartiallyBound = VK_TRUE;
+            indexing_features.runtimeDescriptorArray          = VK_TRUE;
+
+            physical_features2.pNext = &indexing_features;
         }
 
         if (vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device) != VK_SUCCESS)

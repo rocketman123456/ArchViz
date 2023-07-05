@@ -17,9 +17,9 @@ include(CMakeDependentOption)
 
 find_package(spdlog CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
-find_package(Eigen3 CONFIG REQUIRED)
+# find_package(Eigen3 CONFIG REQUIRED)
 find_package(glslang CONFIG REQUIRED)
-find_package(libzip CONFIG REQUIRED)
+# find_package(libzip CONFIG REQUIRED)
 
 # find_package(glfw3 CONFIG REQUIRED)
 # find_package(volk CONFIG REQUIRED)

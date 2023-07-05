@@ -32,6 +32,8 @@ namespace ArchViz
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice         m_device          = VK_NULL_HANDLE;
 
+        bool m_bindless_support = false;
+
         VkPhysicalDeviceProperties           m_properties;
         VkPhysicalDeviceFeatures             m_features;
         VkPhysicalDeviceFeatures             m_enabled_features;

@@ -92,6 +92,17 @@ namespace ArchViz
         return requiredExtensions.empty();
     }
 
+    bool VulkanUtils::checkBindlessSupport(VkPhysicalDevice device)
+    {
+        VkPhysicalDeviceDescriptorIndexingFeatures indexing_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr};
+        VkPhysicalDeviceFeatures2                  device_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_features};
+
+        vkGetPhysicalDeviceFeatures2(device, &device_features);
+
+        bool bindless_supported = indexing_features.descriptorBindingPartiallyBound && indexing_features.runtimeDescriptorArray;
+        return bindless_supported;
+    }
+
     SwapChainSupportDetails VulkanUtils::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
     {
         SwapChainSupportDetails details;

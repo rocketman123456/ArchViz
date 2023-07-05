@@ -1,6 +1,4 @@
 #pragma once
-#include "runtime/function/render/render_data.h"
-#include "runtime/function/render/render_type.h"
 
 #include <array>
 #include <memory>
@@ -43,7 +41,7 @@ namespace ArchViz
         void processSwapData();
 
     private:
-        RENDER_PIPELINE_TYPE m_render_pipeline_type {RENDER_PIPELINE_TYPE::DEFERRED_PIPELINE};
+        // RENDER_PIPELINE_TYPE m_render_pipeline_type {RENDER_PIPELINE_TYPE::DEFERRED_PIPELINE};
 
         // RenderSwapContext m_swap_context;
 
