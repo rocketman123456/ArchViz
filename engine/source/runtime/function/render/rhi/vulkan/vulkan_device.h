@@ -46,6 +46,7 @@ namespace ArchViz
         VkQueue m_graphics_queue;
         VkQueue m_compute_queue;
         VkQueue m_present_queue;
+        VkQueue m_transfer_queue;
 
         // TODO
     };

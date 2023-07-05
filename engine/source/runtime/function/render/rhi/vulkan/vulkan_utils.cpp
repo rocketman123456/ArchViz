@@ -150,7 +150,7 @@ namespace ArchViz
         int i = 0;
         for (const auto& queue_family : queue_families)
         {
-            if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) // if support graphics command queue
             {
                 indices.m_graphics_family = i;
             }
@@ -160,7 +160,7 @@ namespace ArchViz
                 indices.m_compute_family = i;
             }
 
-            if (queue_family.queueFlags & VK_QUEUE_TRANSFER_BIT)
+            if (queue_family.queueFlags & VK_QUEUE_TRANSFER_BIT) // if support transfer command queue
             {
                 indices.m_transfer_family = i;
             }
@@ -168,7 +168,7 @@ namespace ArchViz
             VkBool32 present_support = false;
             vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &present_support);
 
-            if (present_support)
+            if (present_support) // if support present command queue
             {
                 indices.m_present_family = i;
             }

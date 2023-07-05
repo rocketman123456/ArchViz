@@ -150,5 +150,6 @@ namespace ArchViz
         vkGetDeviceQueue(m_device, m_indices.m_graphics_family.value(), 0, &m_graphics_queue);
         vkGetDeviceQueue(m_device, m_indices.m_compute_family.value(), 0, &m_compute_queue);
         vkGetDeviceQueue(m_device, m_indices.m_present_family.value(), 0, &m_present_queue);
+        vkGetDeviceQueue(m_device, m_indices.m_transfer_family.value(), 0, &m_transfer_queue);
     }
 } // namespace ArchViz
