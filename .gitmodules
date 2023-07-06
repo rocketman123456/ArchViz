@@ -70,9 +70,6 @@
 [submodule "engine/3rd_party/spdlog"]
 	path = engine/3rd_party/spdlog
 	url = https://github.com/gabime/spdlog.git
-[submodule "spdlog"]
-	path = spdlog
-	url = https://github.com/gabime/spdlog.git
 [submodule "engine/3rd_party/fmt"]
 	path = engine/3rd_party/fmt
 	url = https://github.com/fmtlib/fmt.git

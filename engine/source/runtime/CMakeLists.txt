@@ -60,8 +60,8 @@ target_link_directories(${TARGET_NAME} PUBLIC "$<IF:$<CONFIG:Debug>,${JSON11_LIB
 target_link_directories(${TARGET_NAME} PUBLIC "$<IF:$<CONFIG:Debug>,${JOLTPHYSICS_LIB_DEBUG_DIRS},${JOLTPHYSICS_LIB_DIRS}>")
 
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/spdlog/include)
-# target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/fmt/include)
-# target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/eigen)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/fmt/include)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/eigen)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/json11)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/volk)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/glslang)

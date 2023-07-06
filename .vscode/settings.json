@@ -118,7 +118,8 @@
         "hash_map": "cpp",
         "tensor": "cpp",
         "scoped_allocator": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "csignal": "cpp"
     },
     "cmake.automaticReconfigure": false,
     "C_Cpp.default.includePath": [

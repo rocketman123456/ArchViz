@@ -37,18 +37,13 @@ namespace ArchViz
 
         void clear() override;
 
+        void createSwapChain() override;
         void recreateSwapChain() override;
 
     private:
         void createInstance();
-        void setupDebugMessenger();
-        void createSurface();
 
-        void pickPhysicalDevice();
-        void createLogicalDevice();
-
-        void createSwapChain() override;
-        void createImageViews();
+        void createVulkanDevice();
 
         void createRenderPass();
         void createGraphicsPipeline();
@@ -57,6 +52,8 @@ namespace ArchViz
 
         void createCommandPool();
         void createCommandBuffer();
+
+        void createVertexBuffer();
 
         void createSyncObjects();
 
@@ -87,6 +84,9 @@ namespace ArchViz
 
         // asset allocator use VMA library
         VmaAllocator m_assets_allocator;
+
+        VkBuffer       m_vertex_buffer;
+        VkDeviceMemory m_vertex_buffer_memory;
 
         VkCommandPool m_command_pool;
         // VkCommandBuffer m_command_buffer;

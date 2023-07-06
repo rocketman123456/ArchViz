@@ -7,6 +7,8 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
+#include "runtime/function/render/geometry/vertex.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -26,8 +28,7 @@
 #endif
 #endif
 
-#include <memory>
-#include <set>
+const std::vector<ArchViz::Vertex> vertices = {{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
 
 namespace ArchViz
 {
@@ -50,18 +51,12 @@ namespace ArchViz
         m_vulkan_instance->initialize();
     }
 
-    void VulkanRHI::setupDebugMessenger() {}
-
-    void VulkanRHI::createSurface() {}
-
-    void VulkanRHI::pickPhysicalDevice()
+    void VulkanRHI::createVulkanDevice()
     {
         m_vulkan_device = std::make_shared<VulkanDevice>(m_enable_validation_layers);
         m_vulkan_device->connect(m_vulkan_instance->m_instance, m_vulkan_instance->m_surface);
         m_vulkan_device->initialize();
     }
-
-    void VulkanRHI::createLogicalDevice() {}
 
     void VulkanRHI::createSwapChain()
     {
@@ -95,11 +90,8 @@ namespace ArchViz
         m_vulkan_swap_chain->clear();
 
         m_vulkan_swap_chain->initialize(width, height);
-        createImageViews();
         createFramebuffers();
     }
-
-    void VulkanRHI::createImageViews() {}
 
     void VulkanRHI::createRenderPass()
     {
@@ -112,8 +104,8 @@ namespace ArchViz
     void VulkanRHI::createGraphicsPipeline()
     {
         ShaderModuleConfig config;
-        config.m_vert_shader = "shader/glsl/shader_base.vert";
-        config.m_frag_shader = "shader/glsl/shader_base.frag";
+        config.m_vert_shader = "shader/glsl/shader_vertexbuffer.vert";
+        config.m_frag_shader = "shader/glsl/shader_vertexbuffer.frag";
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
 
@@ -181,6 +173,43 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createVertexBuffer()
+    {
+        VkBufferCreateInfo buffer_info {};
+        buffer_info.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_info.size        = sizeof(vertices[0]) * vertices.size();
+        buffer_info.usage       = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+        if (vkCreateBuffer(m_vulkan_device->m_device, &buffer_info, nullptr, &m_vertex_buffer) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create vertex buffer!");
+        }
+
+        VkMemoryRequirements mem_requirements;
+        vkGetBufferMemoryRequirements(m_vulkan_device->m_device, m_vertex_buffer, &mem_requirements);
+
+        VkMemoryAllocateInfo alloc_info {};
+        alloc_info.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc_info.allocationSize = mem_requirements.size;
+        alloc_info.memoryTypeIndex =
+            VulkanUtils::findMemoryType(m_vulkan_device->m_physical_device, mem_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+        if (vkAllocateMemory(m_vulkan_device->m_device, &alloc_info, nullptr, &m_vertex_buffer_memory) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate vertex buffer memory!");
+        }
+
+        vkBindBufferMemory(m_vulkan_device->m_device, m_vertex_buffer, m_vertex_buffer_memory, 0);
+
+        void* data;
+        vkMapMemory(m_vulkan_device->m_device, m_vertex_buffer_memory, 0, buffer_info.size, 0, &data);
+        {
+            memcpy(data, vertices.data(), (size_t)buffer_info.size);
+        }
+        vkUnmapMemory(m_vulkan_device->m_device, m_vertex_buffer_memory);
+    }
+
     void VulkanRHI::createSyncObjects()
     {
         m_image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -226,13 +255,10 @@ namespace ArchViz
         m_initialize_info = initialize_info;
 
         createInstance();
-        setupDebugMessenger();
-        createSurface();
 
-        pickPhysicalDevice();
-        createLogicalDevice();
+        createVulkanDevice();
+
         createSwapChain();
-        createImageViews();
 
         createRenderPass();
         createGraphicsPipeline();
@@ -241,6 +267,8 @@ namespace ArchViz
 
         createCommandPool();
         createCommandBuffer();
+
+        createVertexBuffer();
 
         createSyncObjects();
     }
@@ -284,6 +312,10 @@ namespace ArchViz
             scissor.offset = {0, 0};
             scissor.extent = m_vulkan_swap_chain->m_swap_chain_extent;
             vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+
+            VkBuffer     vertex_buffers[] = {m_vertex_buffer};
+            VkDeviceSize offsets[]       = {0};
+            vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
 
             vkCmdDraw(command_buffer, 3, 1, 0, 0);
         }

@@ -239,4 +239,21 @@ namespace ArchViz
         }
     }
 
+    uint32_t VulkanUtils::findMemoryType(VkPhysicalDevice device, uint32_t type_filter, VkMemoryPropertyFlags properties)
+    {
+        VkPhysicalDeviceMemoryProperties mem_properties;
+        vkGetPhysicalDeviceMemoryProperties(device, &mem_properties);
+
+        for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++)
+        {
+            if ((type_filter & (1 << i)) && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
+            {
+                return i;
+            }
+        }
+
+        LOG_FATAL("failed to find suitable memory type!");
+        return -1;
+    }
+
 } // namespace ArchViz
