@@ -23,10 +23,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <exception>
 #include <filesystem>
 #include <fstream>
-#include <stdexcept>
 
 namespace ArchViz
 {
@@ -95,15 +93,13 @@ namespace ArchViz
         if (!shader->preprocess(resources, defaultVersion, ENoProfile, false, false, messages, &str, includer))
         {
             LOG_ERROR(shader->getInfoLog());
-            LOG_ERROR(shader->getInfoDebugLog());
-            throw std::runtime_error(shader->getInfoLog());
+            LOG_FATAL(shader->getInfoDebugLog());
         }
 
         if (!shader->parse(resources, defaultVersion, false, messages, includer))
         {
             LOG_ERROR(shader->getInfoLog());
-            LOG_ERROR(shader->getInfoDebugLog());
-            throw std::runtime_error(shader->getInfoLog());
+            LOG_FATAL(shader->getInfoDebugLog());
         }
 
         program->addShader(shader);
@@ -111,15 +107,13 @@ namespace ArchViz
         if (!program->link(messages))
         {
             LOG_ERROR(program->getInfoLog());
-            LOG_ERROR(program->getInfoDebugLog());
-            throw std::runtime_error(program->getInfoLog());
+            LOG_FATAL(program->getInfoDebugLog());
         }
 
         if (!program->mapIO())
         {
             LOG_ERROR(program->getInfoLog());
-            LOG_ERROR(program->getInfoDebugLog());
-            throw std::runtime_error(program->getInfoLog());
+            LOG_FATAL(program->getInfoDebugLog());
         }
 
         bool SpvToolsDisassembler = false;
@@ -139,7 +133,7 @@ namespace ArchViz
         }
         else
         {
-            throw std::runtime_error("cannot find target shader");
+            LOG_FATAL("cannot find target shader")
         }
 
         glslang::FinalizeProcess();
@@ -203,15 +197,13 @@ namespace ArchViz
         if (!shader->preprocess(resources, defaultVersion, ENoProfile, false, false, messages, &str, includer))
         {
             LOG_ERROR(shader->getInfoLog());
-            LOG_ERROR(shader->getInfoDebugLog());
-            throw std::runtime_error(shader->getInfoLog());
+            LOG_FATAL(shader->getInfoDebugLog());
         }
 
         if (!shader->parse(resources, defaultVersion, false, messages, includer))
         {
             LOG_ERROR(shader->getInfoLog());
-            LOG_ERROR(shader->getInfoDebugLog());
-            throw std::runtime_error(shader->getInfoLog());
+            LOG_FATAL(shader->getInfoDebugLog());
         }
 
         program->addShader(shader);
@@ -219,15 +211,13 @@ namespace ArchViz
         if (!program->link(messages))
         {
             LOG_ERROR(program->getInfoLog());
-            LOG_ERROR(program->getInfoDebugLog());
-            throw std::runtime_error(program->getInfoLog());
+            LOG_FATAL(program->getInfoDebugLog());
         }
 
         if (!program->mapIO())
         {
             LOG_ERROR(program->getInfoLog());
-            LOG_ERROR(program->getInfoDebugLog());
-            throw std::runtime_error(program->getInfoLog());
+            LOG_FATAL(program->getInfoDebugLog());
         }
 
         bool SpvToolsDisassembler = false;
@@ -247,7 +237,7 @@ namespace ArchViz
         }
         else
         {
-            throw std::runtime_error("cannot find target shader");
+            LOG_FATAL("cannot find target shader");
         }
 
         glslang::FinalizeProcess();
@@ -305,15 +295,13 @@ namespace ArchViz
         if (!shader->preprocess(resources, defaultVersion, ENoProfile, false, false, messages, &str, includer))
         {
             LOG_ERROR(shader->getInfoLog());
-            LOG_ERROR(shader->getInfoDebugLog());
-            throw std::runtime_error(shader->getInfoLog());
+            LOG_FATAL(shader->getInfoDebugLog());
         }
 
         if (!shader->parse(resources, defaultVersion, false, messages, includer))
         {
             LOG_ERROR(shader->getInfoLog());
-            LOG_ERROR(shader->getInfoDebugLog());
-            throw std::runtime_error(shader->getInfoLog());
+            LOG_FATAL(shader->getInfoDebugLog());
         }
 
         program->addShader(shader);
@@ -321,15 +309,13 @@ namespace ArchViz
         if (!program->link(messages))
         {
             LOG_ERROR(program->getInfoLog());
-            LOG_ERROR(program->getInfoDebugLog());
-            throw std::runtime_error(program->getInfoLog());
+            LOG_FATAL(program->getInfoDebugLog());
         }
 
         if (!program->mapIO())
         {
             LOG_ERROR(program->getInfoLog());
-            LOG_ERROR(program->getInfoDebugLog());
-            throw std::runtime_error(program->getInfoLog());
+            LOG_FATAL(program->getInfoDebugLog());
         }
 
         bool SpvToolsDisassembler = false;
@@ -349,7 +335,7 @@ namespace ArchViz
         }
         else
         {
-            throw std::runtime_error("cannot find target shader");
+            LOG_FATAL("cannot find target shader");
         }
 
         glslang::FinalizeProcess();
