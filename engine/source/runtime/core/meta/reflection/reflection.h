@@ -123,8 +123,8 @@ namespace ArchViz
 
             std::string getTypeName();
 
-            int getFieldsList(FieldAccessor*& out_list);
-            int getMethodsList(MethodAccessor*& out_list);
+            size_t getFieldsList(FieldAccessor*& out_list);
+            size_t getMethodsList(MethodAccessor*& out_list);
 
             int getBaseClassReflectionInstanceList(ReflectionInstance*& out_list, void* instance);
 

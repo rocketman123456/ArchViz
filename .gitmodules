@@ -61,3 +61,24 @@
 [submodule "engine/3rd_party/memory"]
 	path = engine/3rd_party/memory
 	url = https://github.com/foonathan/memory.git
+[submodule "engine/3rd_party/zlib"]
+	path = engine/3rd_party/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "engine/3rd_party/glslang"]
+	path = engine/3rd_party/glslang
+	url = https://github.com/KhronosGroup/glslang.git
+[submodule "engine/3rd_party/spdlog"]
+	path = engine/3rd_party/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "spdlog"]
+	path = spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "engine/3rd_party/fmt"]
+	path = engine/3rd_party/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "engine/3rd_party/lua"]
+	path = engine/3rd_party/lua
+	url = https://github.com/lua/lua.git
+[submodule "engine/3rd_party/sol2"]
+	path = engine/3rd_party/sol2
+	url = https://github.com/ThePhD/sol2.git

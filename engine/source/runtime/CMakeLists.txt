@@ -33,54 +33,45 @@ target_compile_options(${TARGET_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:
 target_link_libraries(${TARGET_NAME} PUBLIC json11)
 target_link_libraries(${TARGET_NAME} PUBLIC mustache)
 target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog_header_only)
-target_link_libraries(${TARGET_NAME} PUBLIC fmt::fmt-header-only)
+# target_link_libraries(${TARGET_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC volk::volk_headers)
 target_link_libraries(${TARGET_NAME} PUBLIC volk::volk)
 target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
 target_link_libraries(${TARGET_NAME} PUBLIC SPIRV-Headers)
 target_link_libraries(${TARGET_NAME} PUBLIC Vulkan-Headers)
-# target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
+target_link_libraries(${TARGET_NAME} PUBLIC VulkanMemoryAllocator)
+target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
 # target_link_libraries(${TARGET_NAME} PUBLIC zip)
-# target_link_libraries(${TARGET_NAME} PUBLIC unofficial::vulkan-memory-allocator::vulkan-memory-allocator)
 
 target_link_libraries(${TARGET_NAME} PUBLIC 
-  glslang::OSDependent 
-  glslang::glslang 
-  glslang::MachineIndependent 
-  glslang::GenericCodeGen 
-  glslang::OGLCompiler 
-  # glslang::glslangValidator 
-  # glslang::spirv-remap 
-  glslang::glslang-default-resource-limits 
-  glslang::SPVRemapper 
-  glslang::SPIRV 
-  glslang::HLSL
+  glslang 
+  OSDependent
+  MachineIndependent 
+  GenericCodeGen 
+  OGLCompiler 
+  glslang-default-resource-limits 
+  SPVRemapper 
+  SPIRV 
+  HLSL
 )
-
-# target_link_libraries(${TARGET_NAME} PUBLIC fmt::fmt)
-# target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog)
-# target_link_libraries(${TARGET_NAME} PUBLIC soloud)
-# target_link_libraries(${TARGET_NAME} PUBLIC imgui)
-# target_link_libraries(${TARGET_NAME} PUBLIC tinyobjloader::tinyobjloader)
-# target_link_libraries(${TARGET_NAME} PUBLIC sol2)
-# target_link_libraries(${TARGET_NAME} PUBLIC ${LUA_LIBRARIES})
-# target_link_libraries(${TARGET_NAME} PUBLIC lz4::lz4)
-# target_link_libraries(${TARGET_NAME} PUBLIC nlohmann_json::nlohmann_json)
-# target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 
 target_link_directories(${TARGET_NAME} PUBLIC "$<IF:$<CONFIG:Debug>,${JSON11_LIB_DEBUG_DIRS},${JSON11_LIB_DIRS}>")
 target_link_directories(${TARGET_NAME} PUBLIC "$<IF:$<CONFIG:Debug>,${JOLTPHYSICS_LIB_DEBUG_DIRS},${JOLTPHYSICS_LIB_DIRS}>")
 
-target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/eigen)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/spdlog/include)
+# target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/fmt/include)
+# target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/eigen)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/json11)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/volk)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/glslang)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/stb)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/glfw/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/tinygltf)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/tinyobjloader)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/SPIRV-Headers/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/VulkanMemoryAllocator/include)
 # target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/libzip/lib)
 
 # target_include_directories(${TARGET_NAME} PUBLIC ${STB_INCLUDE_DIRS})

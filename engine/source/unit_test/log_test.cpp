@@ -4,7 +4,7 @@
 
 using namespace ArchViz;
 
-int main()
+int main(int argc, char** argv)
 {
     LogSystem::getInstance().log(LogSystem::LogLevel::debug, "[" + std::string(__FUNCTION__) + "] " + "Hello World");
     LogSystem::getInstance().log(LogSystem::LogLevel::info, "[" + std::string(__FUNCTION__) + "] " + "Hello World");

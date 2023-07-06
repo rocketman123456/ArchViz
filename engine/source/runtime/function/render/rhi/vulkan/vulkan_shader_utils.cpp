@@ -7,12 +7,12 @@
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
-#include <glslang/SPIRV/GLSL.ext.EXT.h>
-#include <glslang/SPIRV/GLSL.ext.KHR.h>
-#include <glslang/SPIRV/GLSL.std.450.h>
-#include <glslang/SPIRV/GlslangToSpv.h>
-#include <glslang/SPIRV/disassemble.h>
-#include <glslang/SPIRV/doc.h>
+#include <SPIRV/GLSL.ext.EXT.h>
+#include <SPIRV/GLSL.ext.KHR.h>
+#include <SPIRV/GLSL.std.450.h>
+#include <SPIRV/GlslangToSpv.h>
+#include <SPIRV/disassemble.h>
+#include <SPIRV/doc.h>
 
 #include <glslang/Include/ResourceLimits.h>
 #include <glslang/Include/ShHandle.h>

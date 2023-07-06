@@ -4,6 +4,8 @@
 
 #include <volk.h>
 
+#include <vk_mem_alloc.h>
+
 #include <cstdint>
 #include <limits>
 
@@ -136,7 +138,7 @@ namespace ArchViz
         // Default constructor
         DepthStencilCreation() : depth_enable(0), depth_write_enable(0), stencil_enable(0) {}
 
-        DepthStencilCreation& set_depth(bool write, VkCompareOp comparison_test);
+        DepthStencilCreation& setDepth(bool write, VkCompareOp comparison_test);
 
     }; // struct DepthStencilCreation
 
@@ -159,9 +161,9 @@ namespace ArchViz
 
         BlendState() : blend_enabled(0), separate_blend(0) {}
 
-        BlendState& set_color(VkBlendFactor source_color, VkBlendFactor destination_color, VkBlendOp color_operation);
-        BlendState& set_alpha(VkBlendFactor source_color, VkBlendFactor destination_color, VkBlendOp color_operation);
-        BlendState& set_color_write_mask(ColorWriteEnabled::Mask value);
+        BlendState& setColor(VkBlendFactor source_color, VkBlendFactor destination_color, VkBlendOp color_operation);
+        BlendState& setAlpha(VkBlendFactor source_color, VkBlendFactor destination_color, VkBlendOp color_operation);
+        BlendState& setColorWriteMask(ColorWriteEnabled::Mask value);
 
     }; // struct BlendState
 
@@ -172,7 +174,7 @@ namespace ArchViz
         uint32_t   active_states = 0;
 
         BlendStateCreation& reset();
-        BlendState&         add_blend_state();
+        BlendState&         addBlendState();
 
     }; // BlendStateCreation
 
@@ -200,8 +202,8 @@ namespace ArchViz
 
         BufferCreation& reset();
         BufferCreation& set(VkBufferUsageFlags flags, ResourceUsageType::Enum usage, uint32_t size);
-        BufferCreation& set_data(void* data);
-        BufferCreation& set_name(const char* name);
+        BufferCreation& setData(void* data);
+        BufferCreation& setName(const char* name);
 
     }; // struct BufferCreation
 
@@ -222,11 +224,11 @@ namespace ArchViz
 
         const char* name = nullptr;
 
-        TextureCreation& set_size(uint16_t width, uint16_t height, uint16_t depth);
-        TextureCreation& set_flags(uint8_t mipmaps, uint8_t flags);
-        TextureCreation& set_format_type(VkFormat format, TextureType::Enum type);
-        TextureCreation& set_name(const char* name);
-        TextureCreation& set_data(void* data);
+        TextureCreation& setSize(uint16_t width, uint16_t height, uint16_t depth);
+        TextureCreation& setFlags(uint8_t mipmaps, uint8_t flags);
+        TextureCreation& setFormatType(VkFormat format, TextureType::Enum type);
+        TextureCreation& setName(const char* name);
+        TextureCreation& setData(void* data);
 
     }; // struct TextureCreation
 
@@ -245,11 +247,11 @@ namespace ArchViz
 
         const char* name = nullptr;
 
-        SamplerCreation& set_min_mag_mip(VkFilter min, VkFilter mag, VkSamplerMipmapMode mip);
-        SamplerCreation& set_address_mode_u(VkSamplerAddressMode u);
-        SamplerCreation& set_address_mode_uv(VkSamplerAddressMode u, VkSamplerAddressMode v);
-        SamplerCreation& set_address_mode_uvw(VkSamplerAddressMode u, VkSamplerAddressMode v, VkSamplerAddressMode w);
-        SamplerCreation& set_name(const char* name);
+        SamplerCreation& setMinMagMip(VkFilter min, VkFilter mag, VkSamplerMipmapMode mip);
+        SamplerCreation& setAddressModeU(VkSamplerAddressMode u);
+        SamplerCreation& setAddressModeUV(VkSamplerAddressMode u, VkSamplerAddressMode v);
+        SamplerCreation& setAddressModeUVW(VkSamplerAddressMode u, VkSamplerAddressMode v, VkSamplerAddressMode w);
+        SamplerCreation& setName(const char* name);
 
     }; // struct SamplerCreation
 
@@ -278,9 +280,9 @@ namespace ArchViz
 
         // Building helpers
         ShaderStateCreation& reset();
-        ShaderStateCreation& set_name(const char* name);
-        ShaderStateCreation& add_stage(const char* code, uint32_t code_size, VkShaderStageFlagBits type);
-        ShaderStateCreation& set_spv_input(bool value);
+        ShaderStateCreation& setName(const char* name);
+        ShaderStateCreation& addStage(const char* code, uint32_t code_size, VkShaderStageFlagBits type);
+        ShaderStateCreation& setSpvInput(bool value);
 
     }; // struct ShaderStateCreation
 
@@ -307,10 +309,10 @@ namespace ArchViz
 
         // Building helpers
         DescriptorSetLayoutCreation& reset();
-        DescriptorSetLayoutCreation& add_binding(const Binding& binding);
-        DescriptorSetLayoutCreation& add_binding_at_index(const Binding& binding, int index);
-        DescriptorSetLayoutCreation& set_name(const char* name);
-        DescriptorSetLayoutCreation& set_set_index(uint32_t index);
+        DescriptorSetLayoutCreation& addBinding(const Binding& binding);
+        DescriptorSetLayoutCreation& addBindingAtIndex(const Binding& binding, int index);
+        DescriptorSetLayoutCreation& setName(const char* name);
+        DescriptorSetLayoutCreation& setSetIndex(uint32_t index);
 
     }; // struct DescriptorSetLayoutCreation
 
@@ -330,11 +332,11 @@ namespace ArchViz
 
         // Building helpers
         DescriptorSetCreation& reset();
-        DescriptorSetCreation& set_layout(DescriptorSetLayoutHandle layout);
+        DescriptorSetCreation& setLayout(DescriptorSetLayoutHandle layout);
         DescriptorSetCreation& texture(TextureHandle texture, uint16_t binding);
         DescriptorSetCreation& buffer(BufferHandle buffer, uint16_t binding);
-        DescriptorSetCreation& texture_sampler(TextureHandle texture, SamplerHandle sampler, uint16_t binding); // TODO: separate samplers from textures
-        DescriptorSetCreation& set_name(const char* name);
+        DescriptorSetCreation& textureSampler(TextureHandle texture, SamplerHandle sampler, uint16_t binding); // TODO: separate samplers from textures
+        DescriptorSetCreation& setName(const char* name);
 
     }; // struct DescriptorSetCreation
 
@@ -382,8 +384,8 @@ namespace ArchViz
         VertexAttribute vertex_attributes[k_max_vertex_attributes];
 
         VertexInputCreation& reset();
-        VertexInputCreation& add_vertex_stream(const VertexStream& stream);
-        VertexInputCreation& add_vertex_attribute(const VertexAttribute& attribute);
+        VertexInputCreation& addVertexStream(const VertexStream& stream);
+        VertexInputCreation& addVertexAttribute(const VertexAttribute& attribute);
     }; // struct VertexInputCreation
 
     //
@@ -402,7 +404,7 @@ namespace ArchViz
         RenderPassOutput& reset();
         RenderPassOutput& color(VkFormat format);
         RenderPassOutput& depth(VkFormat format);
-        RenderPassOutput& set_operations(RenderPassOperation::Enum color, RenderPassOperation::Enum depth, RenderPassOperation::Enum stencil);
+        RenderPassOutput& setOperations(RenderPassOperation::Enum color, RenderPassOperation::Enum depth, RenderPassOperation::Enum stencil);
 
     }; // struct RenderPassOutput
 
@@ -428,12 +430,12 @@ namespace ArchViz
         const char* name = nullptr;
 
         RenderPassCreation& reset();
-        RenderPassCreation& add_render_texture(TextureHandle texture);
-        RenderPassCreation& set_scaling(float scale_x, float scale_y, uint8_t resize);
-        RenderPassCreation& set_depth_stencil_texture(TextureHandle texture);
-        RenderPassCreation& set_name(const char* name);
-        RenderPassCreation& set_type(RenderPassType::Enum type);
-        RenderPassCreation& set_operations(RenderPassOperation::Enum color, RenderPassOperation::Enum depth, RenderPassOperation::Enum stencil);
+        RenderPassCreation& addRenderTexture(TextureHandle texture);
+        RenderPassCreation& setScaling(float scale_x, float scale_y, uint8_t resize);
+        RenderPassCreation& setDepthStencilTexture(TextureHandle texture);
+        RenderPassCreation& setName(const char* name);
+        RenderPassCreation& setType(RenderPassType::Enum type);
+        RenderPassCreation& setOperations(RenderPassOperation::Enum color, RenderPassOperation::Enum depth, RenderPassOperation::Enum stencil);
 
     }; // struct RenderPassCreation
 
@@ -456,8 +458,8 @@ namespace ArchViz
 
         const char* name = nullptr;
 
-        PipelineCreation& add_descriptor_set_layout(DescriptorSetLayoutHandle handle);
-        RenderPassOutput& render_pass_output();
+        PipelineCreation& addDescriptorSetLayout(DescriptorSetLayoutHandle handle);
+        RenderPassOutput& renderPassOutput();
 
     }; // struct PipelineCreation
 
@@ -640,8 +642,8 @@ namespace ArchViz
 
         ExecutionBarrier& reset();
         ExecutionBarrier& set(PipelineStage::Enum source, PipelineStage::Enum destination);
-        ExecutionBarrier& add_image_barrier(const ImageBarrier& image_barrier);
-        ExecutionBarrier& add_memory_barrier(const MemoryBarrier& memory_barrier);
+        ExecutionBarrier& addImageBarrier(const ImageBarrier& image_barrier);
+        ExecutionBarrier& addMemoryBarrier(const MemoryBarrier& memory_barrier);
 
     }; // struct Barrier
 
@@ -666,7 +668,7 @@ namespace ArchViz
     struct Buffer
     {
 
-        VkBuffer       vk_buffer;
+        VkBuffer vk_buffer;
         // VmaAllocation  vma_allocation;
         VkDeviceMemory vk_device_memory;
         VkDeviceSize   vk_device_size;

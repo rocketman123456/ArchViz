@@ -116,7 +116,9 @@
         "alignedvector3": "cpp",
         "typeindex": "cpp",
         "hash_map": "cpp",
-        "tensor": "cpp"
+        "tensor": "cpp",
+        "scoped_allocator": "cpp",
+        "*.inc": "cpp"
     },
     "cmake.automaticReconfigure": false,
     "C_Cpp.default.includePath": [

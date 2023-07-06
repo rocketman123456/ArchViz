@@ -3,8 +3,10 @@
 
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 
-// #include <vk_mem_alloc.h>
 #include <volk.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <vk_mem_alloc.h>
 
 #include <cstdint>
 #include <memory>
@@ -35,7 +37,6 @@ namespace ArchViz
 
         void clear() override;
 
-        void createSwapChain() override;
         void recreateSwapChain() override;
 
     private:
@@ -46,7 +47,7 @@ namespace ArchViz
         void pickPhysicalDevice();
         void createLogicalDevice();
 
-        // void createSwapChain();
+        void createSwapChain() override;
         void createImageViews();
 
         void createRenderPass();
@@ -83,6 +84,9 @@ namespace ArchViz
         std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
+
+        // asset allocator use VMA library
+        VmaAllocator m_assets_allocator;
 
         VkCommandPool m_command_pool;
         // VkCommandBuffer m_command_buffer;

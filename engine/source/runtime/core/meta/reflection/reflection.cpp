@@ -143,7 +143,7 @@ namespace ArchViz
 
         std::string TypeMeta::getTypeName() { return m_type_name; }
 
-        int TypeMeta::getFieldsList(FieldAccessor*& out_list)
+        size_t TypeMeta::getFieldsList(FieldAccessor*& out_list)
         {
             size_t count = m_fields.size();
             out_list  = new FieldAccessor[count];
@@ -154,7 +154,7 @@ namespace ArchViz
             return count;
         }
 
-        int TypeMeta::getMethodsList(MethodAccessor*& out_list)
+        size_t TypeMeta::getMethodsList(MethodAccessor*& out_list)
         {
             size_t count = m_methods.size();
             out_list  = new MethodAccessor[count];

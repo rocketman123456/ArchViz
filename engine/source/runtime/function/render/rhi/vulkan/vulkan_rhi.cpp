@@ -7,13 +7,12 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
+#include "runtime/resource/asset_manager/asset_manager.h"
+#include "runtime/resource/config_manager/config_manager.h"
+
 #include "runtime/function/window/window_system.h"
 
 #include "runtime/core/base/macro.h"
-
-#include <volk.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 
 #if defined(__GNUC__)
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
@@ -208,18 +207,18 @@ namespace ArchViz
 
     void VulkanRHI::createAssetAllocator()
     {
-        // VmaVulkanFunctions vulkanFunctions    = {};
-        // vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
-        // vulkanFunctions.vkGetDeviceProcAddr   = &vkGetDeviceProcAddr;
+        VmaVulkanFunctions vulkanFunctions    = {};
+        vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+        vulkanFunctions.vkGetDeviceProcAddr   = vkGetDeviceProcAddr;
 
-        // VmaAllocatorCreateInfo allocator_create_info = {};
-        // allocator_create_info.vulkanApiVersion       = m_vulkan_api_version;
-        // allocator_create_info.physicalDevice         = m_physical_device;
-        // allocator_create_info.device                 = m_device;
-        // allocator_create_info.instance               = m_instance;
-        // allocator_create_info.pVulkanFunctions       = &vulkanFunctions;
+        VmaAllocatorCreateInfo allocator_create_info = {};
+        allocator_create_info.vulkanApiVersion       = m_vulkan_instance->m_vulkan_api_version;
+        allocator_create_info.physicalDevice         = m_vulkan_device->m_physical_device;
+        allocator_create_info.device                 = m_vulkan_device->m_device;
+        allocator_create_info.instance               = m_vulkan_instance->m_instance;
+        allocator_create_info.pVulkanFunctions       = &vulkanFunctions;
 
-        // vmaCreateAllocator(&allocator_create_info, &m_assets_allocator);
+        vmaCreateAllocator(&allocator_create_info, &m_assets_allocator);
     }
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
