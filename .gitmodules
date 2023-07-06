@@ -82,3 +82,6 @@
 [submodule "engine/3rd_party/sol2"]
 	path = engine/3rd_party/sol2
 	url = https://github.com/ThePhD/sol2.git
+[submodule "engine/3rd_party/tlsf"]
+	path = engine/3rd_party/tlsf
+	url = https://github.com/mattconte/tlsf.git

@@ -22,12 +22,8 @@ if(NOT TARGET glfw)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glfw.cmake)
 endif()
 
-if(NOT TARGET vulkan_headers)
-    add_subdirectory(Vulkan-Headers)
-endif()
-
-if(NOT TARGET SPIRV-Headers)
-    add_subdirectory(SPIRV-Headers)
+if(NOT TARGET tlsf)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tlsf.cmake)
 endif()
 
 if(NOT TARGET VulkanMemoryAllocator)
@@ -48,6 +44,10 @@ endif()
 
 if(NOT TARGET Vulkan-Headers)
     add_subdirectory(Vulkan-Headers)
+endif()
+
+if(NOT TARGET SPIRV-Headers)
+    add_subdirectory(SPIRV-Headers)
 endif()
 
 if(NOT TARGET volk)

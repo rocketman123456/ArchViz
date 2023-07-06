@@ -1,10 +1,10 @@
 #include "runtime/core/memory/slab_allocator.h"
-#include "runtime/core/memory/buddy_allocator.h"
 
+#include <cmath>
 #include <cstring>
 #include <iostream>
 #include <mutex>
-#include <cmath>
+
 
 constexpr int BLOCK_SIZE         = 4096;
 constexpr int CACHE_L1_LINE_SIZE = 64;
@@ -194,11 +194,11 @@ namespace ArchViz
     }
 } // namespace ArchViz
 
-namespace ArchViz
-{
-#define CACHE_NAMELEN (20)    // maximum length of cache name
+#define CACHE_NAMELEN (20) // maximum length of cache name
 #define CACHE_CACHE_ORDER (0) // cache_cache order
 
+namespace ArchViz
+{
     typedef struct slab_s
     {
         unsigned int  colouroff;   // offset for this slab
