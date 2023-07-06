@@ -28,7 +28,7 @@
 #endif
 #endif
 
-const std::vector<ArchViz::Vertex> vertices = {{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
+const std::vector<ArchViz::Vertex> vertices = {{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
 
 namespace ArchViz
 {
@@ -314,7 +314,7 @@ namespace ArchViz
             vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
             VkBuffer     vertex_buffers[] = {m_vertex_buffer};
-            VkDeviceSize offsets[]       = {0};
+            VkDeviceSize offsets[]        = {0};
             vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
 
             vkCmdDraw(command_buffer, 3, 1, 0, 0);
