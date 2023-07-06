@@ -60,6 +60,6 @@ namespace ArchViz
             return 0;
         }
 
-        void parse_binary(const uint32_t* data, size_t data_size, const std::vector<uint8_t>& name_buffer, ParseResult* parse_result) {}
+        void parse_binary(const std::vector<uint32_t>& data, std::vector<uint8_t>& name_buffer, ParseResult& parse_result) {}
     } // namespace SPIRV
 } // namespace ArchViz

@@ -55,3 +55,9 @@
 [submodule "engine/3rd_party/SPIRV-Headers"]
 	path = engine/3rd_party/SPIRV-Headers
 	url = https://github.com/KhronosGroup/SPIRV-Headers.git
+[submodule "engine/3rd_party/Mesh"]
+	path = engine/3rd_party/Mesh
+	url = https://github.com/plasma-umass/Mesh.git
+[submodule "engine/3rd_party/memory"]
+	path = engine/3rd_party/memory
+	url = https://github.com/foonathan/memory.git
