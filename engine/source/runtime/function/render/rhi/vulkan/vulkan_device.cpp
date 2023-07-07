@@ -130,10 +130,10 @@ namespace ArchViz
         create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.pQueueCreateInfos       = queue_create_infos.data();
         create_info.queueCreateInfoCount    = static_cast<uint32_t>(queue_create_infos.size());
-        create_info.pEnabledFeatures        = &device_features;
-        create_info.enabledExtensionCount   = 0;
         create_info.enabledExtensionCount   = static_cast<uint32_t>(VulkanConstants::device_extensions.size());
         create_info.ppEnabledExtensionNames = VulkanConstants::device_extensions.data();
+        create_info.pEnabledFeatures        = nullptr;
+        //create_info.pEnabledFeatures        = &device_features;
         create_info.pNext                   = &physical_features2;
 
         if (m_enable_validation_layers)
@@ -146,13 +146,17 @@ namespace ArchViz
             create_info.enabledLayerCount = 0;
         }
 
+        // Query bindless extension, called Descriptor Indexing (https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VK_EXT_descriptor_indexing.html)
+
+        VkPhysicalDeviceDescriptorIndexingFeatures indexing_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr};
+        VkPhysicalDeviceFeatures2                  device_features_2 {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_features};
+
+        vkGetPhysicalDeviceFeatures2(m_physical_device, &device_features_2);
+
+        m_bindless_support = indexing_features.descriptorBindingPartiallyBound && indexing_features.runtimeDescriptorArray;
+
         if (m_bindless_support)
         {
-            VkPhysicalDeviceDescriptorIndexingFeatures indexing_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr};
-            VkPhysicalDeviceFeatures2                  device_features_2 {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_features};
-
-            vkGetPhysicalDeviceFeatures2(m_physical_device, &device_features_2);
-
             indexing_features.descriptorBindingPartiallyBound = VK_TRUE;
             indexing_features.runtimeDescriptorArray          = VK_TRUE;
 

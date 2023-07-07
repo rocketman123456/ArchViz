@@ -244,11 +244,11 @@ namespace ArchViz
         void* data;
         vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
         {
-            memcpy(data, vertices.data(), (size_t)buffer_size);
+            memcpy(data, indices.data(), (size_t)buffer_size);
         }
         vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
 
-        usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
         VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_index_buffer, m_index_buffer_memory);
 
@@ -319,6 +319,7 @@ namespace ArchViz
         createImGui();
 
         createVertexBuffer();
+        createIndexBuffer();
 
         createSyncObjects();
     }

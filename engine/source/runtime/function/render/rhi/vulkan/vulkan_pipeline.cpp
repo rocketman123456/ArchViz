@@ -10,8 +10,6 @@
 
 #include "runtime/core/base/macro.h"
 
-extern const std::vector<ArchViz::Vertex> vertices;
-
 namespace ArchViz
 {
     void VulkanPipeline::setShaderModule(std::shared_ptr<VulkanShader> shader)

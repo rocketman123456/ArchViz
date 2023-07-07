@@ -26,13 +26,13 @@ namespace ArchViz
         void createLogicalDevice();
 
     public:
-        bool             m_enable_validation_layers;
+        bool m_enable_validation_layers;
+        bool m_bindless_support;
+
         VkInstance       m_instance;
         VkSurfaceKHR     m_surface;
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice         m_device          = VK_NULL_HANDLE;
-
-        bool m_bindless_support = false;
 
         VkPhysicalDeviceProperties           m_properties;
         VkPhysicalDeviceFeatures             m_features;

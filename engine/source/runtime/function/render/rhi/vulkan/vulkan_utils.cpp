@@ -15,7 +15,7 @@ namespace ArchViz
                                                          void*                                       pUserData)
     {
         LOG_ERROR("[Vulkan] validation layer: {}", pCallbackData->pMessage);
-        std::cerr << "[Vulkan] validation layer: " << pCallbackData->pMessage << std::endl;
+        // std::cerr << "[Vulkan] validation layer: " << pCallbackData->pMessage << std::endl;
         return VK_FALSE;
     }
 

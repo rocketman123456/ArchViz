@@ -68,7 +68,7 @@ namespace ArchViz
         void drawFrame();
 
     private:
-        const bool m_enable_validation_layers = false;
+        const bool m_enable_validation_layers = true;
         const int  MAX_FRAMES_IN_FLIGHT       = 2;
 
         bool m_framebuffer_resized = false;
