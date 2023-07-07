@@ -46,8 +46,7 @@ namespace ArchViz
 
     void VFS::unmountFS(const FSConfig& config)
     {
-        auto iter =
-            std::find_if(m_fs.begin(), m_fs.end(), [config](FileSystemPtr fs) { return fs->m_rpath == config.m_rpath && fs->m_vpath == config.m_vpath; });
+        auto iter = std::find_if(m_fs.begin(), m_fs.end(), [config](FileSystemPtr fs) { return fs->m_rpath == config.m_rpath && fs->m_vpath == config.m_vpath; });
         if (iter != m_fs.end())
         {
             m_fs.erase(iter);
@@ -97,13 +96,7 @@ namespace ArchViz
 
     size_t VFS::write(FilePtr file, const std::vector<std::byte>& buffer) { return file->write(buffer); }
 
-    std::future<size_t> VFS::readAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, std::vector<std::byte>& buffer)
-    {
-        return tp->enqueue_task(&VFS::read, this, file, buffer);
-    }
+    std::future<size_t> VFS::readAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, std::vector<std::byte>& buffer) { return tp->enqueue_task(&VFS::read, this, file, buffer); }
 
-    std::future<size_t> VFS::writeAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, const std::vector<std::byte>& buffer)
-    {
-        return tp->enqueue_task(&VFS::write, this, file, buffer);
-    }
+    std::future<size_t> VFS::writeAsync(std::shared_ptr<WorkExecutor> tp, FilePtr file, const std::vector<std::byte>& buffer) { return tp->enqueue_task(&VFS::write, this, file, buffer); }
 } // namespace ArchViz

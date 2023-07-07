@@ -227,4 +227,4 @@ namespace ArchViz
         return proj_matrix;
     }
 
-} // namespace Piccolo
+} // namespace ArchViz

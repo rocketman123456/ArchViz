@@ -7,4 +7,4 @@ namespace ArchViz
     {
         return dynamic_cast<const Base*>(ptr) != nullptr;
     }
-} // namespace Piccolo
+} // namespace ArchViz

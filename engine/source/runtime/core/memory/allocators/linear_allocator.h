@@ -19,10 +19,10 @@ namespace ArchViz
         }
 
         // Non-copy
-        LinearAllocator(const LinearAllocator&)            = delete;
+        LinearAllocator(const LinearAllocator&) = delete;
         LinearAllocator& operator=(const LinearAllocator&) = delete;
         LinearAllocator(LinearAllocator&&)                 = delete;
-        LinearAllocator& operator=(LinearAllocator&&)      = delete;
+        LinearAllocator& operator=(LinearAllocator&&) = delete;
 
         LinearAllocator() : m_offset(0) { m_start_address = ::operator new(size); }
 

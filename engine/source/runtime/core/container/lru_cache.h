@@ -1,9 +1,10 @@
 #pragma once
 
 #include <deque>
-#include <unordered_map>
 #include <exception>
 #include <stdexcept>
+#include <unordered_map>
+
 
 namespace ArchViz
 {
@@ -59,4 +60,4 @@ namespace ArchViz
         std::deque<std::pair<S, T>> history;
         ResourceMap                 resource_map;
     };
-} // namespace Piccolo
+} // namespace ArchViz

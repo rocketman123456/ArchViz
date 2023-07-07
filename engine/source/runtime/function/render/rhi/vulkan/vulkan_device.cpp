@@ -133,8 +133,8 @@ namespace ArchViz
         create_info.enabledExtensionCount   = static_cast<uint32_t>(VulkanConstants::device_extensions.size());
         create_info.ppEnabledExtensionNames = VulkanConstants::device_extensions.data();
         create_info.pEnabledFeatures        = nullptr;
-        //create_info.pEnabledFeatures        = &device_features;
-        create_info.pNext                   = &physical_features2;
+        // create_info.pEnabledFeatures        = &device_features;
+        create_info.pNext = &physical_features2;
 
         if (m_enable_validation_layers)
         {

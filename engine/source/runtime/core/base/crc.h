@@ -330,7 +330,7 @@ namespace ArchViz
         CRC32_XFER(bool use_lut = false) : CRC32(0x000000AF, 0x00000000, false, false, 0x00000000, use_lut) {};
     };
 
-    extern CRC8 g_crc8;
+    extern CRC8  g_crc8;
     extern CRC16 g_crc16;
     extern CRC32 g_crc32;
-} // namespace Piccolo
+} // namespace ArchViz

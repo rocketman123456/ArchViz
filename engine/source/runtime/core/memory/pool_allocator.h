@@ -97,10 +97,10 @@ namespace ArchViz
             using other = PoolAllocator<U, BlockSize, ReservedBlocks>;
         };
 
-        PoolAllocator(const PoolAllocator& other)            = default;
-        PoolAllocator(PoolAllocator&& other)                 = default;
+        PoolAllocator(const PoolAllocator& other) = default;
+        PoolAllocator(PoolAllocator&& other)      = default;
         PoolAllocator& operator=(const PoolAllocator& other) = default;
-        PoolAllocator& operator=(PoolAllocator&& other)      = default;
+        PoolAllocator& operator=(PoolAllocator&& other) = default;
 
         T* allocate(size_t n)
         {

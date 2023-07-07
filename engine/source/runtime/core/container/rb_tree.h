@@ -70,4 +70,4 @@ namespace ArchViz
         void right_rotate(Node* x);
         void print(Node* x, bool isRight, std::string indent) const;
     };
-}
+} // namespace ArchViz

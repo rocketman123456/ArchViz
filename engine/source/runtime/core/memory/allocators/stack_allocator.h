@@ -19,10 +19,10 @@ namespace ArchViz
         }
 
         // Non-copy
-        StackAllocator(const StackAllocator&)            = delete;
+        StackAllocator(const StackAllocator&) = delete;
         StackAllocator& operator=(const StackAllocator&) = delete;
         StackAllocator(StackAllocator&&)                 = delete;
-        StackAllocator& operator=(StackAllocator&&)      = delete;
+        StackAllocator& operator=(StackAllocator&&) = delete;
 
         StackAllocator() : m_offset(0) { this->m_start_address = ::operator new(this->m_size); }
 

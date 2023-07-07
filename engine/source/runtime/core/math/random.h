@@ -7,8 +7,7 @@
 namespace ArchViz
 {
     template<typename NumericType>
-    using uniform_distribution = typename std::
-        conditional<std::is_integral<NumericType>::value, std::uniform_int_distribution<NumericType>, std::uniform_real_distribution<NumericType>>::type;
+    using uniform_distribution = typename std::conditional<std::is_integral<NumericType>::value, std::uniform_int_distribution<NumericType>, std::uniform_real_distribution<NumericType>>::type;
 
     template<typename RandomEngine = std::default_random_engine>
     class RandomNumberGenerator

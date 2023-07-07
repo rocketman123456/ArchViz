@@ -38,4 +38,4 @@ namespace ArchViz
             return attributeDescriptions;
         }
     };
-} // namespace ArhcViz
+} // namespace ArchViz

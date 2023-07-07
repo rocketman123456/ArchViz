@@ -1,9 +1,10 @@
 #pragma once
 #include "runtime/core/log/log_system.h"
 
+#include <cassert>
 #include <chrono>
 #include <thread>
-#include <cassert>
+
 
 #ifdef UNIT_TEST
 #define LOG_HELPER(LOG_LEVEL, ...)

@@ -12,11 +12,11 @@ file(GLOB_RECURSE HEADER_FILES "*.h")
 file(GLOB_RECURSE SOURCE_FILES "*.cpp")
 
 # file(GLOB imgui_sources CONFIGURE_DEPENDS  "${ENGINE_ROOT_DIR}/3rd_party/imgui/*.cpp")
-# file(GLOB imgui_impl CONFIGURE_DEPENDS  
-#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_glfw.cpp" 
-#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_glfw.h"
-#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_vulkan.cpp" 
-#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_vulkan.h"
+# file(GLOB imgui_impl CONFIGURE_DEPENDS
+# "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_glfw.cpp"
+# "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_glfw.h"
+# "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_vulkan.cpp"
+# "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_vulkan.h"
 # )
 
 # source_group(TREE "${ENGINE_ROOT_DIR}/schema" FILES ${SCHEMA_FILES})
@@ -41,6 +41,7 @@ target_compile_options(${TARGET_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:
 target_link_libraries(${TARGET_NAME} PUBLIC json11)
 target_link_libraries(${TARGET_NAME} PUBLIC mustache)
 target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog_header_only)
+
 # target_link_libraries(${TARGET_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC volk::volk_headers)
@@ -51,17 +52,17 @@ target_link_libraries(${TARGET_NAME} PUBLIC Vulkan-Headers)
 target_link_libraries(${TARGET_NAME} PUBLIC VulkanMemoryAllocator)
 target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
-# target_link_libraries(${TARGET_NAME} PUBLIC zip)
 
-target_link_libraries(${TARGET_NAME} PUBLIC 
-  glslang 
+# target_link_libraries(${TARGET_NAME} PUBLIC zip)
+target_link_libraries(${TARGET_NAME} PUBLIC
+  glslang
   OSDependent
-  MachineIndependent 
-  GenericCodeGen 
-  OGLCompiler 
-  glslang-default-resource-limits 
-  SPVRemapper 
-  SPIRV 
+  MachineIndependent
+  GenericCodeGen
+  OGLCompiler
+  glslang-default-resource-limits
+  SPVRemapper
+  SPIRV
   HLSL
 )
 
@@ -82,6 +83,7 @@ target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/ti
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/SPIRV-Headers/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/VulkanMemoryAllocator/include)
+
 # target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/libzip/lib)
 
 # target_include_directories(${TARGET_NAME} PUBLIC ${STB_INCLUDE_DIRS})
@@ -92,10 +94,9 @@ target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vu
 # add_dependencies(${TARGET_NAME} ${SHADER_COMPILE_TARGET})
 
 # target_include_directories(
-#   ${TARGET_NAME}
-#   PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/shader/generated/cpp>
+# ${TARGET_NAME}
+# PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/shader/generated/cpp>
 # )
-
 target_include_directories(
   ${TARGET_NAME}
   PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source>
@@ -103,15 +104,15 @@ target_include_directories(
 )
 
 # target_include_directories(
-#   ${TARGET_NAME}
-#   PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source/runtime>
-#   $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
+# ${TARGET_NAME}
+# PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source/runtime>
+# $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
 # )
 
 # target_include_directories(
-#   ${TARGET_NAME}
-#   PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source/runtime/function/render/include>
-#   $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
+# ${TARGET_NAME}
+# PUBLIC $<BUILD_INTERFACE:${ENGINE_ROOT_DIR}/source/runtime/function/render/include>
+# $<INSTALL_INTERFACE:include/${TARGET_NAME}-${PROJECT_VERSION}>
 # )
 
 # ---- Create an installable target ----

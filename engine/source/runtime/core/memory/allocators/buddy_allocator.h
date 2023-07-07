@@ -31,10 +31,10 @@ namespace ArchViz
         std::array<Node*, std::numeric_limits<std::size_t>::digits - s_log2_header> m_buckets = {};
 
         // Non-copy
-        BuddyAllocator(const BuddyAllocator&)            = delete;
+        BuddyAllocator(const BuddyAllocator&) = delete;
         BuddyAllocator& operator=(const BuddyAllocator&) = delete;
         BuddyAllocator(BuddyAllocator&&)                 = delete;
-        BuddyAllocator& operator=(BuddyAllocator&&)      = delete;
+        BuddyAllocator& operator=(BuddyAllocator&&) = delete;
 
         BuddyAllocator()
         {

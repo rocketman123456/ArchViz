@@ -232,7 +232,7 @@ namespace ArchViz
                 }
                 else
                 {
-                    tail.next   = NULL;
+                    tail.next  = NULL;
                     T* compare = tail_plus_1; // we need preserve tail_plus_1 as compare will alter it on failure
                     // tail_plus_1 is the head, attempt swap with tail
                     if (!head.compare_exchange_strong(compare, &tail))
@@ -241,7 +241,7 @@ namespace ArchViz
                         // tail_plus_1 is no longer the head, so tail_plus_1->next should be non NULL
                         while ((T*)NULL == tail_plus_1->next)
                         {} // wait for next to be updated as head may have just changed.
-                        tail.next        = tail_plus_1->next.load();
+                        tail.next         = tail_plus_1->next.load();
                         tail_plus_1->next = NULL;
                     }
                 }

@@ -348,4 +348,4 @@ namespace ArchViz
         y->m_right = x;
         x->set_parent(y);
     }
-}
+} // namespace ArchViz

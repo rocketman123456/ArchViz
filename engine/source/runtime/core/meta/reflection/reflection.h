@@ -53,8 +53,7 @@ namespace ArchViz
 
 #define TypeMetaDef(class_name, ptr) ArchViz::Reflection::ReflectionInstance(ArchViz::Reflection::TypeMeta::newMetaFromName(#class_name), (class_name*)ptr)
 
-#define TypeMetaDefPtr(class_name, ptr) \
-    new ArchViz::Reflection::ReflectionInstance(ArchViz::Reflection::TypeMeta::newMetaFromName(#class_name), (class_name*)ptr)
+#define TypeMetaDefPtr(class_name, ptr) new ArchViz::Reflection::ReflectionInstance(ArchViz::Reflection::TypeMeta::newMetaFromName(#class_name), (class_name*)ptr)
 
     template<typename T, typename U, typename = void>
     struct is_safely_castable : std::false_type

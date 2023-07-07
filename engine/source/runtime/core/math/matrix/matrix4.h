@@ -338,20 +338,20 @@ namespace ArchViz
          */
         bool operator==(const Matrix4x4& m2) const
         {
-            return !(m_rows[0][0] != m2.m_rows[0][0] || m_rows[0][1] != m2.m_rows[0][1] || m_rows[0][2] != m2.m_rows[0][2] || m_rows[0][3] != m2.m_rows[0][3] ||
-                     m_rows[1][0] != m2.m_rows[1][0] || m_rows[1][1] != m2.m_rows[1][1] || m_rows[1][2] != m2.m_rows[1][2] || m_rows[1][3] != m2.m_rows[1][3] ||
-                     m_rows[2][0] != m2.m_rows[2][0] || m_rows[2][1] != m2.m_rows[2][1] || m_rows[2][2] != m2.m_rows[2][2] || m_rows[2][3] != m2.m_rows[2][3] ||
-                     m_rows[3][0] != m2.m_rows[3][0] || m_rows[3][1] != m2.m_rows[3][1] || m_rows[3][2] != m2.m_rows[3][2] || m_rows[3][3] != m2.m_rows[3][3]);
+            return !(m_rows[0][0] != m2.m_rows[0][0] || m_rows[0][1] != m2.m_rows[0][1] || m_rows[0][2] != m2.m_rows[0][2] || m_rows[0][3] != m2.m_rows[0][3] || m_rows[1][0] != m2.m_rows[1][0] ||
+                     m_rows[1][1] != m2.m_rows[1][1] || m_rows[1][2] != m2.m_rows[1][2] || m_rows[1][3] != m2.m_rows[1][3] || m_rows[2][0] != m2.m_rows[2][0] || m_rows[2][1] != m2.m_rows[2][1] ||
+                     m_rows[2][2] != m2.m_rows[2][2] || m_rows[2][3] != m2.m_rows[2][3] || m_rows[3][0] != m2.m_rows[3][0] || m_rows[3][1] != m2.m_rows[3][1] || m_rows[3][2] != m2.m_rows[3][2] ||
+                     m_rows[3][3] != m2.m_rows[3][3]);
         }
 
         /** Tests 2 matrices for inequality.
          */
         bool operator!=(const Matrix4x4& m2) const
         {
-            return m_rows[0][0] != m2.m_rows[0][0] || m_rows[0][1] != m2.m_rows[0][1] || m_rows[0][2] != m2.m_rows[0][2] || m_rows[0][3] != m2.m_rows[0][3] ||
-                   m_rows[1][0] != m2.m_rows[1][0] || m_rows[1][1] != m2.m_rows[1][1] || m_rows[1][2] != m2.m_rows[1][2] || m_rows[1][3] != m2.m_rows[1][3] ||
-                   m_rows[2][0] != m2.m_rows[2][0] || m_rows[2][1] != m2.m_rows[2][1] || m_rows[2][2] != m2.m_rows[2][2] || m_rows[2][3] != m2.m_rows[2][3] ||
-                   m_rows[3][0] != m2.m_rows[3][0] || m_rows[3][1] != m2.m_rows[3][1] || m_rows[3][2] != m2.m_rows[3][2] || m_rows[3][3] != m2.m_rows[3][3];
+            return m_rows[0][0] != m2.m_rows[0][0] || m_rows[0][1] != m2.m_rows[0][1] || m_rows[0][2] != m2.m_rows[0][2] || m_rows[0][3] != m2.m_rows[0][3] || m_rows[1][0] != m2.m_rows[1][0] ||
+                   m_rows[1][1] != m2.m_rows[1][1] || m_rows[1][2] != m2.m_rows[1][2] || m_rows[1][3] != m2.m_rows[1][3] || m_rows[2][0] != m2.m_rows[2][0] || m_rows[2][1] != m2.m_rows[2][1] ||
+                   m_rows[2][2] != m2.m_rows[2][2] || m_rows[2][3] != m2.m_rows[2][3] || m_rows[3][0] != m2.m_rows[3][0] || m_rows[3][1] != m2.m_rows[3][1] || m_rows[3][2] != m2.m_rows[3][2] ||
+                   m_rows[3][3] != m2.m_rows[3][3];
         }
 
         Matrix4x4 transpose() const
@@ -365,8 +365,7 @@ namespace ArchViz
         //-----------------------------------------------------------------------
         float getMinor(size_t r0, size_t r1, size_t r2, size_t c0, size_t c1, size_t c2) const
         {
-            return m_rows[r0][c0] * (m_rows[r1][c1] * m_rows[r2][c2] - m_rows[r2][c1] * m_rows[r1][c2]) -
-                   m_rows[r0][c1] * (m_rows[r1][c0] * m_rows[r2][c2] - m_rows[r2][c0] * m_rows[r1][c2]) +
+            return m_rows[r0][c0] * (m_rows[r1][c1] * m_rows[r2][c2] - m_rows[r2][c1] * m_rows[r1][c2]) - m_rows[r0][c1] * (m_rows[r1][c0] * m_rows[r2][c2] - m_rows[r2][c0] * m_rows[r1][c2]) +
                    m_rows[r0][c2] * (m_rows[r1][c0] * m_rows[r2][c1] - m_rows[r2][c0] * m_rows[r1][c1]);
         }
 
@@ -390,10 +389,7 @@ namespace ArchViz
 
         Matrix4x4 buildViewportMatrix(uint32_t width, uint32_t height)
         {
-            return Matrix4x4({{0.5f * (float)width, 0.0f, 0.0f, 0.5f * (float)width},
-                              {0.0f, -0.5f * (float)height, 0.0f, 0.5f * (float)height},
-                              {0.0f, 0.0f, -1.0f, 1.0f},
-                              {0.0f, 0.0f, 0.0f, 1.0f}});
+            return Matrix4x4({{0.5f * (float)width, 0.0f, 0.0f, 0.5f * (float)width}, {0.0f, -0.5f * (float)height, 0.0f, 0.5f * (float)height}, {0.0f, 0.0f, -1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f}});
         }
 
         static Matrix4x4 mirrorMatrix(Vector4 mirror_plane)
@@ -656,8 +652,7 @@ namespace ArchViz
 
         float determinant() const
         {
-            return m_rows[0][0] * getMinor(1, 2, 3, 1, 2, 3) - m_rows[0][1] * getMinor(1, 2, 3, 0, 2, 3) + m_rows[0][2] * getMinor(1, 2, 3, 0, 1, 3) -
-                   m_rows[0][3] * getMinor(1, 2, 3, 0, 1, 2);
+            return m_rows[0][0] * getMinor(1, 2, 3, 1, 2, 3) - m_rows[0][1] * getMinor(1, 2, 3, 0, 2, 3) + m_rows[0][2] * getMinor(1, 2, 3, 0, 1, 3) - m_rows[0][3] * getMinor(1, 2, 3, 0, 1, 2);
         }
 
         float trace() const

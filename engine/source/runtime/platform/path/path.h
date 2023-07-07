@@ -18,4 +18,4 @@ namespace ArchViz
 
         static const std::string getFilePureName(const std::string);
     };
-} // namespace Piccolo
+} // namespace ArchViz

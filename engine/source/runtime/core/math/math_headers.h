@@ -14,4 +14,4 @@
 #include "runtime/core/math/vector4.h"
 
 namespace ArchViz
-{} // namespace Piccolo
+{} // namespace ArchViz

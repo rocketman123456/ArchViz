@@ -8,7 +8,6 @@ namespace Piccolo
     class System
     {
     public:
-
         // Example:
         // for (auto const& entity : mEntities)
         // {

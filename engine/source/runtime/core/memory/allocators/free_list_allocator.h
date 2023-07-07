@@ -33,15 +33,14 @@ namespace ArchViz
         }
 
         // Non-copy
-        FreeListAllocator(const FreeListAllocator&)            = delete;
+        FreeListAllocator(const FreeListAllocator&) = delete;
         FreeListAllocator& operator=(const FreeListAllocator&) = delete;
         FreeListAllocator(FreeListAllocator&&)                 = delete;
-        FreeListAllocator& operator=(FreeListAllocator&&)      = delete;
+        FreeListAllocator& operator=(FreeListAllocator&&) = delete;
 
         FreeListAllocator(const SearchMethod searchMethod = BEST)
         {
-            static std::string message =
-                "Total size must be atleast " + std::to_string(sizeof(linked_list::Node) + 1) + " bytes for an allocator with atleast 1 byte of free space";
+            static std::string message = "Total size must be atleast " + std::to_string(sizeof(linked_list::Node) + 1) + " bytes for an allocator with atleast 1 byte of free space";
             assert(this->m_size >= sizeof(linked_list::Node) + 1 && message.c_str());
             m_search_method       = searchMethod;
             this->m_start_address = ::operator new(this->m_size);

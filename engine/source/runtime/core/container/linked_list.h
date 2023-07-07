@@ -18,4 +18,4 @@ namespace ArchViz
         void search_first(const std::size_t v, Node*& curr, Node*& prev);
         void search_best(const std::size_t v, Node*& curr, Node*& prev);
     };
-} // namespace Piccolo
+} // namespace ArchViz

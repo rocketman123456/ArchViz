@@ -40,4 +40,4 @@ namespace ArchViz
         return true;
     }
 
-} // namespace Piccolo
+} // namespace ArchViz

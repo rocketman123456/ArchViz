@@ -248,4 +248,4 @@ namespace ArchViz
         std::condition_variable m_condition_push;
         std::condition_variable m_condition_pop;
     };
-} // namespace Piccolo
+} // namespace ArchViz

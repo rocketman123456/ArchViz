@@ -15,4 +15,4 @@ namespace ArchViz
         std::scoped_lock lock(std_out_lock);
         (std::cout << ... << args) << std::endl;
     }
-} // namespace Piccolo
+} // namespace ArchViz

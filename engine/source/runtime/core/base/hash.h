@@ -83,4 +83,4 @@ namespace ArchViz
     int32_t hash_2(const std::string& key);
     int32_t hash_3(const std::string& key);
     int32_t hash_4(const std::string& key);
-} // namespace Piccolo
+} // namespace ArchViz

@@ -21,10 +21,10 @@ namespace ArchViz
 
     public:
         // Non-copy
-        FreeTreeAllocator(const FreeTreeAllocator&)            = delete;
+        FreeTreeAllocator(const FreeTreeAllocator&) = delete;
         FreeTreeAllocator& operator=(const FreeTreeAllocator&) = delete;
         FreeTreeAllocator(FreeTreeAllocator&&)                 = delete;
-        FreeTreeAllocator& operator=(FreeTreeAllocator&&)      = delete;
+        FreeTreeAllocator& operator=(FreeTreeAllocator&&) = delete;
 
         template<typename U, size_t BZ>
         FreeTreeAllocator(const FreeTreeAllocator<U, BZ>& other)
@@ -35,9 +35,8 @@ namespace ArchViz
         FreeTreeAllocator()
         {
             static std::size_t rootNodePadding = get_root_node_padding();
-            static std::string message         = "Total size must be atleast " + std::to_string(sizeof(RBTree::Node) * 2 + rootNodePadding) +
-                                         " bytes for an allocator with atleast " + std::to_string(sizeof(RBTree::Node) - sizeof(Header)) +
-                                         " bytes of free space";
+            static std::string message         = "Total size must be atleast " + std::to_string(sizeof(RBTree::Node) * 2 + rootNodePadding) + " bytes for an allocator with atleast " +
+                                         std::to_string(sizeof(RBTree::Node) - sizeof(Header)) + " bytes of free space";
             assert(this->m_size >= sizeof(RBTree::Node) * 2 + rootNodePadding && message.c_str());
             this->m_start_address = ::operator new(this->m_size);
             init();
@@ -107,8 +106,8 @@ namespace ArchViz
         {
             RBTree::Node* nil = reinterpret_cast<RBTree::Node*>(this->m_start_address);
             m_tree.init(nil);
-            void* currentAddress = reinterpret_cast<RBTree::Node*>(reinterpret_cast<char*>(this->m_start_address) + sizeof(RBTree::Node) + sizeof(Header));
-            std::size_t space    = this->m_size - sizeof(Header) - sizeof(RBTree::Node);
+            void*       currentAddress = reinterpret_cast<RBTree::Node*>(reinterpret_cast<char*>(this->m_start_address) + sizeof(RBTree::Node) + sizeof(Header));
+            std::size_t space          = this->m_size - sizeof(Header) - sizeof(RBTree::Node);
             std::align(alignof(std::max_align_t), sizeof(std::max_align_t), currentAddress, space);
             RBTree::Node* root = reinterpret_cast<RBTree::Node*>(reinterpret_cast<char*>(currentAddress) - sizeof(Header));
             root->m_value      = reinterpret_cast<char*>(this->m_start_address) + this->m_size - reinterpret_cast<char*>(root) - sizeof(Header);

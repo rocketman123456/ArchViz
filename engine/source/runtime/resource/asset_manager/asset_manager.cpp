@@ -20,10 +20,7 @@ namespace ArchViz
         ASSERT(m_config_manager);
     }
 
-    std::filesystem::path AssetManager::getFullPath(const std::string& relative_path) const
-    {
-        return std::filesystem::absolute(m_config_manager->getRootFolder() / relative_path);
-    }
+    std::filesystem::path AssetManager::getFullPath(const std::string& relative_path) const { return std::filesystem::absolute(m_config_manager->getRootFolder() / relative_path); }
 
     void AssetManager::readTextFile(const std::filesystem::path& file_path, std::string& content) const
     {

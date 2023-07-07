@@ -75,7 +75,7 @@ namespace ArchViz
         create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
 #endif
 
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
+            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
         if (m_validation)
         {
             create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());

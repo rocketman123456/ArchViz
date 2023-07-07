@@ -549,8 +549,7 @@ namespace ArchViz
     }      // namespace RenderPassOperation
 
     // TODO: taken from the Forge
-    using ResourceState = enum ResourceState
-    {
+    using ResourceState = enum ResourceState {
         RESOURCE_STATE_UNDEFINED                         = 0,
         RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER        = 0x1,
         RESOURCE_STATE_INDEX_BUFFER                      = 0x2,

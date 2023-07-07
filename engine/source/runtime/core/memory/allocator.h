@@ -39,8 +39,8 @@ namespace ArchViz
         std::size_t m_size {BlockSize};
         void*       m_start_address;
 
-        Allocator()                            = default;
-        Allocator(const Allocator&)            = default;
+        Allocator()                 = default;
+        Allocator(const Allocator&) = default;
         Allocator& operator=(const Allocator&) = default;
         virtual ~Allocator()                   = default;
 

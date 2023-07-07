@@ -5,7 +5,6 @@
 #include <iostream>
 #include <mutex>
 
-
 constexpr int BLOCK_SIZE         = 4096;
 constexpr int CACHE_L1_LINE_SIZE = 64;
 

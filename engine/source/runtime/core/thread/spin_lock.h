@@ -19,8 +19,7 @@ namespace ArchViz
                     break;
                 }
                 while (m_atomic_flag.test(std::memory_order_relaxed))
-                {
-                }
+                {}
             }
         }
         void unlock() { m_atomic_flag.clear(std::memory_order_release); }

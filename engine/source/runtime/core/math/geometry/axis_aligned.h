@@ -35,4 +35,4 @@ namespace ArchViz
         Vector3 m_min_corner {std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
         Vector3 m_max_corner {-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max()};
     };
-} // namespace Piccolo
+} // namespace ArchViz

@@ -12,10 +12,8 @@ namespace ArchViz
 
     Quaternion Quaternion::operator*(const Quaternion& rhs) const
     {
-        return Quaternion(w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
-                          w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
-                          w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
-                          w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x);
+        return Quaternion(
+            w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z, w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y, w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z, w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x);
     }
 
     //-----------------------------------------------------------------------

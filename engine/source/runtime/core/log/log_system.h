@@ -26,8 +26,8 @@ namespace ArchViz
             return instance;
         }
 
-        LogSystem(LogSystem&&)           = delete;
-        LogSystem(const LogSystem&)      = delete;
+        LogSystem(LogSystem&&)      = delete;
+        LogSystem(const LogSystem&) = delete;
         void operator=(const LogSystem&) = delete;
 
     protected:

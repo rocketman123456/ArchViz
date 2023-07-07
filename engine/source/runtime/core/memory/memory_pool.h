@@ -31,8 +31,7 @@ namespace ArchViz
         MemoryPool(const MemoryPool&) = delete;
 
         MemoryPool(MemoryPool&& other) :
-            m_chunks {std::exchange(other.m_chunks, 0)}, m_next_chunk {std::exchange(other.m_next_chunk, nullptr)},
-            m_allocated_blocks {std::move(other.m_allocated_blocks)}
+            m_chunks {std::exchange(other.m_chunks, 0)}, m_next_chunk {std::exchange(other.m_next_chunk, nullptr)}, m_allocated_blocks {std::move(other.m_allocated_blocks)}
         {}
 
         MemoryPool& operator=(MemoryPool other)
@@ -153,8 +152,8 @@ namespace ArchViz
     template<std::size_t ChunkSize, std::size_t ChunksPerBlock>
     inline std::ostream& operator<<(std::ostream& os, const MemoryPool<ChunkSize, ChunksPerBlock>& pool)
     {
-        os << "CS: " << pool.chunk_size() << ", BS: " << pool.block_size() << ", CPB: " << pool.chunks_per_block() << ", chunks: " << pool.allocated_chunks()
-           << ", blocks: " << pool.allocated_blocks() << ", chunk capacit: " << pool.chunk_capacity() << ", full: " << (pool.full() ? "yes" : "no");
+        os << "CS: " << pool.chunk_size() << ", BS: " << pool.block_size() << ", CPB: " << pool.chunks_per_block() << ", chunks: " << pool.allocated_chunks() << ", blocks: " << pool.allocated_blocks()
+           << ", chunk capacit: " << pool.chunk_capacity() << ", full: " << (pool.full() ? "yes" : "no");
         return os;
     }
 } // namespace ArchViz

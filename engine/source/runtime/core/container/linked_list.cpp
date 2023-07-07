@@ -45,4 +45,4 @@ namespace ArchViz
         prev = prevBest;
         curr = best;
     }
-}
+} // namespace ArchViz

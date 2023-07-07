@@ -51,4 +51,4 @@ namespace ArchViz
 
     using FTransform2 = FMatrix3;
     using FTransform3 = FMatrix4;
-} // namespace Piccolo
+} // namespace ArchViz

@@ -113,7 +113,7 @@ namespace ArchViz
             return *this;
         }
         Degree& operator=(const Degree& d) = default;
-        Degree& operator=(const Radian& r)
+        Degree& operator                   =(const Radian& r)
         {
             m_deg = r.valueDegrees();
             return *this;
@@ -306,4 +306,4 @@ namespace ArchViz
     inline Degree operator*(float a, const Degree& b) { return Degree(a * b.valueDegrees()); }
 
     inline Degree operator/(float a, const Degree& b) { return Degree(a / b.valueDegrees()); }
-} // namespace Piccolo
+} // namespace ArchViz

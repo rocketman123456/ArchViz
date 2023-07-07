@@ -59,4 +59,4 @@ namespace ArchViz
         }
         return (hash_ & 0x7fffffff);
     }
-} // namespace Piccolo
+} // namespace ArchViz

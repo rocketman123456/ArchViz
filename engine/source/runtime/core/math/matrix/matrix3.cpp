@@ -21,9 +21,7 @@ namespace ArchViz
     //-----------------------------------------------------------------------
     Vector3 operator*(const Vector3& v, const Matrix3x3& mat)
     {
-        return Vector3(v.x * mat[0][0] + v.y * mat[1][0] + v.z * mat[2][0],
-                       v.x * mat[0][1] + v.y * mat[1][1] + v.z * mat[2][1],
-                       v.x * mat[0][2] + v.y * mat[1][2] + v.z * mat[2][2]);
+        return Vector3(v.x * mat[0][0] + v.y * mat[1][0] + v.z * mat[2][0], v.x * mat[0][1] + v.y * mat[1][1] + v.z * mat[2][1], v.x * mat[0][2] + v.y * mat[1][2] + v.z * mat[2][2]);
     }
     //-----------------------------------------------------------------------
     void Matrix3x3::setColumn(size_t col_index, const Vector3& vec)
@@ -107,8 +105,8 @@ namespace ArchViz
         out_Q[2][2] *= inv_length;
 
         // guarantee that orthogonal matrix has determinant 1 (no reflections)
-        float det = out_Q[0][0] * out_Q[1][1] * out_Q[2][2] + out_Q[0][1] * out_Q[1][2] * out_Q[2][0] + out_Q[0][2] * out_Q[1][0] * out_Q[2][1] -
-                    out_Q[0][2] * out_Q[1][1] * out_Q[2][0] - out_Q[0][1] * out_Q[1][0] * out_Q[2][2] - out_Q[0][0] * out_Q[1][2] * out_Q[2][1];
+        float det = out_Q[0][0] * out_Q[1][1] * out_Q[2][2] + out_Q[0][1] * out_Q[1][2] * out_Q[2][0] + out_Q[0][2] * out_Q[1][0] * out_Q[2][1] - out_Q[0][2] * out_Q[1][1] * out_Q[2][0] -
+                    out_Q[0][1] * out_Q[1][0] * out_Q[2][2] - out_Q[0][0] * out_Q[1][2] * out_Q[2][1];
 
         if (det < 0.0)
         {

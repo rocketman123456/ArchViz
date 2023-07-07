@@ -12,8 +12,8 @@ namespace ArchViz
             return instance;
         }
 
-        Singleton(T&&)           = delete;
-        Singleton(const T&)      = delete;
+        Singleton(T&&)      = delete;
+        Singleton(const T&) = delete;
         void operator=(const T&) = delete;
 
     protected:
