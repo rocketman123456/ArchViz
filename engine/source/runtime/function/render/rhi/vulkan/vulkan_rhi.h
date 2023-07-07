@@ -49,6 +49,9 @@ namespace ArchViz
         void createImGui();
 
         void createDescriptorSetLayout();
+        void createDescriptorPool();
+        void createDescriptorSets();
+
         void createRenderPass();
         void createGraphicsPipeline();
 
@@ -59,6 +62,7 @@ namespace ArchViz
 
         void createVertexBuffer();
         void createIndexBuffer();
+        void createUniformBuffers();
 
         void createSyncObjects();
 
@@ -89,7 +93,13 @@ namespace ArchViz
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
-        VkDescriptorSetLayout m_descriptor_set_layout;
+        VkDescriptorSetLayout        m_descriptor_set_layout;
+        VkDescriptorPool             m_descriptor_pool;
+        std::vector<VkDescriptorSet> m_descriptor_sets;
+
+        std::vector<VkBuffer>       m_uniform_buffers;
+        std::vector<VkDeviceMemory> m_uniform_buffers_memory;
+        std::vector<void*>          m_uniform_buffers_mapped;
 
         // asset allocator use VMA library
         VmaAllocator m_assets_allocator;

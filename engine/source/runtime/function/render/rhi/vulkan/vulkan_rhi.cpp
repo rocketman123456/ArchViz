@@ -99,7 +99,22 @@ namespace ArchViz
 
     void VulkanRHI::createDescriptorSetLayout()
     {
+        VkDescriptorSetLayoutBinding uboLayoutBinding {};
+        uboLayoutBinding.binding            = 0;
+        uboLayoutBinding.descriptorCount    = 1;
+        uboLayoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        uboLayoutBinding.pImmutableSamplers = nullptr;
+        uboLayoutBinding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
 
+        VkDescriptorSetLayoutCreateInfo layoutInfo {};
+        layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = 1;
+        layoutInfo.pBindings    = &uboLayoutBinding;
+
+        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layoutInfo, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create descriptor set layout!");
+        }
     }
 
     void VulkanRHI::createRenderPass()
@@ -263,6 +278,78 @@ namespace ArchViz
         vkFreeMemory(m_vulkan_device->m_device, staging_buffer_memory, nullptr);
     }
 
+    void VulkanRHI::createUniformBuffers()
+    {
+        VkDeviceSize buffer_size = sizeof(UniformBufferObject);
+
+        m_uniform_buffers.resize(MAX_FRAMES_IN_FLIGHT);
+        m_uniform_buffers_memory.resize(MAX_FRAMES_IN_FLIGHT);
+        m_uniform_buffers_mapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            auto usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+            auto flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, flag, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
+
+            vkMapMemory(m_vulkan_device->m_device, m_uniform_buffers_memory[i], 0, buffer_size, 0, &m_uniform_buffers_mapped[i]);
+        }
+    }
+
+    void VulkanRHI::createDescriptorPool()
+    {
+        VkDescriptorPoolSize pool_size {};
+        pool_size.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        pool_size.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+        VkDescriptorPoolCreateInfo pool_info {};
+        pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.poolSizeCount = 1;
+        pool_info.pPoolSizes    = &pool_size;
+        pool_info.maxSets       = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+        if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create descriptor pool!");
+        }
+    }
+
+    void VulkanRHI::createDescriptorSets()
+    {
+        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, m_descriptor_set_layout);
+
+        VkDescriptorSetAllocateInfo alloc_info {};
+        alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.descriptorPool     = m_descriptor_pool;
+        alloc_info.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+        alloc_info.pSetLayouts        = layouts.data();
+
+        m_descriptor_sets.resize(MAX_FRAMES_IN_FLIGHT);
+        if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &alloc_info, m_descriptor_sets.data()) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate descriptor sets!");
+        }
+
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            VkDescriptorBufferInfo bufferInfo {};
+            bufferInfo.buffer = m_uniform_buffers[i];
+            bufferInfo.offset = 0;
+            bufferInfo.range  = sizeof(UniformBufferObject);
+
+            VkWriteDescriptorSet descriptorWrite {};
+            descriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrite.dstSet          = m_descriptor_sets[i];
+            descriptorWrite.dstBinding      = 0;
+            descriptorWrite.dstArrayElement = 0;
+            descriptorWrite.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrite.descriptorCount = 1;
+            descriptorWrite.pBufferInfo     = &bufferInfo;
+
+            vkUpdateDescriptorSets(m_vulkan_device->m_device, 1, &descriptorWrite, 0, nullptr);
+        }
+    }
+
     void VulkanRHI::createSyncObjects()
     {
         m_image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -314,7 +401,8 @@ namespace ArchViz
         createSwapChain();
 
         createDescriptorSetLayout();
-        createRenderPass(); 
+
+        createRenderPass();
         createGraphicsPipeline();
 
         createFramebuffers();
@@ -326,6 +414,9 @@ namespace ArchViz
 
         createVertexBuffer();
         createIndexBuffer();
+        createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
 
         createSyncObjects();
     }
@@ -378,7 +469,7 @@ namespace ArchViz
 
             vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
-            //vkCmdDraw(command_buffer, 3, 1, 0, 0);
+            // vkCmdDraw(command_buffer, 3, 1, 0, 0);
         }
 
         vkCmdEndRenderPass(command_buffer);
@@ -481,6 +572,12 @@ namespace ArchViz
             vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fences[i], nullptr);
         }
 
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            vkDestroyBuffer(m_vulkan_device->m_device, m_uniform_buffers[i], nullptr);
+            vkFreeMemory(m_vulkan_device->m_device, m_uniform_buffers_memory[i], nullptr);
+        }
+
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
 
         // m_vulkan_ui->clear();
@@ -496,6 +593,10 @@ namespace ArchViz
         {
             vkDestroyFramebuffer(m_vulkan_device->m_device, framebuffer, nullptr);
         }
+
+        vkDestroyDescriptorPool(m_vulkan_device->m_device, m_descriptor_pool, nullptr);
+
+        vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_descriptor_set_layout, nullptr);
 
         m_vulkan_pipeline->clear();
         m_vulkan_pipeline.reset();
