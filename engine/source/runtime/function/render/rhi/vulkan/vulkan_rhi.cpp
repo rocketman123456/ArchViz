@@ -1,4 +1,5 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_buffer_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_pipeline.h"
@@ -29,7 +30,9 @@
 #endif
 #endif
 
-const std::vector<ArchViz::Vertex> vertices = {{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
+const std::vector<ArchViz::Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}, {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+
+const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
 namespace ArchViz
 {
@@ -203,39 +206,56 @@ namespace ArchViz
 
     void VulkanRHI::createVertexBuffer()
     {
-        VkBufferCreateInfo buffer_info {};
-        buffer_info.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        buffer_info.size        = sizeof(vertices[0]) * vertices.size();
-        buffer_info.usage       = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        VkDeviceSize buffer_size = sizeof(vertices[0]) * vertices.size();
 
-        if (vkCreateBuffer(m_vulkan_device->m_device, &buffer_info, nullptr, &m_vertex_buffer) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create vertex buffer!");
-        }
-
-        VkMemoryRequirements mem_requirements;
-        vkGetBufferMemoryRequirements(m_vulkan_device->m_device, m_vertex_buffer, &mem_requirements);
-
-        VkMemoryAllocateInfo alloc_info {};
-        alloc_info.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        alloc_info.allocationSize = mem_requirements.size;
-        alloc_info.memoryTypeIndex =
-            VulkanUtils::findMemoryType(m_vulkan_device->m_physical_device, mem_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-        if (vkAllocateMemory(m_vulkan_device->m_device, &alloc_info, nullptr, &m_vertex_buffer_memory) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to allocate vertex buffer memory!");
-        }
-
-        vkBindBufferMemory(m_vulkan_device->m_device, m_vertex_buffer, m_vertex_buffer_memory, 0);
+        VkBuffer              staging_buffer;
+        VkDeviceMemory        staging_buffer_memory;
+        VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
 
         void* data;
-        vkMapMemory(m_vulkan_device->m_device, m_vertex_buffer_memory, 0, buffer_info.size, 0, &data);
+        vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
         {
-            memcpy(data, vertices.data(), (size_t)buffer_info.size);
+            memcpy(data, vertices.data(), (size_t)buffer_size);
         }
-        vkUnmapMemory(m_vulkan_device->m_device, m_vertex_buffer_memory);
+        vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
+
+        usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_vertex_buffer, m_vertex_buffer_memory);
+
+        VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_vertex_buffer, buffer_size);
+
+        vkDestroyBuffer(m_vulkan_device->m_device, staging_buffer, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, staging_buffer_memory, nullptr);
+    }
+
+    void VulkanRHI::createIndexBuffer()
+    {
+        VkDeviceSize buffer_size = sizeof(indices[0]) * indices.size();
+
+        VkBuffer              staging_buffer;
+        VkDeviceMemory        staging_buffer_memory;
+        VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
+
+        void* data;
+        vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+        {
+            memcpy(data, vertices.data(), (size_t)buffer_size);
+        }
+        vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
+
+        usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_index_buffer, m_index_buffer_memory);
+
+        VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_index_buffer, buffer_size);
+
+        vkDestroyBuffer(m_vulkan_device->m_device, staging_buffer, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, staging_buffer_memory, nullptr);
     }
 
     void VulkanRHI::createSyncObjects()
@@ -347,6 +367,10 @@ namespace ArchViz
             VkDeviceSize offsets[]        = {0};
             vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
 
+            vkCmdBindIndexBuffer(command_buffer, m_index_buffer, 0, VK_INDEX_TYPE_UINT16);
+
+            vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
             vkCmdDraw(command_buffer, 3, 1, 0, 0);
         }
 
@@ -454,6 +478,12 @@ namespace ArchViz
 
         // m_vulkan_ui->clear();
         m_vulkan_ui.reset();
+
+        vkDestroyBuffer(m_vulkan_device->m_device, m_index_buffer, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, m_index_buffer_memory, nullptr);
+
+        vkDestroyBuffer(m_vulkan_device->m_device, m_vertex_buffer, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, m_vertex_buffer_memory, nullptr);
 
         for (auto framebuffer : m_swap_chain_framebuffers)
         {

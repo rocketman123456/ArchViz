@@ -25,7 +25,7 @@ namespace ArchViz
 
         GLFWwindow* m_window;
 
-        uint32_t m_vulkan_api_version {VK_API_VERSION_1_2};
+        uint32_t m_vulkan_api_version {VK_API_VERSION_1_0};
 
         VkInstance               m_instance;
         VkDebugUtilsMessengerEXT m_debug_messenger;

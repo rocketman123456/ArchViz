@@ -57,6 +57,7 @@ namespace ArchViz
         void createCommandBuffer();
 
         void createVertexBuffer();
+        void createIndexBuffer();
 
         void createSyncObjects();
 
@@ -92,6 +93,8 @@ namespace ArchViz
 
         VkBuffer       m_vertex_buffer;
         VkDeviceMemory m_vertex_buffer_memory;
+        VkBuffer       m_index_buffer;
+        VkDeviceMemory m_index_buffer_memory;
 
         VkCommandPool m_command_pool;
         // VkCommandBuffer m_command_buffer;

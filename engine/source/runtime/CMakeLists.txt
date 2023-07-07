@@ -11,6 +11,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB_RECURSE HEADER_FILES "*.h")
 file(GLOB_RECURSE SOURCE_FILES "*.cpp")
 
+# file(GLOB imgui_sources CONFIGURE_DEPENDS  "${ENGINE_ROOT_DIR}/3rd_party/imgui/*.cpp")
+# file(GLOB imgui_impl CONFIGURE_DEPENDS  
+#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_glfw.cpp" 
+#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_glfw.h"
+#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_vulkan.cpp" 
+#   "${ENGINE_ROOT_DIR}/3rd_party/imgui/backends/imgui_impl_vulkan.h"
+# )
+
 # source_group(TREE "${ENGINE_ROOT_DIR}/schema" FILES ${SCHEMA_FILES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
 
@@ -18,7 +26,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${HEADER_FILES} ${SOURCE_F
 
 # Note: for header-only libraries change all PUBLIC flags to INTERFACE and create an interface
 # target: add_library(${TARGET_NAME} INTERFACE)
-add_library(${TARGET_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+add_library(${TARGET_NAME} ${HEADER_FILES} ${SOURCE_FILES}) # ${imgui_impl} ${imgui_sources}
 
 set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 17)
 set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "Engine")

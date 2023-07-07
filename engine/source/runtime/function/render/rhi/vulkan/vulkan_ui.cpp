@@ -3,9 +3,9 @@
 #include "runtime/core/base/macro.h"
 
 #define GLFW_INCLUDE_NONE
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_vulkan.h>
-#include <imgui.h>
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_vulkan.h"
+#include "imgui.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,11 +120,11 @@ namespace ArchViz
         init_info.Queue                     = m_graphics_queue;
         init_info.PipelineCache             = VK_NULL_HANDLE;
         init_info.DescriptorPool            = m_descriptor_pool;
-        init_info.Allocator                 = nullptr;
+        init_info.Allocator                 = VK_NULL_HANDLE;
         init_info.MinImageCount             = 2;
         init_info.ImageCount                = m_image_count;
-        init_info.MSAASamples               = VK_SAMPLE_COUNT_1_BIT;
         init_info.CheckVkResultFn           = check_vk_result;
+        // init_info.MSAASamples               = VK_SAMPLE_COUNT_1_BIT;
         ImGui_ImplVulkan_Init(&init_info, m_ui_pass);
 
         // Load Fonts
