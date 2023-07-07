@@ -3,10 +3,8 @@
 namespace ArchViz
 {
     const std::vector<const char*> VulkanConstants::validation_layers = {
-#ifdef VULKAN_DEBUG_REPORT
-        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
-        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-#endif // VULKAN_DEBUG_REPORT
+        // VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+        // VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
         "VK_LAYER_KHRONOS_validation",
     };
 

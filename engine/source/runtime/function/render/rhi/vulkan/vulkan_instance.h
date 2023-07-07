@@ -29,9 +29,8 @@ namespace ArchViz
 
         VkInstance               m_instance;
         VkDebugUtilsMessengerEXT m_debug_messenger;
-        VkDebugReportCallbackEXT m_report_callback; // TODO
+        VkDebugReportCallbackEXT m_report_callback;
 
-        // TODO
         VkSurfaceKHR m_surface;
     };
 } // namespace ArchViz

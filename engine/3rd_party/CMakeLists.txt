@@ -30,9 +30,9 @@ if(NOT TARGET tlsf)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tlsf.cmake)
 endif()
 
-if(NOT TARGET VulkanMemoryAllocator)
-    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/vma.cmake)
-endif()
+# if(NOT TARGET VulkanMemoryAllocator)
+#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/vma.cmake)
+# endif()
 
 if(NOT TARGET glslang)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glslang.cmake)

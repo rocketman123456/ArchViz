@@ -7,7 +7,6 @@
 
 #include <vk_mem_alloc.h>
 
-#include <cstdint>
 #include <limits>
 
 namespace ArchViz
