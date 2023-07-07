@@ -21,6 +21,7 @@ namespace ArchViz
     class VulkanPipeline;
     class VulkanRenderPass;
     class VulkanInstance;
+    class VulkanUI;
 
     class VulkanRHI : public RHI
     {
@@ -44,6 +45,8 @@ namespace ArchViz
         void createInstance();
 
         void createVulkanDevice();
+
+        void createImGui();
 
         void createRenderPass();
         void createGraphicsPipeline();
@@ -80,6 +83,8 @@ namespace ArchViz
         std::shared_ptr<VulkanPipeline>   m_vulkan_pipeline;
         std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
 
+        std::shared_ptr<VulkanUI> m_vulkan_ui;
+
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
         // asset allocator use VMA library
@@ -91,6 +96,8 @@ namespace ArchViz
         VkCommandPool m_command_pool;
         // VkCommandBuffer m_command_buffer;
         std::vector<VkCommandBuffer> m_command_buffers;
+
+        VkCommandBuffer m_transfer_buffer;
 
         std::vector<VkSemaphore> m_image_available_semaphores;
         std::vector<VkSemaphore> m_render_finished_semaphores;

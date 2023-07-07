@@ -71,6 +71,10 @@ namespace ArchViz
         create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
 
+#ifdef __MACH__
+        create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
+#endif
+
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
         if (m_validation)
         {

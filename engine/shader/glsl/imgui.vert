@@ -1,25 +1,23 @@
 #version 450 core
 
-layout(location = 0) in vec2 aPos;
-layout(location = 1) in vec2 aUV;
-layout(location = 2) in vec4 aColor;
+layout(location = 0) in vec2 inPos;
+layout(location = 1) in vec2 inUV;
+layout(location = 2) in vec4 inColor;
 
 layout(push_constant) uniform uPushConstant {
-    vec2 uScale;
-    vec2 uTranslate;
+    vec2 scale;
+    vec2 translate;
 } pc;
 
 out gl_PerVertex {
     vec4 gl_Position;
 };
 
-layout(location = 0) out struct {
-    vec4 Color;
-    vec2 UV;
-} Out;
+layout (location = 0) out vec2 outUV;
+layout (location = 1) out vec4 outColor;
 
 void main() {
-    Out.Color = aColor;
-    Out.UV = aUV;
-    gl_Position = vec4(aPos * pc.uScale + pc.uTranslate, 0, 1);
+    outUV = inUV;
+    outColor = inColor;
+    gl_Position = vec4(inPos * pc.scale + pc.translate, 0, 1);
 }

@@ -10,6 +10,10 @@ if(NOT TARGET json11)
     add_subdirectory(json11)
 endif()
 
+if(NOT TARGET imgui)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/imgui.cmake)
+endif()
+
 # if(NOT TARGET zlib)
 #     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/zlib.cmake)
 # endif()

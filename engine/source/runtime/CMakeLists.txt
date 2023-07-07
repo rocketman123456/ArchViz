@@ -42,6 +42,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC SPIRV-Headers)
 target_link_libraries(${TARGET_NAME} PUBLIC Vulkan-Headers)
 target_link_libraries(${TARGET_NAME} PUBLIC VulkanMemoryAllocator)
 target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
+target_link_libraries(${TARGET_NAME} PUBLIC imgui)
 # target_link_libraries(${TARGET_NAME} PUBLIC zip)
 
 target_link_libraries(${TARGET_NAME} PUBLIC 
@@ -65,6 +66,7 @@ target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/ei
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/json11)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/volk)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/glslang)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/imgui)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/stb)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/glfw/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/tinygltf)

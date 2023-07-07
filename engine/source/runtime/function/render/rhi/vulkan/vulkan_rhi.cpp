@@ -5,6 +5,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_render_pass.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
 #include "runtime/function/render/geometry/vertex.h"
@@ -171,6 +172,33 @@ namespace ArchViz
         {
             LOG_FATAL("failed to allocate command buffers!");
         }
+
+        alloc_info.commandBufferCount = 1;
+
+        if (vkAllocateCommandBuffers(m_vulkan_device->m_device, &alloc_info, &m_transfer_buffer) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate command buffers!");
+        }
+    }
+
+    void VulkanRHI::createImGui()
+    {
+        m_vulkan_ui = std::make_shared<VulkanUI>();
+
+        m_vulkan_ui->m_window = m_initialize_info.window_system->getWindow();
+
+        m_vulkan_ui->m_instance              = m_vulkan_instance->m_instance;
+        m_vulkan_ui->m_physical_device       = m_vulkan_device->m_physical_device;
+        m_vulkan_ui->m_device                = m_vulkan_device->m_device;
+        m_vulkan_ui->m_graphics_queue_family = m_vulkan_device->m_indices.m_graphics_family.value();
+        m_vulkan_ui->m_graphics_queue        = m_vulkan_device->m_graphics_queue;
+        m_vulkan_ui->m_image_count           = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
+        m_vulkan_ui->m_image_format          = m_vulkan_swap_chain->m_swap_chain_image_format;
+
+        m_vulkan_ui->m_command_pool   = m_command_pool;
+        m_vulkan_ui->m_command_buffer = m_transfer_buffer;
+
+        // m_vulkan_ui->initialize();
     }
 
     void VulkanRHI::createVertexBuffer()
@@ -268,6 +296,8 @@ namespace ArchViz
         createCommandPool();
         createCommandBuffer();
 
+        createImGui();
+
         createVertexBuffer();
 
         createSyncObjects();
@@ -321,6 +351,8 @@ namespace ArchViz
         }
 
         vkCmdEndRenderPass(command_buffer);
+
+        // m_vulkan_ui->recordCommandBuffer(command_buffer, m_swap_chain_framebuffers[image_index], m_vulkan_swap_chain->m_swap_chain_extent.width, m_vulkan_swap_chain->m_swap_chain_extent.height);
 
         if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
         {
@@ -397,9 +429,15 @@ namespace ArchViz
     {
         vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
         vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
+
+        // m_vulkan_ui->prepareContext();
     }
 
-    void VulkanRHI::render() { drawFrame(); }
+    void VulkanRHI::render()
+    {
+        // m_vulkan_ui->render();
+        drawFrame();
+    }
 
     void VulkanRHI::clear()
     {
@@ -413,6 +451,9 @@ namespace ArchViz
         }
 
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
+
+        // m_vulkan_ui->clear();
+        m_vulkan_ui.reset();
 
         for (auto framebuffer : m_swap_chain_framebuffers)
         {

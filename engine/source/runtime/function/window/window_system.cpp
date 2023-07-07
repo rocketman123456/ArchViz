@@ -2,8 +2,12 @@
 
 #include "runtime/core/base/macro.h"
 
+#include <stdlib.h>
+
 namespace ArchViz
 {
+    static void glfw_error_callback(int error, const char* description) { LOG_ERROR("GLFW Error {}: {}", error, description); }
+
     WindowSystem::~WindowSystem()
     {
         glfwDestroyWindow(m_window);
@@ -12,6 +16,8 @@ namespace ArchViz
 
     void WindowSystem::initialize(WindowCreateInfo create_info)
     {
+        glfwSetErrorCallback(glfw_error_callback);
+
         if (!glfwInit())
         {
             LOG_FATAL("failed to initialize GLFW");
@@ -21,7 +27,7 @@ namespace ArchViz
         m_width  = create_info.width;
         m_height = create_info.height;
 
-        // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
         m_window = glfwCreateWindow(create_info.width, create_info.height, create_info.title.c_str(), nullptr, nullptr);
