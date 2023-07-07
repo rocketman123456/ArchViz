@@ -15,26 +15,6 @@ set(BUILD_SHARED_LIBS OFF)
 
 include(CMakeDependentOption)
 
-# find_package(spdlog CONFIG REQUIRED)
-# find_package(fmt CONFIG REQUIRED)
-# find_package(Eigen3 CONFIG REQUIRED)
-# find_package(glslang CONFIG REQUIRED)
-# find_package(libzip CONFIG REQUIRED)
-
-# find_package(glfw3 CONFIG REQUIRED)
-# find_package(volk CONFIG REQUIRED)
-# find_package(unofficial-vulkan-memory-allocator CONFIG REQUIRED)
-# find_package(Lua REQUIRED)
-# find_package(LLVM CONFIG REQUIRED)
-# find_path(TINYGLTF_INCLUDE_DIRS "tiny_gltf.h")
-# find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
-# find_package(tinyobjloader CONFIG REQUIRED)
-# find_package(sol2 CONFIG REQUIRED)
-# find_package(lz4 CONFIG REQUIRED)
-# find_package(nlohmann_json CONFIG REQUIRED)
-# find_package(Taskflow CONFIG REQUIRED)
-# target_link_libraries(main PRIVATE Taskflow::Taskflow)
-
 # ---- Include guards ----
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.")
