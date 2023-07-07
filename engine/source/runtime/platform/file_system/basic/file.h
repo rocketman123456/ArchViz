@@ -34,7 +34,7 @@ namespace ArchViz
         };
 
     public:
-        File(const std::string& vpath, const std::string& rpath) : m_vpath {vpath}, m_rpath {rpath} {}
+        explicit File(const std::string& vpath, const std::string& rpath) : m_vpath {vpath}, m_rpath {rpath} {}
         virtual ~File() = default;
 
         virtual bool open(uint32_t mode) = 0;

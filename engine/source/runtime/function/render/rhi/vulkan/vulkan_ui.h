@@ -9,7 +9,6 @@ namespace ArchViz
     class VulkanUI
     {
     public:
-        void connect();
         void initialize();
         void clear();
 

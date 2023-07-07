@@ -30,6 +30,12 @@ namespace ArchViz
         m_render_pass = render_pass;
     }
 
+    void VulkanPipeline::setDescriptorSetLayout(VkDescriptorSetLayout layout)
+    {
+        ASSERT(layout);
+        m_descriptor_set_layout = layout;
+    }
+
     void VulkanPipeline::initialize()
     {
         m_shader->initialize();
@@ -47,7 +53,7 @@ namespace ArchViz
         frag_shader_stage_info.module = m_shader->m_frag_shader;
         frag_shader_stage_info.pName  = "main";
 
-        VkPipelineShaderStageCreateInfo shaderStages[] = {vert_shader_stage_info, frag_shader_stage_info};
+        VkPipelineShaderStageCreateInfo shader_stages[] = {vert_shader_stage_info, frag_shader_stage_info};
 
         // TODO : add custom bindings
         auto bindingDescription    = Vertex::getBindingDescription();
@@ -77,8 +83,9 @@ namespace ArchViz
         rasterizer.polygonMode             = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth               = 1.0f;
         rasterizer.cullMode                = VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace               = VK_FRONT_FACE_CLOCKWISE;
+        rasterizer.frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable         = VK_FALSE;
+        rasterizer.cullMode                = VK_CULL_MODE_BACK_BIT;
 
         VkPipelineMultisampleStateCreateInfo multisampling {};
         multisampling.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -107,9 +114,9 @@ namespace ArchViz
         dynamic_state.pDynamicStates    = dynamic_states.data();
 
         VkPipelineLayoutCreateInfo pipeline_layout_info {};
-        pipeline_layout_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipeline_layout_info.setLayoutCount         = 0;
-        pipeline_layout_info.pushConstantRangeCount = 0;
+        pipeline_layout_info.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipeline_layout_info.setLayoutCount = 1;
+        pipeline_layout_info.pSetLayouts    = &m_descriptor_set_layout;
 
         if (vkCreatePipelineLayout(m_device->m_device, &pipeline_layout_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
         {
@@ -119,7 +126,7 @@ namespace ArchViz
         VkGraphicsPipelineCreateInfo pipeline_info {};
         pipeline_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipeline_info.stageCount          = 2;
-        pipeline_info.pStages             = shaderStages;
+        pipeline_info.pStages             = shader_stages;
         pipeline_info.pVertexInputState   = &vertex_input_info;
         pipeline_info.pInputAssemblyState = &input_assembly;
         pipeline_info.pViewportState      = &viewport_state;

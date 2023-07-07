@@ -17,6 +17,7 @@ namespace ArchViz
         void setShaderModule(std::shared_ptr<VulkanShader> shader);
         void setDevice(std::shared_ptr<VulkanDevice> device);
         void setRenderPass(VkRenderPass render_pass);
+        void setDescriptorSetLayout(VkDescriptorSetLayout layout);
 
         void initialize();
         void clear();
@@ -28,7 +29,8 @@ namespace ArchViz
         VkRenderPass m_render_pass;
 
     public:
-        VkPipelineLayout m_pipeline_layout;
-        VkPipeline       m_pipeline;
+        VkPipelineLayout      m_pipeline_layout;
+        VkPipeline            m_pipeline;
+        VkDescriptorSetLayout m_descriptor_set_layout;
     };
 } // namespace ArchViz

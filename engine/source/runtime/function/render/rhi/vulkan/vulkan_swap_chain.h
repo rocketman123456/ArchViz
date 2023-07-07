@@ -14,9 +14,6 @@ namespace ArchViz
     class VulkanSwapChain
     {
     public:
-        VulkanSwapChain()  = default;
-        ~VulkanSwapChain() = default;
-
         void connect(VkInstance instance, VkSurfaceKHR surface, VkPhysicalDevice physical_device, VkDevice device);
         void initialize(uint32_t width, uint32_t height, bool vsync = false, bool fullscreen = false);
         void clear();

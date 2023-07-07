@@ -17,6 +17,7 @@
 #include "runtime/function/window/window_system.h"
 
 #include "runtime/core/base/macro.h"
+#include "runtime/core/math/graphics_utils.h"
 
 #if defined(__GNUC__)
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
@@ -99,19 +100,19 @@ namespace ArchViz
 
     void VulkanRHI::createDescriptorSetLayout()
     {
-        VkDescriptorSetLayoutBinding uboLayoutBinding {};
-        uboLayoutBinding.binding            = 0;
-        uboLayoutBinding.descriptorCount    = 1;
-        uboLayoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBinding.pImmutableSamplers = nullptr;
-        uboLayoutBinding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+        VkDescriptorSetLayoutBinding ubo_layout_binding {};
+        ubo_layout_binding.binding            = 0;
+        ubo_layout_binding.descriptorCount    = 1;
+        ubo_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        ubo_layout_binding.pImmutableSamplers = nullptr;
+        ubo_layout_binding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
 
-        VkDescriptorSetLayoutCreateInfo layoutInfo {};
-        layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = 1;
-        layoutInfo.pBindings    = &uboLayoutBinding;
+        VkDescriptorSetLayoutCreateInfo layout_info {};
+        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = 1;
+        layout_info.pBindings    = &ubo_layout_binding;
 
-        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layoutInfo, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
+        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
         {
             LOG_FATAL("failed to create descriptor set layout!");
         }
@@ -128,8 +129,8 @@ namespace ArchViz
     void VulkanRHI::createGraphicsPipeline()
     {
         ShaderModuleConfig config;
-        config.m_vert_shader = "shader/glsl/shader_vertexbuffer.vert";
-        config.m_frag_shader = "shader/glsl/shader_vertexbuffer.frag";
+        config.m_vert_shader = "shader/glsl/shader_ubo.vert";
+        config.m_frag_shader = "shader/glsl/shader_ubo.frag";
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
 
@@ -141,6 +142,7 @@ namespace ArchViz
         m_vulkan_pipeline->setDevice(m_vulkan_device);
         m_vulkan_pipeline->setShaderModule(shader);
         m_vulkan_pipeline->setRenderPass(m_vulkan_render_pass->m_render_pass);
+        m_vulkan_pipeline->setDescriptorSetLayout(m_descriptor_set_layout);
         m_vulkan_pipeline->initialize();
     }
 
@@ -467,9 +469,9 @@ namespace ArchViz
 
             vkCmdBindIndexBuffer(command_buffer, m_index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
-            vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
 
-            // vkCmdDraw(command_buffer, 3, 1, 0, 0);
+            vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
         }
 
         vkCmdEndRenderPass(command_buffer);
@@ -480,6 +482,26 @@ namespace ArchViz
         {
             LOG_FATAL("failed to record command buffer!");
         }
+    }
+
+    void VulkanRHI::updateUniformBuffer(uint32_t current_image)
+    {
+        static auto startTime = std::chrono::high_resolution_clock::now();
+
+        auto  currentTime = std::chrono::high_resolution_clock::now();
+        float time        = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+        UniformBufferObject ubo {};
+        ubo.model = FMatrix4::Identity();
+        ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.01f, FVector3::UnitZ()).toRotationMatrix();
+        // glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+        // look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+        ubo.proj = perspective(45.0f / 180.0 * 3.14, m_vulkan_swap_chain->m_swap_chain_extent.width / m_vulkan_swap_chain->m_swap_chain_extent.height, 0.1f, 10.0f);
+        // glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+        ubo.proj(1, 1) *= -1;
+
+        memcpy(m_uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
     }
 
     void VulkanRHI::drawFrame()
@@ -553,6 +575,7 @@ namespace ArchViz
         vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
 
         // m_vulkan_ui->prepareContext();
+        updateUniformBuffer(m_current_frame);
     }
 
     void VulkanRHI::render()

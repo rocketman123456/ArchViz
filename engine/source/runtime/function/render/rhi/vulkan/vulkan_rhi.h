@@ -70,6 +70,7 @@ namespace ArchViz
 
     private:
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+        void updateUniformBuffer(uint32_t current_image);
         void drawFrame();
 
     private:
