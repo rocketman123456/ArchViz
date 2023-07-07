@@ -41,8 +41,8 @@ namespace ArchViz
 
     struct UniformBufferObject
     {
-        FMatrix4 model;
-        FMatrix4 view;
-        FMatrix4 proj;
+        alignas(16) FMatrix4 model;
+        alignas(16) FMatrix4 view;
+        alignas(16) FMatrix4 proj;
     };
 } // namespace ArchViz

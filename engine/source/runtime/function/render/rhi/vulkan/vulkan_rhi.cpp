@@ -493,7 +493,7 @@ namespace ArchViz
 
         UniformBufferObject ubo {};
         ubo.model = FMatrix4::Identity();
-        ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.01f, FVector3::UnitZ()).toRotationMatrix();
+        ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
         // glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
         // look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
