@@ -62,10 +62,10 @@ namespace ArchViz
         VkPresentModeKHR   present_mode   = VulkanUtils::chooseSwapPresentMode(swap_chain_support.presentModes);
         VkExtent2D         extent         = VulkanUtils::chooseSwapExtent(swap_chain_support.capabilities, m_window);
 
-        uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
-        if (swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
+        m_image_count = swap_chain_support.capabilities.minImageCount + 1;
+        if (swap_chain_support.capabilities.maxImageCount > 0 && m_image_count > swap_chain_support.capabilities.maxImageCount)
         {
-            image_count = swap_chain_support.capabilities.maxImageCount;
+            m_image_count = swap_chain_support.capabilities.maxImageCount;
         }
 
         VkExtent2D swapchainExtent = {};
@@ -86,7 +86,7 @@ namespace ArchViz
         VkSwapchainCreateInfoKHR create_info {};
         create_info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         create_info.surface          = m_surface;
-        create_info.minImageCount    = image_count;
+        create_info.minImageCount    = m_image_count;
         create_info.imageFormat      = surface_format.format;
         create_info.imageColorSpace  = surface_format.colorSpace;
         create_info.imageExtent      = extent;
@@ -128,16 +128,16 @@ namespace ArchViz
         // create image views
         if (old_swap_chain != VK_NULL_HANDLE)
         {
-            for (uint32_t i = 0; i < image_count; i++)
+            for (uint32_t i = 0; i < m_image_count; i++)
             {
                 vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
             }
             vkDestroySwapchainKHR(m_device, old_swap_chain, nullptr);
         }
 
-        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, nullptr);
-        m_images.resize(image_count);
-        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &image_count, m_images.data());
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &m_image_count, nullptr);
+        m_images.resize(m_image_count);
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &m_image_count, m_images.data());
 
         m_swap_chain_image_format = surface_format.format;
         m_swap_chain_extent       = extent;
@@ -177,6 +177,7 @@ namespace ArchViz
             for (uint32_t i = 0; i < m_image_count; i++)
             {
                 vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
+                //vkDestroyImage(m_device, m_buffers[i].image, nullptr);
             }
 
             vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);

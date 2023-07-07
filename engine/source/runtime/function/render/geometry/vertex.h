@@ -38,4 +38,11 @@ namespace ArchViz
             return attributeDescriptions;
         }
     };
+
+    struct UniformBufferObject
+    {
+        FMatrix4 model;
+        FMatrix4 view;
+        FMatrix4 proj;
+    };
 } // namespace ArchViz

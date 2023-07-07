@@ -14,8 +14,22 @@ namespace ArchViz
                                                          const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
                                                          void*                                       pUserData)
     {
-        LOG_ERROR("[Vulkan] validation layer: {}", pCallbackData->pMessage);
-        // std::cerr << "[Vulkan] validation layer: " << pCallbackData->pMessage << std::endl;
+        if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+        {
+            LOG_DEBUG("[Vulkan] validation layer: {}", pCallbackData->pMessage);
+        }
+        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+        {
+            LOG_INFO("[Vulkan] validation layer: {}", pCallbackData->pMessage);
+        }
+        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        {
+            LOG_WARN("[Vulkan] validation layer: {}", pCallbackData->pMessage);
+        }
+        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        {
+            LOG_ERROR("[Vulkan] validation layer: {}", pCallbackData->pMessage);
+        }
         return VK_FALSE;
     }
 

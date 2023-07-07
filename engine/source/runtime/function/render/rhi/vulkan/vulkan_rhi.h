@@ -48,6 +48,7 @@ namespace ArchViz
 
         void createImGui();
 
+        void createDescriptorSetLayout();
         void createRenderPass();
         void createGraphicsPipeline();
 
@@ -87,6 +88,8 @@ namespace ArchViz
         std::shared_ptr<VulkanUI> m_vulkan_ui;
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
+
+        VkDescriptorSetLayout m_descriptor_set_layout;
 
         // asset allocator use VMA library
         VmaAllocator m_assets_allocator;

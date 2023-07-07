@@ -97,6 +97,11 @@ namespace ArchViz
         createFramebuffers();
     }
 
+    void VulkanRHI::createDescriptorSetLayout()
+    {
+
+    }
+
     void VulkanRHI::createRenderPass()
     {
         m_vulkan_render_pass = std::make_shared<VulkanRenderPass>();
@@ -308,7 +313,8 @@ namespace ArchViz
 
         createSwapChain();
 
-        createRenderPass();
+        createDescriptorSetLayout();
+        createRenderPass(); 
         createGraphicsPipeline();
 
         createFramebuffers();
@@ -372,7 +378,7 @@ namespace ArchViz
 
             vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
-            vkCmdDraw(command_buffer, 3, 1, 0, 0);
+            //vkCmdDraw(command_buffer, 3, 1, 0, 0);
         }
 
         vkCmdEndRenderPass(command_buffer);
