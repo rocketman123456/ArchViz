@@ -143,21 +143,6 @@ namespace ArchViz
         {
             LOG_FATAL("failed to create ui discriptor pool");
         }
-
-        // VkDescriptorPoolSize pool_size {};
-        // pool_size.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // pool_size.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-        // VkDescriptorPoolCreateInfo pool_info {};
-        // pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        // pool_info.poolSizeCount = 1;
-        // pool_info.pPoolSizes    = &pool_size;
-        // pool_info.maxSets       = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-        // if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
-        // {
-        //     LOG_FATAL("failed to create descriptor pool!");
-        // }
     }
 
     void VulkanRHI::createRenderPass()
