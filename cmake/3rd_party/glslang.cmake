@@ -12,4 +12,4 @@ option(ENABLE_GLSLANG_INSTALL "Install" OFF)
 
 add_subdirectory(glslang)
 
-target_include_directories(glslang PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)
+# target_include_directories(glslang PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)

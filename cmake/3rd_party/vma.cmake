@@ -13,4 +13,4 @@ add_subdirectory(VulkanMemoryAllocator)
 # target_link_libraries(VulkanMemoryAllocator PUBLIC volk::volk_headers)
 # target_link_libraries(VulkanMemoryAllocator PUBLIC volk::volk)
 
-target_include_directories(VulkanMemoryAllocator PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)
+# target_include_directories(VulkanMemoryAllocator PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)

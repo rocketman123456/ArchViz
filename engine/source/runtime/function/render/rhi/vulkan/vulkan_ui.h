@@ -16,6 +16,9 @@ namespace ArchViz
         void render();
         void recordCommandBuffer(VkCommandBuffer command_buffer, VkFramebuffer frame_buffer, uint32_t width, uint32_t height);
 
+    private:
+        void createRenderPass();
+
     public:
         GLFWwindow* m_window;
 

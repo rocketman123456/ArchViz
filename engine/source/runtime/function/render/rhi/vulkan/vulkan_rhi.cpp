@@ -118,6 +118,48 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createDescriptorPool()
+    {
+        VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+                                             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+                                             {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+                                             {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+                                             {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+                                             {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+                                             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+                                             {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+                                             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+                                             {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+                                             {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
+
+        VkDescriptorPoolCreateInfo pool_info = {};
+        pool_info.sType                      = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags                      = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        pool_info.maxSets                    = 1000 * sizeof(pool_sizes) / sizeof(pool_sizes[0]);
+        pool_info.poolSizeCount              = (uint32_t)sizeof(pool_sizes) / sizeof(pool_sizes[0]);
+        pool_info.pPoolSizes                 = pool_sizes;
+
+        if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create ui discriptor pool");
+        }
+
+        // VkDescriptorPoolSize pool_size {};
+        // pool_size.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        // pool_size.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+        // VkDescriptorPoolCreateInfo pool_info {};
+        // pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        // pool_info.poolSizeCount = 1;
+        // pool_info.pPoolSizes    = &pool_size;
+        // pool_info.maxSets       = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+        // if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
+        // {
+        //     LOG_FATAL("failed to create descriptor pool!");
+        // }
+    }
+
     void VulkanRHI::createRenderPass()
     {
         m_vulkan_render_pass = std::make_shared<VulkanRenderPass>();
@@ -219,9 +261,9 @@ namespace ArchViz
         m_vulkan_ui->m_graphics_queue        = m_vulkan_device->m_graphics_queue;
         m_vulkan_ui->m_image_count           = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
         m_vulkan_ui->m_image_format          = m_vulkan_swap_chain->m_swap_chain_image_format;
-
-        m_vulkan_ui->m_command_pool   = m_command_pool;
-        m_vulkan_ui->m_command_buffer = m_transfer_buffer;
+        m_vulkan_ui->m_command_pool          = m_command_pool;
+        m_vulkan_ui->m_command_buffer        = m_transfer_buffer;
+        m_vulkan_ui->m_descriptor_pool       = m_descriptor_pool;
 
         // m_vulkan_ui->initialize();
     }
@@ -298,24 +340,6 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createDescriptorPool()
-    {
-        VkDescriptorPoolSize pool_size {};
-        pool_size.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        pool_size.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-        VkDescriptorPoolCreateInfo pool_info {};
-        pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.poolSizeCount = 1;
-        pool_info.pPoolSizes    = &pool_size;
-        pool_info.maxSets       = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-        if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create descriptor pool!");
-        }
-    }
-
     void VulkanRHI::createDescriptorSets()
     {
         std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, m_descriptor_set_layout);
@@ -334,10 +358,10 @@ namespace ArchViz
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            VkDescriptorBufferInfo bufferInfo {};
-            bufferInfo.buffer = m_uniform_buffers[i];
-            bufferInfo.offset = 0;
-            bufferInfo.range  = sizeof(UniformBufferObject);
+            VkDescriptorBufferInfo buffer_info {};
+            buffer_info.buffer = m_uniform_buffers[i];
+            buffer_info.offset = 0;
+            buffer_info.range  = sizeof(UniformBufferObject);
 
             VkWriteDescriptorSet descriptorWrite {};
             descriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -346,7 +370,7 @@ namespace ArchViz
             descriptorWrite.dstArrayElement = 0;
             descriptorWrite.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrite.descriptorCount = 1;
-            descriptorWrite.pBufferInfo     = &bufferInfo;
+            descriptorWrite.pBufferInfo     = &buffer_info;
 
             vkUpdateDescriptorSets(m_vulkan_device->m_device, 1, &descriptorWrite, 0, nullptr);
         }
@@ -403,6 +427,7 @@ namespace ArchViz
         createSwapChain();
 
         createDescriptorSetLayout();
+        createDescriptorPool();
 
         createRenderPass();
         createGraphicsPipeline();
@@ -417,7 +442,6 @@ namespace ArchViz
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
-        createDescriptorPool();
         createDescriptorSets();
 
         createSyncObjects();
@@ -492,7 +516,7 @@ namespace ArchViz
         float time        = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
         UniformBufferObject ubo {};
-        ubo.model = FMatrix4::Identity();
+        ubo.model                   = FMatrix4::Identity();
         ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
         // glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});

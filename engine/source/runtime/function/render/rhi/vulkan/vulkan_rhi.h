@@ -46,11 +46,8 @@ namespace ArchViz
 
         void createVulkanDevice();
 
-        void createImGui();
-
         void createDescriptorSetLayout();
         void createDescriptorPool();
-        void createDescriptorSets();
 
         void createRenderPass();
         void createGraphicsPipeline();
@@ -60,9 +57,12 @@ namespace ArchViz
         void createCommandPool();
         void createCommandBuffer();
 
+        void createImGui();
+
         void createVertexBuffer();
         void createIndexBuffer();
         void createUniformBuffers();
+        void createDescriptorSets();
 
         void createSyncObjects();
 
