@@ -82,16 +82,16 @@ namespace ArchViz
         alloc_info.commandPool        = command_pool;
         alloc_info.commandBufferCount = 1;
 
-        VkCommandBuffer commandBuffer;
-        vkAllocateCommandBuffers(device->m_device, &alloc_info, &commandBuffer);
+        VkCommandBuffer command_buffer;
+        vkAllocateCommandBuffers(device->m_device, &alloc_info, &command_buffer);
 
         VkCommandBufferBeginInfo begin_info {};
         begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-        vkBeginCommandBuffer(commandBuffer, &begin_info);
+        vkBeginCommandBuffer(command_buffer, &begin_info);
 
-        return commandBuffer;
+        return command_buffer;
     }
 
     void VulkanBufferUtils::endSingleTimeCommands(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkCommandBuffer command_buffer)

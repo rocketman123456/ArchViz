@@ -49,7 +49,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC volk::volk)
 target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
 target_link_libraries(${TARGET_NAME} PUBLIC SPIRV-Headers)
 target_link_libraries(${TARGET_NAME} PUBLIC Vulkan-Headers)
-target_link_libraries(${TARGET_NAME} PUBLIC VulkanMemoryAllocator)
+# target_link_libraries(${TARGET_NAME} PUBLIC VulkanMemoryAllocator)
 target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
 

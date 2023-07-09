@@ -4,18 +4,24 @@
 
 #include <volk.h>
 
+#include <vk_mem_alloc.h>
+
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
+
 namespace ArchViz
 {
+    class VulkanInstance;
+
     class VulkanDevice
     {
     public:
         explicit VulkanDevice(bool enable_validation) : m_enable_validation_layers(enable_validation) {}
 
-        void connect(VkInstance instance, VkSurfaceKHR surface);
+        void connect(std::shared_ptr<VulkanInstance> instance);
         void initialize();
         void clear();
 
@@ -24,13 +30,15 @@ namespace ArchViz
     private:
         void pickPhysicalDevice();
         void createLogicalDevice();
+        void createCommandPool();
+        void createAssetAllocator();
 
     public:
         bool m_enable_validation_layers;
         bool m_bindless_support;
 
-        VkInstance       m_instance;
-        VkSurfaceKHR     m_surface;
+        std::shared_ptr<VulkanInstance> m_instance;
+
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice         m_device          = VK_NULL_HANDLE;
 
@@ -49,6 +57,9 @@ namespace ArchViz
         VkQueue m_compute_queue;
         VkQueue m_present_queue;
         VkQueue m_transfer_queue;
+
+        // asset allocator use VMA library
+        VmaAllocator m_assets_allocator;
 
         // TODO
     };

@@ -28,4 +28,6 @@ set(ARCHVIZ_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(CMAKE_INSTALL_PREFIX "${ARCHVIZ_ROOT_DIR}/bin")
 set(BINARY_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/")
 
+option(PRECOMPILE_PROJECT "precompile for serialization" OFF)
+
 add_subdirectory(engine)

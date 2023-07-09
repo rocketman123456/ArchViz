@@ -1,18 +1,22 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
 #include "runtime/core/base/macro.h"
+
+#define VMA_IMPLEMENTATION 1
+#define VMA_STATIC_VULKAN_FUNCTIONS 0
+#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
+#include <vk_mem_alloc.h>
 
 #include <set>
 
 namespace ArchViz
 {
-    void VulkanDevice::connect(VkInstance instance, VkSurfaceKHR surface)
+    void VulkanDevice::connect(std::shared_ptr<VulkanInstance> instance)
     {
         ASSERT(instance);
         m_instance = instance;
-        ASSERT(surface);
-        m_surface = surface;
     }
 
     void VulkanDevice::wait()
@@ -25,6 +29,8 @@ namespace ArchViz
     {
         pickPhysicalDevice();
         createLogicalDevice();
+        createCommandPool();
+        createAssetAllocator();
     }
 
     void VulkanDevice::clear()
@@ -42,7 +48,7 @@ namespace ArchViz
     void VulkanDevice::pickPhysicalDevice()
     {
         uint32_t device_count = 0;
-        vkEnumeratePhysicalDevices(m_instance, &device_count, nullptr);
+        vkEnumeratePhysicalDevices(m_instance->m_instance, &device_count, nullptr);
 
         if (device_count == 0)
         {
@@ -50,16 +56,16 @@ namespace ArchViz
         }
 
         std::vector<VkPhysicalDevice> devices(device_count);
-        vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
+        vkEnumeratePhysicalDevices(m_instance->m_instance, &device_count, devices.data());
 
         for (const auto& device : devices)
         {
             VkPhysicalDeviceFeatures supported_features;
             vkGetPhysicalDeviceFeatures(device, &supported_features);
 
-            bool suitable  = VulkanUtils::isDeviceSuitable(device, m_surface);
+            bool suitable  = VulkanUtils::isDeviceSuitable(device, m_instance->m_surface);
             bool extension = VulkanUtils::checkDeviceExtensionSupport(device, VulkanConstants::device_extensions);
-            bool adequate  = VulkanUtils::isSwapChainAdequate(device, m_surface, extension);
+            bool adequate  = VulkanUtils::isSwapChainAdequate(device, m_instance->m_surface, extension);
             bool bindless  = VulkanUtils::checkBindlessSupport(device);
             if (suitable && extension && adequate && bindless && supported_features.samplerAnisotropy)
             {
@@ -108,7 +114,7 @@ namespace ArchViz
 
     void VulkanDevice::createLogicalDevice()
     {
-        m_indices = VulkanUtils::findQueueFamilies(m_physical_device, m_surface);
+        m_indices = VulkanUtils::findQueueFamilies(m_physical_device, m_instance->m_surface);
 
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
         std::set<uint32_t>                   unique_queue_families = {m_indices.m_graphics_family.value(), m_indices.m_compute_family.value(), m_indices.m_present_family.value()};
@@ -178,5 +184,34 @@ namespace ArchViz
         vkGetDeviceQueue(m_device, m_indices.m_compute_family.value(), 0, &m_compute_queue);
         vkGetDeviceQueue(m_device, m_indices.m_present_family.value(), 0, &m_present_queue);
         vkGetDeviceQueue(m_device, m_indices.m_transfer_family.value(), 0, &m_transfer_queue);
+    }
+
+    void VulkanDevice::createCommandPool()
+    {
+        VkCommandPoolCreateInfo pool_info {};
+        pool_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        pool_info.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        pool_info.queueFamilyIndex = m_indices.m_graphics_family.value();
+
+        if (vkCreateCommandPool(m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create command pool!");
+        }
+    }
+
+    void VulkanDevice::createAssetAllocator()
+    {
+        VmaVulkanFunctions vulkanFunctions    = {};
+        vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+        vulkanFunctions.vkGetDeviceProcAddr   = vkGetDeviceProcAddr;
+
+        VmaAllocatorCreateInfo allocator_create_info = {};
+        allocator_create_info.vulkanApiVersion       = m_instance->m_vulkan_api_version;
+        allocator_create_info.instance               = m_instance->m_instance;
+        allocator_create_info.physicalDevice         = m_physical_device;
+        allocator_create_info.device                 = m_device;
+        allocator_create_info.pVulkanFunctions       = &vulkanFunctions;
+
+        vmaCreateAllocator(&allocator_create_info, &m_assets_allocator);
     }
 } // namespace ArchViz

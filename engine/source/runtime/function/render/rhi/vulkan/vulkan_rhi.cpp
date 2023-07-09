@@ -63,7 +63,7 @@ namespace ArchViz
     void VulkanRHI::createVulkanDevice()
     {
         m_vulkan_device = std::make_shared<VulkanDevice>(m_enable_validation_layers);
-        m_vulkan_device->connect(m_vulkan_instance->m_instance, m_vulkan_instance->m_surface);
+        m_vulkan_device->connect(m_vulkan_instance);
         m_vulkan_device->initialize();
     }
 
@@ -133,29 +133,42 @@ namespace ArchViz
 
     void VulkanRHI::createDescriptorPool()
     {
-        /*VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
-                                             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-                                             {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
-                                             {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
-                                             {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
-                                             {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
-                                             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
-                                             {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
-                                             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-                                             {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-                                             {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};*/
+        // Since DescriptorSet should be treated as asset in Vulkan, DescriptorPool
+        // should be big enough, and thus we can sub-allocate DescriptorSet from
+        // DescriptorPool merely as we sub-allocate Buffer/Image from DeviceMemory.
 
-        std::array<VkDescriptorPoolSize, 2> pool_sizes {};
-        pool_sizes[0].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        pool_sizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-        pool_sizes[1].type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        pool_sizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+        const uint32_t descriptor_count = 1000;
+
+        std::array<VkDescriptorPoolSize, 11> pool_sizes {};
+        pool_sizes[0].type             = VK_DESCRIPTOR_TYPE_SAMPLER;
+        pool_sizes[0].descriptorCount  = descriptor_count;
+        pool_sizes[1].type             = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        pool_sizes[1].descriptorCount  = descriptor_count;
+        pool_sizes[2].type             = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        pool_sizes[2].descriptorCount  = descriptor_count;
+        pool_sizes[3].type             = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        pool_sizes[3].descriptorCount  = descriptor_count;
+        pool_sizes[4].type             = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        pool_sizes[4].descriptorCount  = descriptor_count;
+        pool_sizes[5].type             = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+        pool_sizes[5].descriptorCount  = descriptor_count;
+        pool_sizes[6].type             = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        pool_sizes[6].descriptorCount  = descriptor_count;
+        pool_sizes[7].type             = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        pool_sizes[7].descriptorCount  = descriptor_count;
+        pool_sizes[8].type             = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        pool_sizes[8].descriptorCount  = descriptor_count;
+        pool_sizes[9].type             = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+        pool_sizes[9].descriptorCount  = descriptor_count;
+        pool_sizes[10].type            = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+        pool_sizes[10].descriptorCount = descriptor_count;
 
         VkDescriptorPoolCreateInfo pool_info {};
         pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
         pool_info.pPoolSizes    = pool_sizes.data();
-        pool_info.maxSets       = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+        pool_info.maxSets       = static_cast<uint32_t>(pool_sizes.size() * descriptor_count);
 
         if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
         {
@@ -251,33 +264,13 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createImGui()
-    {
-        m_vulkan_ui = std::make_shared<VulkanUI>();
-
-        m_vulkan_ui->m_window = m_initialize_info.window_system->getWindow();
-
-        m_vulkan_ui->m_instance              = m_vulkan_instance->m_instance;
-        m_vulkan_ui->m_physical_device       = m_vulkan_device->m_physical_device;
-        m_vulkan_ui->m_device                = m_vulkan_device->m_device;
-        m_vulkan_ui->m_graphics_queue_family = m_vulkan_device->m_indices.m_graphics_family.value();
-        m_vulkan_ui->m_graphics_queue        = m_vulkan_device->m_graphics_queue;
-        m_vulkan_ui->m_image_count           = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
-        m_vulkan_ui->m_image_format          = m_vulkan_swap_chain->m_swap_chain_image_format;
-        m_vulkan_ui->m_command_pool          = m_command_pool;
-        m_vulkan_ui->m_command_buffer        = m_transfer_buffer;
-        m_vulkan_ui->m_descriptor_pool       = m_descriptor_pool;
-
-        // m_vulkan_ui->initialize();
-    }
-
     void VulkanRHI::createTextureImage()
     {
         m_vulkan_texture                   = std::make_shared<VulkanTexture>();
         m_vulkan_texture->m_asset_manager  = m_asset_manager;
         m_vulkan_texture->m_config_manager = m_config_manager;
-        m_vulkan_texture->m_command_pool   = m_command_pool;
         m_vulkan_texture->m_device         = m_vulkan_device;
+        m_vulkan_texture->m_command_pool   = m_command_pool;
         m_vulkan_texture->m_image_uri      = "asset-test/texture/texture.jpg";
         m_vulkan_texture->initizlize();
     }
@@ -428,20 +421,24 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createAssetAllocator()
+    void VulkanRHI::createImGui()
     {
-        VmaVulkanFunctions vulkanFunctions    = {};
-        vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
-        vulkanFunctions.vkGetDeviceProcAddr   = vkGetDeviceProcAddr;
+        m_vulkan_ui = std::make_shared<VulkanUI>();
 
-        VmaAllocatorCreateInfo allocator_create_info = {};
-        allocator_create_info.vulkanApiVersion       = m_vulkan_instance->m_vulkan_api_version;
-        allocator_create_info.physicalDevice         = m_vulkan_device->m_physical_device;
-        allocator_create_info.device                 = m_vulkan_device->m_device;
-        allocator_create_info.instance               = m_vulkan_instance->m_instance;
-        allocator_create_info.pVulkanFunctions       = &vulkanFunctions;
+        m_vulkan_ui->m_window = m_initialize_info.window_system->getWindow();
 
-        vmaCreateAllocator(&allocator_create_info, &m_assets_allocator);
+        m_vulkan_ui->m_instance              = m_vulkan_instance->m_instance;
+        m_vulkan_ui->m_physical_device       = m_vulkan_device->m_physical_device;
+        m_vulkan_ui->m_device                = m_vulkan_device->m_device;
+        m_vulkan_ui->m_graphics_queue_family = m_vulkan_device->m_indices.m_graphics_family.value();
+        m_vulkan_ui->m_graphics_queue        = m_vulkan_device->m_graphics_queue;
+        m_vulkan_ui->m_image_count           = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
+        m_vulkan_ui->m_image_format          = m_vulkan_swap_chain->m_swap_chain_image_format;
+        m_vulkan_ui->m_command_pool          = m_command_pool;
+        m_vulkan_ui->m_command_buffer        = m_transfer_buffer;
+        m_vulkan_ui->m_descriptor_pool       = m_descriptor_pool;
+
+        // m_vulkan_ui->initialize();
     }
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
@@ -465,8 +462,6 @@ namespace ArchViz
         createCommandPool();
         createCommandBuffer();
 
-        createImGui();
-
         createTextureImage();
 
         createVertexBuffer();
@@ -475,6 +470,8 @@ namespace ArchViz
         createDescriptorSets();
 
         createSyncObjects();
+
+        createImGui();
     }
 
     void VulkanRHI::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index)

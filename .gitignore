@@ -38,6 +38,8 @@ build/
 # Ignore macOS .DS_Store
 .DS_Store
 
+.VSCodeCounter/
+
 .vscode/setting.json
 .vscode/c_cpp_properties.json
 
