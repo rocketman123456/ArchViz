@@ -6,15 +6,19 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <memory>
 #include <optional>
 #include <vector>
 
 namespace ArchViz
 {
+    class VulkanInstance;
+    class VulkanDevice;
+
     class VulkanSwapChain
     {
     public:
-        void connect(VkInstance instance, VkSurfaceKHR surface, VkPhysicalDevice physical_device, VkDevice device);
+        void connect(std::shared_ptr<VulkanInstance> instance, std::shared_ptr<VulkanDevice> device);
         void initialize(uint32_t width, uint32_t height, bool vsync = false, bool fullscreen = false);
         void clear();
 
@@ -37,9 +41,7 @@ namespace ArchViz
         std::vector<VulkanSwapChainBuffer> m_buffers;
 
     public:
-        VkInstance       m_instance        = VK_NULL_HANDLE;
-        VkSurfaceKHR     m_surface         = VK_NULL_HANDLE;
-        VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
-        VkDevice         m_device          = VK_NULL_HANDLE;
+        std::shared_ptr<VulkanInstance> m_instance;
+        std::shared_ptr<VulkanDevice> m_device;
     };
 } // namespace ArchViz

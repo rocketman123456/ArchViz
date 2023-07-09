@@ -85,10 +85,10 @@ namespace ArchViz
         create_info.ppEnabledExtensionNames = extensions.data();
 
 #ifdef __MACH__
-        create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
+        create_info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 #endif
 
-            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
         if (m_validation)
         {
             create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
@@ -124,12 +124,15 @@ namespace ArchViz
             LOG_FATAL("failed to set up debug messenger!");
         }
 
+        auto FUNC_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
+
         VkDebugReportCallbackCreateInfoEXT debug_report_ci;
         debug_report_ci.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
         debug_report_ci.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
         debug_report_ci.pfnCallback = debug_report;
         debug_report_ci.pUserData   = nullptr;
-        if (vkCreateDebugReportCallbackEXT(m_instance, &debug_report_ci, nullptr, &m_report_callback))
+        debug_report_ci.pNext       = nullptr;
+        if (FUNC_vkCreateDebugReportCallbackEXT(m_instance, &debug_report_ci, nullptr, &m_report_callback))
         {
             LOG_FATAL("failed to set up debug report!");
         }

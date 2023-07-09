@@ -6,6 +6,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_render_pass.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
@@ -31,7 +32,10 @@
 #endif
 #endif
 
-const std::vector<ArchViz::Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}, {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+const std::vector<ArchViz::Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+                                               {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+                                               {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+                                               {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
 
 const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
@@ -70,7 +74,7 @@ namespace ArchViz
         uint32_t width  = m_initialize_info.window_system->getWindowWidth();
         uint32_t height = m_initialize_info.window_system->getWindowHeight();
 
-        m_vulkan_swap_chain->connect(m_vulkan_instance->m_instance, m_vulkan_instance->m_surface, m_vulkan_device->m_physical_device, m_vulkan_device->m_device);
+        m_vulkan_swap_chain->connect(m_vulkan_instance, m_vulkan_device);
         m_vulkan_swap_chain->initialize(width, height, false, false);
     }
 
@@ -107,10 +111,19 @@ namespace ArchViz
         ubo_layout_binding.pImmutableSamplers = nullptr;
         ubo_layout_binding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
 
+        VkDescriptorSetLayoutBinding sampler_layout_binding {};
+        sampler_layout_binding.binding            = 1;
+        sampler_layout_binding.descriptorCount    = 1;
+        sampler_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 2> bindings = {ubo_layout_binding, sampler_layout_binding};
+
         VkDescriptorSetLayoutCreateInfo layout_info {};
         layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = 1;
-        layout_info.pBindings    = &ubo_layout_binding;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings    = bindings.data();
 
         if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
         {
@@ -120,7 +133,7 @@ namespace ArchViz
 
     void VulkanRHI::createDescriptorPool()
     {
-        VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+        /*VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
                                              {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
                                              {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
                                              {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
@@ -130,14 +143,19 @@ namespace ArchViz
                                              {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
                                              {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
                                              {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-                                             {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
+                                             {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};*/
 
-        VkDescriptorPoolCreateInfo pool_info = {};
-        pool_info.sType                      = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags                      = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets                    = 1000 * sizeof(pool_sizes) / sizeof(pool_sizes[0]);
-        pool_info.poolSizeCount              = (uint32_t)sizeof(pool_sizes) / sizeof(pool_sizes[0]);
-        pool_info.pPoolSizes                 = pool_sizes;
+        std::array<VkDescriptorPoolSize, 2> pool_sizes {};
+        pool_sizes[0].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        pool_sizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+        pool_sizes[1].type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        pool_sizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+        VkDescriptorPoolCreateInfo pool_info {};
+        pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
+        pool_info.pPoolSizes    = pool_sizes.data();
+        pool_info.maxSets       = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
         if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
         {
@@ -156,8 +174,8 @@ namespace ArchViz
     void VulkanRHI::createGraphicsPipeline()
     {
         ShaderModuleConfig config;
-        config.m_vert_shader = "shader/glsl/shader_ubo.vert";
-        config.m_frag_shader = "shader/glsl/shader_ubo.frag";
+        config.m_vert_shader = "shader/glsl/shader_textures.vert";
+        config.m_frag_shader = "shader/glsl/shader_textures.frag";
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
 
@@ -251,6 +269,17 @@ namespace ArchViz
         m_vulkan_ui->m_descriptor_pool       = m_descriptor_pool;
 
         // m_vulkan_ui->initialize();
+    }
+
+    void VulkanRHI::createTextureImage()
+    {
+        m_vulkan_texture                   = std::make_shared<VulkanTexture>();
+        m_vulkan_texture->m_asset_manager  = m_asset_manager;
+        m_vulkan_texture->m_config_manager = m_config_manager;
+        m_vulkan_texture->m_command_pool   = m_command_pool;
+        m_vulkan_texture->m_device         = m_vulkan_device;
+        m_vulkan_texture->m_image_uri      = "asset-test/texture/texture.jpg";
+        m_vulkan_texture->initizlize();
     }
 
     void VulkanRHI::createVertexBuffer()
@@ -348,16 +377,30 @@ namespace ArchViz
             buffer_info.offset = 0;
             buffer_info.range  = sizeof(UniformBufferObject);
 
-            VkWriteDescriptorSet descriptorWrite {};
-            descriptorWrite.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrite.dstSet          = m_descriptor_sets[i];
-            descriptorWrite.dstBinding      = 0;
-            descriptorWrite.dstArrayElement = 0;
-            descriptorWrite.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrite.descriptorCount = 1;
-            descriptorWrite.pBufferInfo     = &buffer_info;
+            VkDescriptorImageInfo image_info {};
+            image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            image_info.imageView   = m_vulkan_texture->m_view;
+            image_info.sampler     = m_vulkan_texture->m_sampler;
 
-            vkUpdateDescriptorSets(m_vulkan_device->m_device, 1, &descriptorWrite, 0, nullptr);
+            std::array<VkWriteDescriptorSet, 2> descriptor_writes {};
+
+            descriptor_writes[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptor_writes[0].dstSet          = m_descriptor_sets[i];
+            descriptor_writes[0].dstBinding      = 0;
+            descriptor_writes[0].dstArrayElement = 0;
+            descriptor_writes[0].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptor_writes[0].descriptorCount = 1;
+            descriptor_writes[0].pBufferInfo     = &buffer_info;
+
+            descriptor_writes[1].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptor_writes[1].dstSet          = m_descriptor_sets[i];
+            descriptor_writes[1].dstBinding      = 1;
+            descriptor_writes[1].dstArrayElement = 0;
+            descriptor_writes[1].descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptor_writes[1].descriptorCount = 1;
+            descriptor_writes[1].pImageInfo      = &image_info;
+
+            vkUpdateDescriptorSets(m_vulkan_device->m_device, static_cast<uint32_t>(descriptor_writes.size()), descriptor_writes.data(), 0, nullptr);
         }
     }
 
@@ -424,6 +467,8 @@ namespace ArchViz
 
         createImGui();
 
+        createTextureImage();
+
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
@@ -484,8 +529,6 @@ namespace ArchViz
         }
 
         vkCmdEndRenderPass(command_buffer);
-
-        // m_vulkan_ui->recordCommandBuffer(command_buffer, m_swap_chain_framebuffers[image_index], m_vulkan_swap_chain->m_swap_chain_extent.width, m_vulkan_swap_chain->m_swap_chain_extent.height);
 
         if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
         {
@@ -611,6 +654,9 @@ namespace ArchViz
         }
 
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
+
+        m_vulkan_texture->clear();
+        m_vulkan_texture.reset();
 
         // m_vulkan_ui->clear();
         m_vulkan_ui.reset();

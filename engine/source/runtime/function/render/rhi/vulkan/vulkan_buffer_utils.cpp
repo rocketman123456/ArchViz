@@ -73,4 +73,39 @@ namespace ArchViz
 
         vkFreeCommandBuffers(device->m_device, command_pool, 1, &command_buffer);
     }
+
+    VkCommandBuffer VulkanBufferUtils::beginSingleTimeCommands(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool)
+    {
+        VkCommandBufferAllocateInfo alloc_info {};
+        alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        alloc_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        alloc_info.commandPool        = command_pool;
+        alloc_info.commandBufferCount = 1;
+
+        VkCommandBuffer commandBuffer;
+        vkAllocateCommandBuffers(device->m_device, &alloc_info, &commandBuffer);
+
+        VkCommandBufferBeginInfo begin_info {};
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(commandBuffer, &begin_info);
+
+        return commandBuffer;
+    }
+
+    void VulkanBufferUtils::endSingleTimeCommands(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkCommandBuffer command_buffer)
+    {
+        vkEndCommandBuffer(command_buffer);
+
+        VkSubmitInfo submit_info {};
+        submit_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers    = &command_buffer;
+
+        vkQueueSubmit(device->m_graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+        vkQueueWaitIdle(device->m_graphics_queue);
+
+        vkFreeCommandBuffers(device->m_device, command_pool, 1, &command_buffer);
+    }
 } // namespace ArchViz

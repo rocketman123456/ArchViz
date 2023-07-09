@@ -54,11 +54,14 @@ namespace ArchViz
 
         for (const auto& device : devices)
         {
+            VkPhysicalDeviceFeatures supported_features;
+            vkGetPhysicalDeviceFeatures(device, &supported_features);
+
             bool suitable  = VulkanUtils::isDeviceSuitable(device, m_surface);
             bool extension = VulkanUtils::checkDeviceExtensionSupport(device, VulkanConstants::device_extensions);
             bool adequate  = VulkanUtils::isSwapChainAdequate(device, m_surface, extension);
             bool bindless  = VulkanUtils::checkBindlessSupport(device);
-            if (suitable && extension && adequate && bindless)
+            if (suitable && extension && adequate && bindless && supported_features.samplerAnisotropy)
             {
                 m_bindless_support = bindless;
                 m_physical_device  = device;
@@ -122,6 +125,7 @@ namespace ArchViz
         }
 
         VkPhysicalDeviceFeatures device_features {};
+        device_features.samplerAnisotropy = VK_TRUE;
 
         VkPhysicalDeviceFeatures2 physical_features2 = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
         vkGetPhysicalDeviceFeatures2(m_physical_device, &physical_features2);

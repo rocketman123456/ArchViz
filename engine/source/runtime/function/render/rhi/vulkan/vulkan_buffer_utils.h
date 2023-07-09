@@ -17,5 +17,9 @@ namespace ArchViz
         static void createBuffer(std::shared_ptr<VulkanDevice> device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory);
 
         static void copyBuffer(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);
+
+        static VkCommandBuffer beginSingleTimeCommands(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool);
+
+        static void endSingleTimeCommands(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkCommandBuffer command_buffer);
     };
 } // namespace ArchViz

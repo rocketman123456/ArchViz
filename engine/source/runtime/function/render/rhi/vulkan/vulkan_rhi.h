@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <vk_mem_alloc.h>
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -22,6 +23,7 @@ namespace ArchViz
     class VulkanRenderPass;
     class VulkanInstance;
     class VulkanUI;
+    class VulkanTexture;
 
     class VulkanRHI : public RHI
     {
@@ -59,6 +61,8 @@ namespace ArchViz
 
         void createImGui();
 
+        void createTextureImage();
+
         void createVertexBuffer();
         void createIndexBuffer();
         void createUniformBuffers();
@@ -89,6 +93,8 @@ namespace ArchViz
         std::shared_ptr<VulkanSwapChain>  m_vulkan_swap_chain;
         std::shared_ptr<VulkanPipeline>   m_vulkan_pipeline;
         std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
+
+        std::shared_ptr<VulkanTexture> m_vulkan_texture;
 
         std::shared_ptr<VulkanUI> m_vulkan_ui;
 
