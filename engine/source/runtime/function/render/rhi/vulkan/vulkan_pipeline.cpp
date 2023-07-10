@@ -107,6 +107,18 @@ namespace ArchViz
         color_blending.blendConstants[2] = 0.0f;
         color_blending.blendConstants[3] = 0.0f;
 
+        VkPipelineDepthStencilStateCreateInfo depth_stencil {};
+        depth_stencil.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depth_stencil.depthTestEnable       = VK_TRUE;
+        depth_stencil.depthWriteEnable      = VK_TRUE;
+        depth_stencil.depthCompareOp        = VK_COMPARE_OP_LESS;
+        depth_stencil.depthBoundsTestEnable = VK_FALSE;
+        depth_stencil.stencilTestEnable     = VK_FALSE;
+        depth_stencil.minDepthBounds        = 0.0f; // Optional
+        depth_stencil.maxDepthBounds        = 1.0f; // Optional
+        depth_stencil.front                 = {};   // Optional
+        depth_stencil.back                  = {};   // Optional
+
         std::vector<VkDynamicState>      dynamic_states = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
         VkPipelineDynamicStateCreateInfo dynamic_state {};
         dynamic_state.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -133,6 +145,7 @@ namespace ArchViz
         pipeline_info.pRasterizationState = &rasterizer;
         pipeline_info.pMultisampleState   = &multisampling;
         pipeline_info.pColorBlendState    = &color_blending;
+        pipeline_info.pDepthStencilState  = &depth_stencil;
         pipeline_info.pDynamicState       = &dynamic_state;
         pipeline_info.layout              = m_pipeline_layout;
         pipeline_info.renderPass          = m_render_pass;

@@ -7,6 +7,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
@@ -32,12 +33,19 @@
 #endif
 #endif
 
-const std::vector<ArchViz::Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-                                               {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-                                               {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-                                               {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
+const std::vector<ArchViz::Vertex> vertices = {
+    // first
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+    // second
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
 
-const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4};
 
 namespace ArchViz
 {
@@ -91,6 +99,10 @@ namespace ArchViz
 
         m_vulkan_device->wait();
 
+        vkDestroyImageView(m_vulkan_device->m_device, m_depth_image_view, nullptr);
+        vkDestroyImage(m_vulkan_device->m_device, m_depth_image, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, m_depth_image_memory, nullptr);
+
         for (auto framebuffer : m_swap_chain_framebuffers)
         {
             vkDestroyFramebuffer(m_vulkan_device->m_device, framebuffer, nullptr);
@@ -99,6 +111,7 @@ namespace ArchViz
         m_vulkan_swap_chain->clear();
 
         m_vulkan_swap_chain->initialize(width, height);
+        createDepthResources();
         createFramebuffers();
     }
 
@@ -204,19 +217,37 @@ namespace ArchViz
         m_vulkan_pipeline->initialize();
     }
 
+    void VulkanRHI::createDepthResources()
+    {
+        m_depth_format = VulkanUtils::findDepthFormat(m_vulkan_device->m_physical_device);
+
+        VulkanTextureUtils::createImage(m_vulkan_device,
+                                        m_vulkan_swap_chain->m_swap_chain_extent.width,
+                                        m_vulkan_swap_chain->m_swap_chain_extent.height,
+                                        m_depth_format,
+                                        VK_IMAGE_TILING_OPTIMAL,
+                                        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                        m_depth_image,
+                                        m_depth_image_memory);
+        m_depth_image_view = VulkanTextureUtils::createImageView(m_vulkan_device, m_depth_image, m_depth_format, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+        VulkanTextureUtils::transitionImageLayout(m_vulkan_device, m_command_pool, m_depth_image, m_depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+    }
+
     void VulkanRHI::createFramebuffers()
     {
         m_swap_chain_framebuffers.resize(m_vulkan_swap_chain->m_buffers.size());
 
         for (size_t i = 0; i < m_vulkan_swap_chain->m_buffers.size(); i++)
         {
-            VkImageView attachments[] = {m_vulkan_swap_chain->m_buffers[i].view};
+            std::array<VkImageView, 2> attachments = {m_vulkan_swap_chain->m_buffers[i].view, m_depth_image_view};
 
             VkFramebufferCreateInfo framebuffer_info {};
             framebuffer_info.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebuffer_info.renderPass      = m_vulkan_render_pass->m_render_pass;
-            framebuffer_info.attachmentCount = 1;
-            framebuffer_info.pAttachments    = attachments;
+            framebuffer_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+            framebuffer_info.pAttachments    = attachments.data();
             framebuffer_info.width           = m_vulkan_swap_chain->m_swap_chain_extent.width;
             framebuffer_info.height          = m_vulkan_swap_chain->m_swap_chain_extent.height;
             framebuffer_info.layers          = 1;
@@ -457,9 +488,11 @@ namespace ArchViz
         createRenderPass();
         createGraphicsPipeline();
 
+        createCommandPool();
+
+        createDepthResources();
         createFramebuffers();
 
-        createCommandPool();
         createCommandBuffer();
 
         createTextureImage();
@@ -491,9 +524,12 @@ namespace ArchViz
         render_pass_info.renderArea.offset = {0, 0};
         render_pass_info.renderArea.extent = m_vulkan_swap_chain->m_swap_chain_extent;
 
-        VkClearValue clear_color         = {{{0.2f, 0.3f, 0.4f, 1.0f}}};
-        render_pass_info.clearValueCount = 1;
-        render_pass_info.pClearValues    = &clear_color;
+        std::array<VkClearValue, 2> clear_color {};
+        clear_color[0].color        = {{0.2f, 0.3f, 0.4f, 1.0f}};
+        clear_color[1].depthStencil = {1.0f, 0};
+
+        render_pass_info.clearValueCount = static_cast<uint32_t>(clear_color.size());
+        render_pass_info.pClearValues    = clear_color.data();
 
         vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -663,6 +699,10 @@ namespace ArchViz
 
         vkDestroyBuffer(m_vulkan_device->m_device, m_vertex_buffer, nullptr);
         vkFreeMemory(m_vulkan_device->m_device, m_vertex_buffer_memory, nullptr);
+
+        vkDestroyImageView(m_vulkan_device->m_device, m_depth_image_view, nullptr);
+        vkDestroyImage(m_vulkan_device->m_device, m_depth_image, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, m_depth_image_memory, nullptr);
 
         for (auto framebuffer : m_swap_chain_framebuffers)
         {

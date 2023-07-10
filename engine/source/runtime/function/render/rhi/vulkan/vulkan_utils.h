@@ -20,17 +20,17 @@ namespace ArchViz
 
         static bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
 
-        static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
+        static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
 
-        static bool isSwapChainAdequate(VkPhysicalDevice device, VkSurfaceKHR surface, bool extensions_supported);
+        static bool isSwapChainAdequate(VkPhysicalDevice physical_device, VkSurfaceKHR surface, bool extensions_supported);
 
-        static bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
+        static bool isDeviceSuitable(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
 
-        static bool checkDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions);
+        static bool checkDeviceExtensionSupport(VkPhysicalDevice physical_device, const std::vector<const char*>& deviceExtensions);
 
-        static bool checkBindlessSupport(VkPhysicalDevice device);
+        static bool checkBindlessSupport(VkPhysicalDevice physical_device);
 
-        static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
+        static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
 
         static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& available_formats);
 
@@ -38,6 +38,12 @@ namespace ArchViz
 
         static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
 
-        static uint32_t findMemoryType(VkPhysicalDevice device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        static uint32_t findMemoryType(VkPhysicalDevice physical_device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+        static VkFormat findSupportedFormat(VkPhysicalDevice physical_device, const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+        static VkFormat findDepthFormat(VkPhysicalDevice physical_device);
+
+        static bool hasStencilComponent(VkFormat format);
     };
 } // namespace ArchViz

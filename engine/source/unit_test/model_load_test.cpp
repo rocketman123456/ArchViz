@@ -28,5 +28,8 @@ int main(int argc, char** argv)
 
     reader.ParseFromFile(model_path.generic_string());
 
+    auto& shapes    = reader.GetShapes();
+    auto& materials = reader.GetMaterials();
+
     return 0;
 }

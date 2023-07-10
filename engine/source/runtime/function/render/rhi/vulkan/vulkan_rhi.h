@@ -54,9 +54,11 @@ namespace ArchViz
         void createRenderPass();
         void createGraphicsPipeline();
 
+        void createCommandPool();
+
+        void createDepthResources();
         void createFramebuffers();
 
-        void createCommandPool();
         void createCommandBuffer();
 
         void createTextureImage();
@@ -98,6 +100,11 @@ namespace ArchViz
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
+        VkFormat       m_depth_format;
+        VkImage        m_depth_image;
+        VkDeviceMemory m_depth_image_memory;
+        VkImageView    m_depth_image_view;
+
         VkDescriptorSetLayout        m_descriptor_set_layout;
         VkDescriptorPool             m_descriptor_pool;
         std::vector<VkDescriptorSet> m_descriptor_sets;
@@ -112,7 +119,7 @@ namespace ArchViz
         VkDeviceMemory m_index_buffer_memory;
 
         // The main purpose of a command pool is to be a (mostly) single-threaded allocator for the storage used by a set of command buffers which are filled by that thread.
-        VkCommandPool m_command_pool;
+        VkCommandPool                m_command_pool;
         std::vector<VkCommandBuffer> m_command_buffers;
 
         VkCommandBuffer m_transfer_buffer;
