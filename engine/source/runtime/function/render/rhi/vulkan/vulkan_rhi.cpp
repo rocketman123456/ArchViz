@@ -615,7 +615,7 @@ namespace ArchViz
         // glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
         // look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
-        ubo.proj = perspective(45.0f / 180.0 * 3.14, m_vulkan_swap_chain->m_swap_chain_extent.width / m_vulkan_swap_chain->m_swap_chain_extent.height, 0.1f, 10.0f);
+        ubo.proj = perspective(45.0f, (float)m_vulkan_swap_chain->m_swap_chain_extent.width / (float)m_vulkan_swap_chain->m_swap_chain_extent.height, 0.1f, 10.0f);
         // glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
         ubo.proj(1, 1) *= -1;
 

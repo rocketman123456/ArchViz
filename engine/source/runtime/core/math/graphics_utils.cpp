@@ -47,23 +47,26 @@ namespace ArchViz
         return view;
     }
 
-    FMatrix4 perspective(float fov, float ratio, float znear, float zfar)
+    FMatrix4 perspective(float fovy, float ratio, float znear, float zfar)
     {
-        FMatrix4 view = FMatrix4::Zero();
+        Eigen::Transform<float, 3, Eigen::Projective> tr;
+        tr.matrix().setZero();
+        //FMatrix4 view = FMatrix4::Zero();
 
         ASSERT(ratio > 0);
         ASSERT(zfar > znear);
         ASSERT(znear > 0);
 
-        float tan_half_fovy = tanf(fov / 2.0);
+        float radf          = M_PI * fovy / 180.0f;
+        float tan_half_fovy = tanf(radf / 2.0);
 
-        view(0, 0) = 1.0 / (ratio * tan_half_fovy);
-        view(1, 1) = 1.0 / (tan_half_fovy);
-        view(2, 2) = -(zfar + znear) / (zfar - znear);
-        view(3, 2) = -1.0;
-        view(2, 3) = -(2.0 * zfar * znear) / (zfar - znear);
+        tr(0, 0) = 1.0 / (ratio * tan_half_fovy);
+        tr(1, 1) = 1.0 / (tan_half_fovy);
+        tr(2, 2) = -(zfar + znear) / (zfar - znear);
+        tr(3, 2) = -1.0;
+        tr(2, 3) = -(2.0 * zfar * znear) / (zfar - znear);
 
-        return view;
+        return tr.matrix();
     }
 
     FMatrix4 orthogonal(float left, float right, float bottom, float top, float znear, float zfar)
