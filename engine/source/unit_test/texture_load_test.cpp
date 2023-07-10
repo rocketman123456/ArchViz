@@ -6,9 +6,6 @@
 #include <iostream>
 #include <memory>
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
-
 using namespace ArchViz;
 using namespace std;
 
@@ -21,12 +18,7 @@ int main(int argc, char** argv)
     std::shared_ptr<ConfigManager> config_manager = std::make_shared<ConfigManager>();
     config_manager->initialize(config_file_path.generic_string());
 
-    auto model_path = config_manager->getRootFolder() / "asset-test/data/model/basic/cube.obj";
 
-    tinyobj::ObjReaderConfig config;
-    tinyobj::ObjReader       reader;
-
-    reader.ParseFromFile(model_path.generic_string());
 
     return 0;
 }

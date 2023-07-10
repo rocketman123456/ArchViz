@@ -271,7 +271,7 @@ namespace ArchViz
         m_vulkan_texture->m_config_manager = m_config_manager;
         m_vulkan_texture->m_device         = m_vulkan_device;
         m_vulkan_texture->m_command_pool   = m_command_pool;
-        m_vulkan_texture->m_image_uri      = "asset-test/texture/texture.jpg";
+        m_vulkan_texture->m_image_uri      = "asset-test/data/texture/object/texture.jpg";
         m_vulkan_texture->initizlize();
     }
 

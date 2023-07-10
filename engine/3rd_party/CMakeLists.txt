@@ -66,9 +66,9 @@ if(NOT TARGET tinygltf)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tinygltf.cmake)
 endif()
 
-if(NOT TARGET tinyobjloader)
-    add_subdirectory(tinyobjloader)
-endif()
+# if(NOT TARGET tinyobjloader)
+#     add_subdirectory(tinyobjloader)
+# endif()
 
 # if(NOT TARGET x9)
 #     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/x9.cmake)

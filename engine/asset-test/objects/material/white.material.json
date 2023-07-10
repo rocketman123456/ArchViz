@@ -1,0 +1,7 @@
+{
+  "base_colour_texture_file": "asset-test/data/texture/object/white.tga",
+  "metallic_roughness_texture_file": "asset-test/data/texture/object/mr.tga",
+  "normal_texture_file": "asset-test/data/texture/object/n.tga",
+  "occlusion_texture_file": "",
+  "emissive_texture_file": ""
+}

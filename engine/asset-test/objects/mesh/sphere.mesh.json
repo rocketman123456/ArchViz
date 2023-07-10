@@ -1,0 +1,26 @@
+{
+    "sub_meshes": [
+        {
+            "material": "asset-test/objects/material/white.material.json",
+            "obj_file_ref": "asset-test/data/model/basic/sphere.obj",
+            "transform": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "w": 1,
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
+            }
+        }
+    ]
+}
