@@ -11,8 +11,6 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
-#include "runtime/function/render/geometry/vertex.h"
-
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -20,6 +18,12 @@
 
 #include "runtime/core/base/macro.h"
 #include "runtime/core/math/graphics_utils.h"
+
+// TODO : move this to asset loader part
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+
+#include <unordered_map>
 
 #if defined(__GNUC__)
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
@@ -32,20 +36,6 @@
 #error Unknown Platform
 #endif
 #endif
-
-const std::vector<ArchViz::Vertex> vertices = {
-    // first
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-    // second
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
-
-const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4};
 
 namespace ArchViz
 {
@@ -302,13 +292,54 @@ namespace ArchViz
         m_vulkan_texture->m_config_manager = m_config_manager;
         m_vulkan_texture->m_device         = m_vulkan_device;
         m_vulkan_texture->m_command_pool   = m_command_pool;
-        m_vulkan_texture->m_image_uri      = "asset-test/data/texture/object/texture.jpg";
+        m_vulkan_texture->m_image_uri      = "asset-test/data/model/viking_room/viking_room.png";
+        // m_vulkan_texture->m_image_uri      = "asset-test/data/texture/object/texture.jpg";
         m_vulkan_texture->initizlize();
+    }
+
+    void VulkanRHI::loadModel()
+    {
+        std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
+        // TODO : make this with world load
+        tinyobj::attrib_t                attrib;
+        std::vector<tinyobj::shape_t>    shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string                      warn, err;
+
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str()))
+        {
+            throw std::runtime_error(warn + err);
+        }
+
+        std::unordered_map<Vertex, uint32_t> uniqueVertices {};
+
+        for (const auto& shape : shapes)
+        {
+            for (const auto& index : shape.mesh.indices)
+            {
+                Vertex vertex {};
+
+                vertex.pos = {attrib.vertices[3 * index.vertex_index + 0], attrib.vertices[3 * index.vertex_index + 1], attrib.vertices[3 * index.vertex_index + 2]};
+
+                vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], 1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
+                //vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], attrib.texcoords[2 * index.texcoord_index + 1]};
+
+                vertex.color = {1.0f, 1.0f, 1.0f};
+
+                if (uniqueVertices.count(vertex) == 0)
+                {
+                    uniqueVertices[vertex] = static_cast<uint32_t>(m_vertices.size());
+                    m_vertices.push_back(vertex);
+                }
+
+                m_indices.push_back(uniqueVertices[vertex]);
+            }
+        }
     }
 
     void VulkanRHI::createVertexBuffer()
     {
-        VkDeviceSize buffer_size = sizeof(vertices[0]) * vertices.size();
+        VkDeviceSize buffer_size = sizeof(m_vertices[0]) * m_vertices.size();
 
         VkBuffer              staging_buffer;
         VkDeviceMemory        staging_buffer_memory;
@@ -319,7 +350,7 @@ namespace ArchViz
         void* data;
         vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
         {
-            memcpy(data, vertices.data(), (size_t)buffer_size);
+            memcpy(data, m_vertices.data(), (size_t)buffer_size);
         }
         vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
 
@@ -335,7 +366,7 @@ namespace ArchViz
 
     void VulkanRHI::createIndexBuffer()
     {
-        VkDeviceSize buffer_size = sizeof(indices[0]) * indices.size();
+        VkDeviceSize buffer_size = sizeof(m_indices[0]) * m_indices.size();
 
         VkBuffer              staging_buffer;
         VkDeviceMemory        staging_buffer_memory;
@@ -346,7 +377,7 @@ namespace ArchViz
         void* data;
         vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
         {
-            memcpy(data, indices.data(), (size_t)buffer_size);
+            memcpy(data, m_indices.data(), (size_t)buffer_size);
         }
         vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
 
@@ -497,6 +528,8 @@ namespace ArchViz
 
         createTextureImage();
 
+        loadModel();
+
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
@@ -554,11 +587,11 @@ namespace ArchViz
             VkDeviceSize offsets[]        = {0};
             vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
 
-            vkCmdBindIndexBuffer(command_buffer, m_index_buffer, 0, VK_INDEX_TYPE_UINT16);
+            vkCmdBindIndexBuffer(command_buffer, m_index_buffer, 0, VK_INDEX_TYPE_UINT32);
 
             vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
 
-            vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
         }
 
         vkCmdEndRenderPass(command_buffer);

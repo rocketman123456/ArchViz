@@ -1,7 +1,8 @@
 #pragma once
 #include "runtime/function/render/rhi/rhi.h"
-
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
+
+#include "runtime/function/render/geometry/vertex.h"
 
 #include <volk.h>
 #define GLFW_INCLUDE_NONE
@@ -24,6 +25,7 @@ namespace ArchViz
     class VulkanInstance;
     class VulkanUI;
     class VulkanTexture;
+    class Vertex;
 
     class VulkanRHI : public RHI
     {
@@ -63,6 +65,8 @@ namespace ArchViz
 
         void createTextureImage();
 
+        void loadModel();
+
         void createVertexBuffer();
         void createIndexBuffer();
         void createUniformBuffers();
@@ -100,6 +104,12 @@ namespace ArchViz
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+
         VkFormat       m_depth_format;
         VkImage        m_depth_image;
         VkDeviceMemory m_depth_image_memory;
@@ -128,5 +138,14 @@ namespace ArchViz
         std::vector<VkSemaphore> m_render_finished_semaphores;
         std::vector<VkFence>     m_in_flight_fences;
         uint32_t                 m_current_frame = 0;
+
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+
+        std::vector<Vertex>   m_vertices;
+        std::vector<uint32_t> m_indices;
     };
 } // namespace ArchViz

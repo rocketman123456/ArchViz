@@ -1,5 +1,5 @@
 #pragma once
-
+#include "runtime/core/base/hash.h"
 #include "runtime/core/math/math_type.h"
 
 #include <volk.h>
@@ -43,6 +43,8 @@ namespace ArchViz
 
             return attributeDescriptions;
         }
+
+        bool operator==(const Vertex& other) const { return pos == other.pos && color == other.color && tex_coord == other.tex_coord; }
     };
 
     struct UniformBufferObject
@@ -52,3 +54,21 @@ namespace ArchViz
         alignas(16) FMatrix4 proj;
     };
 } // namespace ArchViz
+
+namespace std
+{
+    template<>
+    struct hash<ArchViz::Vertex>
+    {
+        size_t operator()(ArchViz::Vertex const& vertex) const
+        {
+            size_t pos_hash = 0;
+            hash_combine(pos_hash, vertex.pos[0], vertex.pos[1], vertex.pos[2]);
+            size_t color_hash = 0;
+            hash_combine(color_hash, vertex.color[0], vertex.color[1], vertex.color[2]);
+            size_t tex_hash = 0;
+            hash_combine(tex_hash, vertex.tex_coord[0], vertex.tex_coord[1]);
+            return pos_hash ^ ((color_hash << 1) >> 1) ^ (tex_hash << 1);
+        }
+    };
+} // namespace std
