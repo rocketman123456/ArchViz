@@ -111,8 +111,8 @@ namespace ArchViz
         VkBuffer       m_index_buffer;
         VkDeviceMemory m_index_buffer_memory;
 
+        // The main purpose of a command pool is to be a (mostly) single-threaded allocator for the storage used by a set of command buffers which are filled by that thread.
         VkCommandPool m_command_pool;
-        // VkCommandBuffer m_command_buffer;
         std::vector<VkCommandBuffer> m_command_buffers;
 
         VkCommandBuffer m_transfer_buffer;

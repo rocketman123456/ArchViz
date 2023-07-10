@@ -1,5 +1,4 @@
 #pragma once
-
 #include "runtime/core/math/math.h"
 #include "runtime/core/math/matrix/matrix3.h"
 #include "runtime/core/math/quaternion.h"
