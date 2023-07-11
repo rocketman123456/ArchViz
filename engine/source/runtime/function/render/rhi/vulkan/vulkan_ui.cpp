@@ -373,7 +373,13 @@ namespace ArchViz
     {
         ImGuiIO& io = ImGui::GetIO();
 
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
         ImGui::Begin("ArchViz");
+        ImGui::Text("Hello, world %d", 123);
+        ImGui::End();
+
+        ImGui::Begin("ArchViz-Test");
         ImGui::Text("Hello, world %d", 123);
         ImGui::End();
 
@@ -408,7 +414,7 @@ namespace ArchViz
         // Vertex buffer
         if ((m_vertex_buffer->buffer == VK_NULL_HANDLE) || (m_vertex_count != main_draw_data->TotalVtxCount))
         {
-            // TODO : use fence or semphore to wait 
+            // TODO : use fence or semphore to wait
             m_device->wait();
 
             m_vertex_buffer->unmap();
@@ -424,13 +430,14 @@ namespace ArchViz
             m_vertex_buffer->setupDescriptor();
 
             m_vertex_count = main_draw_data->TotalVtxCount;
-            m_vertex_buffer->map(vertex_buffer_size, 0);
+            // m_vertex_buffer->map(vertex_buffer_size, 0);
+            m_vertex_buffer->map();
         }
 
         // Index buffer
         if ((m_index_buffer->buffer == VK_NULL_HANDLE) || (m_index_count < main_draw_data->TotalIdxCount))
         {
-            // TODO : use fence or semphore to wait 
+            // TODO : use fence or semphore to wait
             m_device->wait();
 
             m_index_buffer->unmap();
@@ -446,7 +453,8 @@ namespace ArchViz
             m_index_buffer->setupDescriptor();
 
             m_index_count = main_draw_data->TotalIdxCount;
-            m_index_buffer->map(index_buffer_size, 0);
+            // m_index_buffer->map(index_buffer_size, 0);
+            m_index_buffer->map();
         }
 
         // Upload data

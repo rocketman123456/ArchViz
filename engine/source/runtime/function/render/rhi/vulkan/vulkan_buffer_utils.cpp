@@ -13,6 +13,15 @@ namespace ArchViz
                                          VkBuffer&                     buffer,
                                          VkDeviceMemory&               buffer_memory)
     {
+        // fix warnings
+        VkDeviceSize limit     = device->m_properties.limits.nonCoherentAtomSize;
+        VkDeviceSize redundent = size % limit;
+        if (redundent != 0)
+        {
+            VkDeviceSize free_size = limit - redundent;
+            size += free_size;
+        }
+
         VkBufferCreateInfo buffer_info {};
         buffer_info.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         buffer_info.size        = size;
@@ -24,7 +33,7 @@ namespace ArchViz
             LOG_FATAL("failed to create buffer!");
         }
 
-        VkMemoryRequirements mem_requirements;
+        VkMemoryRequirements mem_requirements {};
         vkGetBufferMemoryRequirements(device->m_device, buffer, &mem_requirements);
 
         VkMemoryAllocateInfo alloc_info {};
