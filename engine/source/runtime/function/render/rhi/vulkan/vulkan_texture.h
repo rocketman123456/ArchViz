@@ -15,7 +15,7 @@ namespace ArchViz
     {
     public:
         void initizlize(const std::string& image_uri);
-        void initialize(const uint8_t* pixels, const size_t image_size, VkFormat format, uint32_t width, uint32_t height);
+        void initialize(const uint8_t* pixels, const VkDeviceSize image_size, VkFormat format, uint32_t width, uint32_t height);
 
         void clear();
 

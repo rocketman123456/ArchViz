@@ -48,7 +48,7 @@ namespace ArchViz
 
     public:
         std::vector<MeshVertex>      vertex_buffer;
-        std::vector<int32_t>         index_buffer;
+        std::vector<int>             index_buffer;
         std::vector<SkeletonBinding> bind;
     };
 
