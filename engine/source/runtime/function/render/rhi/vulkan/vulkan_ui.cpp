@@ -387,8 +387,11 @@ namespace ArchViz
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
+    }
 
-        m_can_draw = false;
+    void VulkanUI::recordCommandBuffer(VkCommandBuffer command_buffer, VkFramebuffer frame_buffer)
+    {
+        ImGuiIO& io = ImGui::GetIO();
 
         ImDrawData* main_draw_data    = ImGui::GetDrawData();
         const bool  main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
@@ -405,6 +408,9 @@ namespace ArchViz
         // Vertex buffer
         if ((m_vertex_buffer->buffer == VK_NULL_HANDLE) || (m_vertex_count != main_draw_data->TotalVtxCount))
         {
+            // TODO : use fence or semphore to wait 
+            m_device->wait();
+
             m_vertex_buffer->unmap();
             m_vertex_buffer->destroy();
 
@@ -424,6 +430,9 @@ namespace ArchViz
         // Index buffer
         if ((m_index_buffer->buffer == VK_NULL_HANDLE) || (m_index_count < main_draw_data->TotalIdxCount))
         {
+            // TODO : use fence or semphore to wait 
+            m_device->wait();
+
             m_index_buffer->unmap();
             m_index_buffer->destroy();
 
@@ -439,9 +448,6 @@ namespace ArchViz
             m_index_count = main_draw_data->TotalIdxCount;
             m_index_buffer->map(index_buffer_size, 0);
         }
-
-        // m_vertex_buffer->map();
-        // m_index_buffer->map();
 
         // Upload data
         ImDrawVert* vtx_dst = (ImDrawVert*)m_vertex_buffer->mapped;
@@ -464,16 +470,6 @@ namespace ArchViz
 
         // m_vertex_buffer->unmap();
         // m_index_buffer->unmap();
-
-        m_can_draw = true;
-    }
-
-    void VulkanUI::recordCommandBuffer(VkCommandBuffer command_buffer, VkFramebuffer frame_buffer)
-    {
-        if (!m_can_draw)
-            return;
-
-        ImGuiIO& io = ImGui::GetIO();
 
         // VkExtent2D extend {};
         // extend.width  = io.DisplaySize.x;

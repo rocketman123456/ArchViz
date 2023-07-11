@@ -77,7 +77,5 @@ namespace ArchViz
         VkRenderPass m_ui_pass;
 
         PushConstantBlock m_push_const;
-
-        bool m_can_draw = false;
     };
 } // namespace ArchViz
