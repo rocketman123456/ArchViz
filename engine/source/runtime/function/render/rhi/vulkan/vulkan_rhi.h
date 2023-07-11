@@ -50,13 +50,14 @@ namespace ArchViz
 
         void createVulkanDevice();
 
-        void createDescriptorSetLayout();
         void createDescriptorPool();
 
         void createRenderPass();
         void createGraphicsPipeline();
 
         void createCommandPool();
+
+        void createImGui();
 
         void createDepthResources();
         void createFramebuffers();
@@ -70,11 +71,10 @@ namespace ArchViz
         void createVertexBuffer();
         void createIndexBuffer();
         void createUniformBuffers();
+        void createDescriptorSetLayout();
         void createDescriptorSets();
 
         void createSyncObjects();
-
-        void createImGui();
 
     private:
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
@@ -102,18 +102,20 @@ namespace ArchViz
 
         std::shared_ptr<VulkanUI> m_vulkan_ui;
 
-        std::vector<VkFramebuffer> m_swap_chain_framebuffers;
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
 
-        // ---------------------------------------------------------------------------
-        // ---------------------------------------------------------------------------
-        // ---------------------------------------------------------------------------
-        // ---------------------------------------------------------------------------
-        // ---------------------------------------------------------------------------
+        VkPipelineCache m_pipeline_cache;
 
         VkFormat       m_depth_format;
         VkImage        m_depth_image;
         VkDeviceMemory m_depth_image_memory;
         VkImageView    m_depth_image_view;
+
+        std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
         VkDescriptorSetLayout        m_descriptor_set_layout;
         VkDescriptorPool             m_descriptor_pool;

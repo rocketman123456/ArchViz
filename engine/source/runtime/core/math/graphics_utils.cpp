@@ -32,26 +32,9 @@ namespace ArchViz
         return mat;
     }
 
-    FMatrix4 viewport(const FVector3& pos, const FVector3& scale)
-    {
-        FMatrix4 view = FMatrix4::Identity();
-
-        view(0, 0) = scale[0] / 2;
-        view(1, 1) = scale[1] / 2;
-        view(2, 2) = scale[2] / 2;
-
-        view(0, 3) = pos[0] + scale[0] / 2;
-        view(1, 3) = pos[1] + scale[1] / 2;
-        view(2, 3) = scale[2] / 2;
-
-        return view;
-    }
-
     FMatrix4 perspective(float fovy, float ratio, float znear, float zfar)
     {
-        Eigen::Transform<float, 3, Eigen::Projective> tr;
-        tr.matrix().setZero();
-        //FMatrix4 view = FMatrix4::Zero();
+        FMatrix4 tr = FMatrix4::Zero();
 
         ASSERT(ratio > 0);
         ASSERT(zfar > znear);
@@ -66,7 +49,7 @@ namespace ArchViz
         tr(3, 2) = -1.0;
         tr(2, 3) = -(2.0 * zfar * znear) / (zfar - znear);
 
-        return tr.matrix();
+        return tr;
     }
 
     FMatrix4 orthogonal(float left, float right, float bottom, float top, float znear, float zfar)

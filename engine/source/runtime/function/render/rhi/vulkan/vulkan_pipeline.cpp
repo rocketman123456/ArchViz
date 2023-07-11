@@ -12,48 +12,9 @@
 
 namespace ArchViz
 {
-    void VulkanPipeline::setShaderModule(std::shared_ptr<VulkanShader> shader)
-    {
-        ASSERT(shader);
-        m_shader = shader;
-    }
-
-    void VulkanPipeline::setDevice(std::shared_ptr<VulkanDevice> device)
-    {
-        ASSERT(device);
-        m_device = device;
-    }
-
-    void VulkanPipeline::setRenderPass(VkRenderPass render_pass)
-    {
-        ASSERT(render_pass);
-        m_render_pass = render_pass;
-    }
-
-    void VulkanPipeline::setDescriptorSetLayout(VkDescriptorSetLayout layout)
-    {
-        ASSERT(layout);
-        m_descriptor_set_layout = layout;
-    }
-
     void VulkanPipeline::initialize()
     {
         m_shader->initialize();
-
-        // TODO : make auto
-        VkPipelineShaderStageCreateInfo vert_shader_stage_info {};
-        vert_shader_stage_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        vert_shader_stage_info.stage  = VK_SHADER_STAGE_VERTEX_BIT;
-        vert_shader_stage_info.module = m_shader->m_vert_shader;
-        vert_shader_stage_info.pName  = "main";
-
-        VkPipelineShaderStageCreateInfo frag_shader_stage_info {};
-        frag_shader_stage_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        frag_shader_stage_info.stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-        frag_shader_stage_info.module = m_shader->m_frag_shader;
-        frag_shader_stage_info.pName  = "main";
-
-        VkPipelineShaderStageCreateInfo shader_stages[] = {vert_shader_stage_info, frag_shader_stage_info};
 
         // TODO : add custom bindings
         auto bindingDescription    = Vertex::getBindingDescription();
@@ -137,8 +98,8 @@ namespace ArchViz
 
         VkGraphicsPipelineCreateInfo pipeline_info {};
         pipeline_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipeline_info.stageCount          = 2;
-        pipeline_info.pStages             = shader_stages;
+        pipeline_info.stageCount          = static_cast<uint32_t>(m_shader->m_stage_info.size());
+        pipeline_info.pStages             = m_shader->m_stage_info.data();
         pipeline_info.pVertexInputState   = &vertex_input_info;
         pipeline_info.pInputAssemblyState = &input_assembly;
         pipeline_info.pViewportState      = &viewport_state;
@@ -152,7 +113,7 @@ namespace ArchViz
         pipeline_info.subpass             = 0;
         pipeline_info.basePipelineHandle  = VK_NULL_HANDLE;
 
-        if (vkCreateGraphicsPipelines(m_device->m_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_pipeline) != VK_SUCCESS)
+        if (vkCreateGraphicsPipelines(m_device->m_device, m_pipeline_cache, 1, &pipeline_info, nullptr, &m_pipeline) != VK_SUCCESS)
         {
             LOG_FATAL("failed to create graphics pipeline!");
         }

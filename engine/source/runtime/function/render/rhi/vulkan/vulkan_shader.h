@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace ArchViz
 {
@@ -29,14 +30,18 @@ namespace ArchViz
     {
     public:
         VulkanShader(const ShaderModuleConfig& config);
-        ~VulkanShader();
+        ~VulkanShader() = default;
 
         void initialize();
         void clear();
 
+        const std::vector<VkPipelineShaderStageCreateInfo>& getStageInfos() const;
+
     private:
         void createShaderModule(const std::string file, VkShaderModule& shader);
         void destroyShaderModule(VkShaderModule& shader);
+
+        VkPipelineShaderStageCreateInfo getStageInfo(VkShaderModule module, VkShaderStageFlagBits stage);
 
     public:
         std::shared_ptr<AssetManager>  m_asset_manager;
@@ -52,5 +57,7 @@ namespace ArchViz
         VkShaderModule m_comp_shader = VK_NULL_HANDLE;
         VkShaderModule m_tesc_shader = VK_NULL_HANDLE;
         VkShaderModule m_tese_shader = VK_NULL_HANDLE;
+
+        std::vector<VkPipelineShaderStageCreateInfo> m_stage_info;
     };
 } // namespace ArchViz

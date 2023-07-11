@@ -11,17 +11,14 @@ namespace ArchViz
     class VulkanRenderPass
     {
     public:
-        void setDevice(std::shared_ptr<VulkanDevice> device);
-
         void initialize();
         void clear();
 
     public:
+        std::shared_ptr<VulkanDevice> m_device;
+
         VkRenderPass m_render_pass;
 
         VkFormat m_color_format;
-
-    private:
-        std::shared_ptr<VulkanDevice> m_device;
     };
 } // namespace ArchViz

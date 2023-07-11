@@ -1,23 +1,26 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_buffer.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_shader_utils.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_texture_utils.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
+
+#include "runtime/resource/asset_manager/asset_manager.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 #include "runtime/core/base/macro.h"
 
 #define GLFW_INCLUDE_NONE
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_vulkan.h"
+// #include "backends/imgui_impl_glfw.h"
+// #include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-
-static void check_vk_result(VkResult err)
-{
-    if (err == 0)
-        return;
-    fprintf(stderr, "[vulkan] Error: VkResult = %d\n", err);
-    if (err < 0)
-        abort();
-}
 
 namespace ArchViz
 {
@@ -27,42 +30,31 @@ namespace ArchViz
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         (void)io;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+        // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
+        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoTaskBarIcon = true;
+
+        // TODO : add multi viewport support
+
+        io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         // ImGui::StyleColorsLight();
 
+        float scale_x, scale_y;
+        glfwGetWindowContentScale(m_window, &scale_x, &scale_y);
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();
+        style.ScaleAllSizes(scale_x);
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             style.WindowRounding              = 0.0f;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
-
-        createRenderPass();
-
-        ImGui_ImplGlfw_InitForVulkan(m_window, true);
-        ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance                  = m_instance;
-        init_info.PhysicalDevice            = m_physical_device;
-        init_info.Device                    = m_device;
-        init_info.QueueFamily               = m_graphics_queue_family;
-        init_info.Queue                     = m_graphics_queue;
-        init_info.PipelineCache             = VK_NULL_HANDLE;
-        init_info.DescriptorPool            = m_descriptor_pool;
-        init_info.Allocator                 = VK_NULL_HANDLE;
-        init_info.MinImageCount             = 2;
-        init_info.ImageCount                = m_image_count;
-        init_info.CheckVkResultFn           = check_vk_result;
-        // init_info.MSAASamples               = VK_SAMPLE_COUNT_1_BIT;
-        ImGui_ImplVulkan_Init(&init_info, m_ui_pass);
 
         // Load Fonts
         // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -73,47 +65,35 @@ namespace ArchViz
         // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
         // - Read 'docs/FONTS.md' for more instructions and details.
         // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+        auto font_path = m_config_manager->getRootFolder() / "asset-test/data/font/MiSans-Normal.ttf";
         // io.Fonts->AddFontDefault();
-        // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-        // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-        // IM_ASSERT(font != nullptr);
+        ImFont* font = io.Fonts->AddFontFromFileTTF(font_path.generic_string().c_str(), 16.0f);
+        ASSERT(font);
+
+        unsigned char* font_data;
+        int            tex_width, tex_height;
+
+        io.Fonts->GetTexDataAsRGBA32(&font_data, &tex_width, &tex_height);
+        VkDeviceSize imageSize = tex_width * tex_height * 4;
 
         // Upload Fonts
-        {
-            // Use any command queue
-            VkCommandPool   command_pool   = m_command_pool;
-            VkCommandBuffer command_buffer = m_command_buffer;
+        m_font_texture                 = std::make_shared<VulkanTexture>();
+        m_font_texture->m_device       = m_device;
+        m_font_texture->m_command_pool = m_command_pool;
+        m_font_texture->m_address_mode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        m_font_texture->initialize(font_data, imageSize, VK_FORMAT_R8G8B8A8_UNORM, tex_width, tex_height);
 
-            auto err = vkResetCommandPool(m_device, command_pool, 0);
-            check_vk_result(err);
+        m_vertex_buffer = std::make_shared<VulkanBuffer>();
+        m_index_buffer  = std::make_shared<VulkanBuffer>();
 
-            VkCommandBufferBeginInfo begin_info = {};
-            begin_info.sType                    = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            begin_info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        m_vertex_buffer->device = m_device->m_device;
+        m_index_buffer->device  = m_device->m_device;
 
-            err = vkBeginCommandBuffer(command_buffer, &begin_info);
-            check_vk_result(err);
-
-            ImGui_ImplVulkan_CreateFontsTexture(command_buffer);
-
-            VkSubmitInfo end_info       = {};
-            end_info.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            end_info.commandBufferCount = 1;
-            end_info.pCommandBuffers    = &command_buffer;
-
-            err = vkEndCommandBuffer(command_buffer);
-            check_vk_result(err);
-
-            err = vkQueueSubmit(m_graphics_queue, 1, &end_info, VK_NULL_HANDLE);
-            check_vk_result(err);
-
-            err = vkDeviceWaitIdle(m_device);
-            check_vk_result(err);
-            ImGui_ImplVulkan_DestroyFontUploadObjects();
-        }
+        // createRenderPass();
+        createDescriptorSetLayout();
+        createDescriptorSets();
+        createPipelineLayout();
+        createPipeline();
     }
 
     void VulkanUI::createRenderPass()
@@ -154,16 +134,238 @@ namespace ArchViz
         info.dependencyCount = 1;
         info.pDependencies   = &dependency;
 
-        if (vkCreateRenderPass(m_device, &info, nullptr, &m_ui_pass) != VK_SUCCESS)
+        if (vkCreateRenderPass(m_device->m_device, &info, nullptr, &m_ui_pass) != VK_SUCCESS)
         {
             LOG_FATAL("failed to create ui pass!");
         }
     }
 
-    void VulkanUI::prepareContext()
+    void VulkanUI::createDescriptorSetLayout()
     {
-        ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
+        VkDescriptorSetLayoutBinding sampler_layout_binding {};
+        sampler_layout_binding.binding            = 0;
+        sampler_layout_binding.descriptorCount    = 1;
+        sampler_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {sampler_layout_binding};
+
+        VkDescriptorSetLayoutCreateInfo layout_info {};
+        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings    = bindings.data();
+
+        if (vkCreateDescriptorSetLayout(m_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create descriptor set layout!");
+        }
+    }
+
+    void VulkanUI::createDescriptorSets()
+    {
+        VkDescriptorSetAllocateInfo alloc_info {};
+        alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.descriptorPool     = m_descriptor_pool;
+        alloc_info.descriptorSetCount = 1;
+        alloc_info.pSetLayouts        = &m_descriptor_set_layout;
+
+        if (vkAllocateDescriptorSets(m_device->m_device, &alloc_info, &m_descriptor_set) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate descriptor sets!");
+        }
+
+        VkDescriptorImageInfo image_info {};
+        image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        image_info.imageView   = m_font_texture->m_view;
+        image_info.sampler     = m_font_texture->m_sampler;
+
+        VkWriteDescriptorSet descriptor_write {};
+
+        descriptor_write.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptor_write.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptor_write.dstSet          = m_descriptor_set;
+        descriptor_write.dstBinding      = 0;
+        descriptor_write.descriptorCount = 1;
+        descriptor_write.pImageInfo      = &image_info;
+
+        vkUpdateDescriptorSets(m_device->m_device, 1, &descriptor_write, 0, nullptr);
+    }
+
+    void VulkanUI::createPipelineLayout()
+    {
+        ShaderModuleConfig config;
+        config.m_vert_shader = "shader/glsl/imgui.vert";
+        config.m_frag_shader = "shader/glsl/imgui.frag";
+
+        m_shader = std::make_shared<VulkanShader>(config);
+
+        m_shader->m_device         = m_device;
+        m_shader->m_config_manager = m_config_manager;
+        m_shader->m_asset_manager  = m_asset_manager;
+
+        m_shader->initialize();
+
+        VkPushConstantRange push_constant_range {};
+        push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        push_constant_range.size       = sizeof(PushConstantBlock);
+        push_constant_range.offset     = 0;
+
+        VkPipelineLayoutCreateInfo pipeline_layout_create_info {};
+        pipeline_layout_create_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipeline_layout_create_info.setLayoutCount         = 1;
+        pipeline_layout_create_info.pSetLayouts            = &m_descriptor_set_layout;
+        pipeline_layout_create_info.pushConstantRangeCount = 1;
+        pipeline_layout_create_info.pPushConstantRanges    = &push_constant_range;
+
+        if (vkCreatePipelineLayout(m_device->m_device, &pipeline_layout_create_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create ui pipeline layout");
+        }
+    }
+
+    void VulkanUI::createPipeline()
+    {
+        VkPipelineInputAssemblyStateCreateInfo input_assembly_state {};
+        input_assembly_state.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        input_assembly_state.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        input_assembly_state.flags                  = 0;
+        input_assembly_state.primitiveRestartEnable = VK_FALSE;
+
+        VkPipelineRasterizationStateCreateInfo rasterization {};
+        rasterization.sType            = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterization.polygonMode      = VK_POLYGON_MODE_FILL;
+        rasterization.cullMode         = VK_CULL_MODE_NONE;
+        rasterization.frontFace        = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+        rasterization.flags            = 0;
+        rasterization.depthClampEnable = VK_FALSE;
+        rasterization.lineWidth        = 1.0f;
+
+        VkPipelineColorBlendAttachmentState blend_attachment {};
+        blend_attachment.blendEnable         = VK_TRUE;
+        blend_attachment.colorWriteMask      = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_attachment.colorBlendOp        = VK_BLEND_OP_ADD;
+        blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+        blend_attachment.alphaBlendOp        = VK_BLEND_OP_ADD;
+
+        VkPipelineColorBlendStateCreateInfo color_blend_state {};
+        color_blend_state.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        color_blend_state.attachmentCount = 1;
+        color_blend_state.pAttachments    = &blend_attachment;
+
+        VkPipelineDepthStencilStateCreateInfo depth_stencil_state {};
+        depth_stencil_state.sType            = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depth_stencil_state.depthTestEnable  = VK_FALSE;
+        depth_stencil_state.depthWriteEnable = VK_FALSE;
+        depth_stencil_state.depthCompareOp   = VK_COMPARE_OP_LESS_OR_EQUAL;
+        depth_stencil_state.back.compareOp   = VK_COMPARE_OP_ALWAYS;
+
+        VkPipelineViewportStateCreateInfo viewport_state {};
+        viewport_state.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewport_state.viewportCount = 1;
+        viewport_state.scissorCount  = 1;
+        viewport_state.flags         = 0;
+
+        VkPipelineMultisampleStateCreateInfo multisample_state {};
+        multisample_state.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        multisample_state.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        multisample_state.flags                = 0;
+
+        std::vector<VkDynamicState> dynamic_state_enables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+
+        VkPipelineDynamicStateCreateInfo dynamic_state {};
+        dynamic_state.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+        dynamic_state.pDynamicStates    = dynamic_state_enables.data();
+        dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_state_enables.size());
+        dynamic_state.flags             = 0;
+
+        // std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages {};
+
+        VkVertexInputBindingDescription binding_description {};
+        binding_description.binding   = 0;
+        binding_description.stride    = sizeof(ImDrawVert);
+        binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        std::vector<VkVertexInputBindingDescription> vertex_input_bindings = {binding_description};
+
+        std::array<VkVertexInputAttributeDescription, 3> vertex_input_attributes {};
+
+        // Location 0: Position
+        vertex_input_attributes[0].binding  = 0;
+        vertex_input_attributes[0].location = 0;
+        vertex_input_attributes[0].format   = VK_FORMAT_R32G32_SFLOAT;
+        vertex_input_attributes[0].offset   = offsetof(ImDrawVert, pos);
+
+        // Location 1: UV
+        vertex_input_attributes[1].binding  = 0;
+        vertex_input_attributes[1].location = 1;
+        vertex_input_attributes[1].format   = VK_FORMAT_R32G32_SFLOAT;
+        vertex_input_attributes[1].offset   = offsetof(ImDrawVert, uv);
+
+        // Location 0: Color
+        vertex_input_attributes[2].binding  = 0;
+        vertex_input_attributes[2].location = 2;
+        vertex_input_attributes[2].format   = VK_FORMAT_R8G8B8A8_UNORM;
+        vertex_input_attributes[2].offset   = offsetof(ImDrawVert, col);
+
+        VkPipelineVertexInputStateCreateInfo vertex_input_state {};
+        vertex_input_state.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        vertex_input_state.vertexBindingDescriptionCount   = static_cast<uint32_t>(vertex_input_bindings.size());
+        vertex_input_state.pVertexBindingDescriptions      = vertex_input_bindings.data();
+        vertex_input_state.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertex_input_attributes.size());
+        vertex_input_state.pVertexAttributeDescriptions    = vertex_input_attributes.data();
+
+        VkGraphicsPipelineCreateInfo pipeline_create_info {};
+        pipeline_create_info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipeline_create_info.layout              = m_pipeline_layout;
+        pipeline_create_info.renderPass          = m_ui_pass;
+        pipeline_create_info.flags               = 0;
+        pipeline_create_info.basePipelineIndex   = -1;
+        pipeline_create_info.basePipelineHandle  = VK_NULL_HANDLE;
+        pipeline_create_info.pInputAssemblyState = &input_assembly_state;
+        pipeline_create_info.pRasterizationState = &rasterization;
+        pipeline_create_info.pColorBlendState    = &color_blend_state;
+        pipeline_create_info.pMultisampleState   = &multisample_state;
+        pipeline_create_info.pViewportState      = &viewport_state;
+        pipeline_create_info.pDepthStencilState  = &depth_stencil_state;
+        pipeline_create_info.pDynamicState       = &dynamic_state;
+        pipeline_create_info.stageCount          = static_cast<uint32_t>(m_shader->m_stage_info.size());
+        pipeline_create_info.pStages             = m_shader->m_stage_info.data();
+        pipeline_create_info.pVertexInputState   = &vertex_input_state;
+
+        if (vkCreateGraphicsPipelines(m_device->m_device, m_pipeline_cache, 1, &pipeline_create_info, nullptr, &m_pipeline) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create ui graphics pipeline");
+        }
+    }
+
+    void VulkanUI::prepareContext(float width, float height)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        // glfwGetWindowSize(bd->Window, &w, &h);
+        io.DisplaySize = ImVec2(width, height);
+
+        float scale_x, scale_y;
+        glfwGetWindowContentScale(m_window, &scale_x, &scale_y);
+        io.DisplayFramebufferScale = ImVec2(scale_x, scale_y);
+
+        int left  = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT);
+        int right = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT);
+
+        double x, y;
+        glfwGetCursorPos(m_window, &x, &y);
+
+        io.MousePos     = ImVec2(x, y);
+        io.MouseDown[0] = left;
+        io.MouseDown[1] = right;
+
+        m_push_const.scale     = {2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
+        m_push_const.translate = {-1.0f, -1.0f};
+
         ImGui::NewFrame();
     }
 
@@ -171,20 +373,13 @@ namespace ArchViz
     {
         ImGuiIO& io = ImGui::GetIO();
 
+        ImGui::Begin("ArchViz");
         ImGui::Text("Hello, world %d", 123);
-        if (ImGui::Button("Save"))
-        {
-            // do stuff
-        }
-        float f = 0;
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+        ImGui::End();
 
         // ImGui::ShowDemoWindow();
 
         ImGui::Render();
-
-        ImDrawData* main_draw_data    = ImGui::GetDrawData();
-        const bool  main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
 
         // Update and Render additional Platform Windows
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -192,39 +387,177 @@ namespace ArchViz
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
-    }
 
-    void VulkanUI::recordCommandBuffer(VkCommandBuffer command_buffer, VkFramebuffer frame_buffer, uint32_t width, uint32_t height)
-    {
+        m_can_draw = false;
+
+        ImDrawData* main_draw_data    = ImGui::GetDrawData();
+        const bool  main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
+
+        // Note: Alignment is done inside buffer creation
+        VkDeviceSize vertex_buffer_size = main_draw_data->TotalVtxCount * sizeof(ImDrawVert);
+        VkDeviceSize index_buffer_size  = main_draw_data->TotalIdxCount * sizeof(ImDrawIdx);
+
+        if ((vertex_buffer_size == 0) || (index_buffer_size == 0))
         {
-            VkClearValue          clear_color = {{{0.2f, 0.3f, 0.4f, 1.0f}}};
-            VkRenderPassBeginInfo info        = {};
-            info.sType                        = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            info.renderPass                   = m_ui_pass;
-            info.framebuffer                  = frame_buffer;
-            info.renderArea.extent.width      = width;
-            info.renderArea.extent.height     = height;
-            info.clearValueCount              = 1;
-            info.pClearValues                 = &clear_color;
-            vkCmdBeginRenderPass(command_buffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+            return;
         }
 
-        ImDrawData* draw_data = ImGui::GetDrawData();
-        // Record dear imgui primitives into command buffer
-        ImGui_ImplVulkan_RenderDrawData(draw_data, command_buffer);
+        // Vertex buffer
+        if ((m_vertex_buffer->buffer == VK_NULL_HANDLE) || (m_vertex_count != main_draw_data->TotalVtxCount))
+        {
+            m_vertex_buffer->unmap();
+            m_vertex_buffer->destroy();
 
-        // Submit command buffer
-        vkCmdEndRenderPass(command_buffer);
+            VulkanBufferUtils::createBuffer(m_device, vertex_buffer_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, m_vertex_buffer->buffer, m_vertex_buffer->memory);
+
+            // TODO : add alignment
+            m_vertex_buffer->size     = vertex_buffer_size;
+            m_vertex_buffer->usage    = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+            m_vertex_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+            m_vertex_buffer->setupDescriptor();
+            // m_vertex_buffer->bind();
+
+            m_vertex_count = main_draw_data->TotalVtxCount;
+            m_vertex_buffer->map();
+        }
+
+        // Index buffer
+        if ((m_index_buffer->buffer == VK_NULL_HANDLE) || (m_index_count < main_draw_data->TotalIdxCount))
+        {
+            m_index_buffer->unmap();
+            m_index_buffer->destroy();
+
+            VulkanBufferUtils::createBuffer(m_device, index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, m_index_buffer->buffer, m_index_buffer->memory);
+
+            // TODO : add alignment
+            m_index_buffer->size     = index_buffer_size;
+            m_index_buffer->usage    = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+            m_index_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+            m_index_buffer->setupDescriptor();
+            // m_index_buffer->bind();
+
+            m_index_count = main_draw_data->TotalIdxCount;
+            m_index_buffer->map();
+        }
+
+        // Upload data
+        ImDrawVert* vtxDst = (ImDrawVert*)m_index_buffer->mapped;
+        ImDrawIdx*  idxDst = (ImDrawIdx*)m_index_buffer->mapped;
+
+        for (int n = 0; n < main_draw_data->CmdListsCount; n++)
+        {
+            const ImDrawList* cmd_list = main_draw_data->CmdLists[n];
+            memcpy(vtxDst, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * sizeof(ImDrawVert));
+            memcpy(idxDst, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx));
+            vtxDst += cmd_list->VtxBuffer.Size;
+            idxDst += cmd_list->IdxBuffer.Size;
+        }
+
+        // Flush to make writes visible to GPU
+        m_index_buffer->flush();
+        m_index_buffer->flush();
+
+        m_can_draw = true;
+    }
+
+    void VulkanUI::recordCommandBuffer(VkCommandBuffer command_buffer, VkFramebuffer frame_buffer)
+    {
+        if (!m_can_draw)
+            return;
+
+        ImGuiIO& io = ImGui::GetIO();
+
+        // VkExtent2D extend {};
+        // extend.width  = io.DisplaySize.x;
+        // extend.height = io.DisplaySize.y;
+
+        // VkRenderPassBeginInfo render_pass_info {};
+        // render_pass_info.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        // render_pass_info.renderPass        = m_ui_pass;
+        // render_pass_info.framebuffer       = frame_buffer;
+        // render_pass_info.renderArea.offset = {0, 0};
+        // render_pass_info.renderArea.extent = extend;
+
+        // std::array<VkClearValue, 2> clear_color {};
+        // clear_color[0].color        = {{0.2f, 0.3f, 0.4f, 1.0f}};
+        // clear_color[1].depthStencil = {1.0f, 0};
+
+        // render_pass_info.clearValueCount = static_cast<uint32_t>(clear_color.size());
+        // render_pass_info.pClearValues    = clear_color.data();
+
+        // vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+
+        {
+            vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &m_descriptor_set, 0, nullptr);
+            vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+            VkViewport viewport {};
+            viewport.width    = ImGui::GetIO().DisplaySize.x;
+            viewport.height   = ImGui::GetIO().DisplaySize.y;
+            viewport.minDepth = 0.0f;
+            viewport.maxDepth = 1.0f;
+            vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+
+            // UI scale and translate via push constants
+            m_push_const.scale     = {2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
+            m_push_const.translate = {-1.0f, -1.0f};
+            vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBlock), &m_push_const);
+
+            // Render commands
+            ImDrawData* main_draw_data = ImGui::GetDrawData();
+            int32_t     vertex_offset  = 0;
+            int32_t     index_offset   = 0;
+
+            if (main_draw_data->CmdListsCount > 0)
+            {
+                VkDeviceSize offsets[1] = {0};
+                vkCmdBindVertexBuffers(command_buffer, 0, 1, &m_vertex_buffer->buffer, offsets);
+                vkCmdBindIndexBuffer(command_buffer, m_index_buffer->buffer, 0, VK_INDEX_TYPE_UINT16);
+
+                for (int32_t i = 0; i < main_draw_data->CmdListsCount; i++)
+                {
+                    const ImDrawList* cmd_list = main_draw_data->CmdLists[i];
+                    for (int32_t j = 0; j < cmd_list->CmdBuffer.Size; j++)
+                    {
+                        const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[j];
+                        VkRect2D         scissorRect;
+                        scissorRect.offset.x      = std::max((int32_t)(pcmd->ClipRect.x), 0);
+                        scissorRect.offset.y      = std::max((int32_t)(pcmd->ClipRect.y), 0);
+                        scissorRect.extent.width  = (uint32_t)(pcmd->ClipRect.z - pcmd->ClipRect.x);
+                        scissorRect.extent.height = (uint32_t)(pcmd->ClipRect.w - pcmd->ClipRect.y);
+                        vkCmdSetScissor(command_buffer, 0, 1, &scissorRect);
+                        vkCmdDrawIndexed(command_buffer, pcmd->ElemCount, 1, index_offset, vertex_offset, 0);
+                        index_offset += pcmd->ElemCount;
+                    }
+                    vertex_offset += cmd_list->VtxBuffer.Size;
+                }
+            }
+        }
+
+        // vkCmdEndRenderPass(command_buffer);
     }
 
     void VulkanUI::clear()
     {
-        ImGui_ImplVulkan_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-
         ImGui::DestroyContext();
 
-        vkDestroyDescriptorPool(m_device, m_descriptor_pool, nullptr);
-        // vkDestroyDescriptorSetLayout(m_device, m_descriptor_set_layout, nullptr);
+        vkDestroyPipeline(m_device->m_device, m_pipeline, nullptr);
+        vkDestroyPipelineLayout(m_device->m_device, m_pipeline_layout, nullptr);
+
+        vkDestroyDescriptorSetLayout(m_device->m_device, m_descriptor_set_layout, nullptr);
+
+        // vkDestroyRenderPass(m_device->m_device, m_ui_pass, nullptr);
+
+        m_index_buffer->destroy();
+        m_index_buffer.reset();
+
+        m_vertex_buffer->destroy();
+        m_vertex_buffer.reset();
+
+        m_shader->clear();
+        m_shader.reset();
+
+        m_font_texture->clear();
+        m_font_texture.reset();
     }
 } // namespace ArchViz

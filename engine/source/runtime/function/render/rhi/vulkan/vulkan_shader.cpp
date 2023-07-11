@@ -9,8 +9,6 @@ namespace ArchViz
 {
     VulkanShader::VulkanShader(const ShaderModuleConfig& config) : m_config(config) {}
 
-    VulkanShader::~VulkanShader() { clear(); }
-
     void VulkanShader::initialize()
     {
         createShaderModule(m_config.m_vert_shader, m_vert_shader);
@@ -19,6 +17,37 @@ namespace ArchViz
         createShaderModule(m_config.m_comp_shader, m_comp_shader);
         createShaderModule(m_config.m_tesc_shader, m_tesc_shader);
         createShaderModule(m_config.m_tese_shader, m_tese_shader);
+
+        if (m_vert_shader != VK_NULL_HANDLE)
+        {
+            auto info = getStageInfo(m_vert_shader, VK_SHADER_STAGE_VERTEX_BIT);
+            m_stage_info.push_back(info);
+        }
+        if (m_frag_shader != VK_NULL_HANDLE)
+        {
+            auto info = getStageInfo(m_frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT);
+            m_stage_info.push_back(info);
+        }
+        if (m_geom_shader != VK_NULL_HANDLE)
+        {
+            auto info = getStageInfo(m_geom_shader, VK_SHADER_STAGE_GEOMETRY_BIT);
+            m_stage_info.push_back(info);
+        }
+        if (m_comp_shader != VK_NULL_HANDLE)
+        {
+            auto info = getStageInfo(m_comp_shader, VK_SHADER_STAGE_COMPUTE_BIT);
+            m_stage_info.push_back(info);
+        }
+        if (m_tesc_shader != VK_NULL_HANDLE)
+        {
+            auto info = getStageInfo(m_tesc_shader, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT);
+            m_stage_info.push_back(info);
+        }
+        if (m_tese_shader != VK_NULL_HANDLE)
+        {
+            auto info = getStageInfo(m_tese_shader, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT);
+            m_stage_info.push_back(info);
+        }
     }
 
     void VulkanShader::clear()
@@ -31,12 +60,24 @@ namespace ArchViz
         destroyShaderModule(m_tese_shader);
     }
 
+    const std::vector<VkPipelineShaderStageCreateInfo>& VulkanShader::getStageInfos() const { return m_stage_info; }
+
+    VkPipelineShaderStageCreateInfo VulkanShader::getStageInfo(VkShaderModule module, VkShaderStageFlagBits stage)
+    {
+        VkPipelineShaderStageCreateInfo stage_info {};
+        stage_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        stage_info.stage  = stage;
+        stage_info.module = module;
+        stage_info.pName  = "main";
+        return stage_info;
+    }
+
     void VulkanShader::createShaderModule(const std::string file, VkShaderModule& shader)
     {
         if (file.size() > 0)
         {
-            std::vector<uint32_t> spv = VulkanShaderUtils::createShaderModuleFromVFS(file, m_config_manager, m_asset_manager);
-            shader                    = VulkanShaderUtils::createShaderModule(m_device->m_device, spv);
+            auto spv = VulkanShaderUtils::createShaderModuleFromVFS(file, m_config_manager, m_asset_manager);
+            shader   = VulkanShaderUtils::createShaderModule(m_device->m_device, spv);
         }
     }
 

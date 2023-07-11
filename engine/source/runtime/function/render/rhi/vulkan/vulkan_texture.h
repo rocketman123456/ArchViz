@@ -14,11 +14,14 @@ namespace ArchViz
     class VulkanTexture
     {
     public:
-        void initizlize();
+        void initizlize(const std::string& image_uri);
+        void initialize(const uint8_t* pixels, const size_t image_size, VkFormat format, uint32_t width, uint32_t height);
+
         void clear();
 
     private:
-        void createTextureImage();
+        void createTextureImageFromFile(const std::string& image_uri);
+        void createTextureImageFromMemory(const uint8_t* pixels, const VkDeviceSize image_size, VkFormat format, uint32_t width, uint32_t height);
         void createTextureImageView();
         void createTextureSampler();
 
@@ -26,8 +29,8 @@ namespace ArchViz
         std::shared_ptr<VulkanDevice>  m_device;
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
-        std::string                    m_image_uri;
-        VkCommandPool                  m_command_pool;
+
+        VkCommandPool m_command_pool;
 
         VkImage               m_image;
         VkImageView           m_view;
@@ -40,6 +43,7 @@ namespace ArchViz
         VkImageTiling         m_tiling;
         VkImageUsageFlags     m_usage;
         VkMemoryPropertyFlags m_memory_property;
+        VkSamplerAddressMode  m_address_mode;
 
         uint32_t m_width;
         uint32_t m_height;
