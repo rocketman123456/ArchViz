@@ -11,11 +11,12 @@ namespace ArchViz
         VkBuffer               buffer = VK_NULL_HANDLE;
         VkDeviceMemory         memory = VK_NULL_HANDLE;
         VkDescriptorBufferInfo descriptor;
-        VkDeviceSize           size      = 0;
-        VkDeviceSize           alignment = 0;
-        void*                  mapped    = nullptr;
-        VkBufferUsageFlags     usage;    /** @brief Usage flags to be filled by external source at buffer creation (to query at some later point) */
-        VkMemoryPropertyFlags  property; /** @brief Memory property flags to be filled by external source at buffer creation (to query at some later point) */
+        VkDeviceSize           size   = 0;
+        void*                  mapped = nullptr;
+
+        VkDeviceSize          alignment = 0;
+        VkBufferUsageFlags    usage;    /** @brief Usage flags to be filled by external source at buffer creation (to query at some later point) */
+        VkMemoryPropertyFlags property; /** @brief Memory property flags to be filled by external source at buffer creation (to query at some later point) */
 
         VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
         void     unmap();

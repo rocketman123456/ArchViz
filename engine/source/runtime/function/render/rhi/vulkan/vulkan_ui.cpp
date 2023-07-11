@@ -408,17 +408,17 @@ namespace ArchViz
             m_vertex_buffer->unmap();
             m_vertex_buffer->destroy();
 
-            VulkanBufferUtils::createBuffer(m_device, vertex_buffer_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, m_vertex_buffer->buffer, m_vertex_buffer->memory);
-
-            // TODO : add alignment
             m_vertex_buffer->size     = vertex_buffer_size;
             m_vertex_buffer->usage    = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-            m_vertex_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+            m_vertex_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+            VulkanBufferUtils::createBuffer(m_device, m_vertex_buffer->size, m_vertex_buffer->usage, m_vertex_buffer->property, m_vertex_buffer->buffer, m_vertex_buffer->memory);
+
+            // TODO : add alignment support
             m_vertex_buffer->setupDescriptor();
-            // m_vertex_buffer->bind();
 
             m_vertex_count = main_draw_data->TotalVtxCount;
-            m_vertex_buffer->map();
+            m_vertex_buffer->map(vertex_buffer_size, 0);
         }
 
         // Index buffer
@@ -427,35 +427,43 @@ namespace ArchViz
             m_index_buffer->unmap();
             m_index_buffer->destroy();
 
-            VulkanBufferUtils::createBuffer(m_device, index_buffer_size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, m_index_buffer->buffer, m_index_buffer->memory);
-
-            // TODO : add alignment
             m_index_buffer->size     = index_buffer_size;
             m_index_buffer->usage    = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-            m_index_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+            m_index_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+            VulkanBufferUtils::createBuffer(m_device, m_index_buffer->size, m_index_buffer->usage, m_index_buffer->property, m_index_buffer->buffer, m_index_buffer->memory);
+
+            // TODO : add alignment support
             m_index_buffer->setupDescriptor();
-            // m_index_buffer->bind();
 
             m_index_count = main_draw_data->TotalIdxCount;
-            m_index_buffer->map();
+            m_index_buffer->map(index_buffer_size, 0);
         }
 
+        // m_vertex_buffer->map();
+        // m_index_buffer->map();
+
         // Upload data
-        ImDrawVert* vtxDst = (ImDrawVert*)m_index_buffer->mapped;
-        ImDrawIdx*  idxDst = (ImDrawIdx*)m_index_buffer->mapped;
+        ImDrawVert* vtx_dst = (ImDrawVert*)m_vertex_buffer->mapped;
+        ImDrawIdx*  idx_dst = (ImDrawIdx*)m_index_buffer->mapped;
 
         for (int n = 0; n < main_draw_data->CmdListsCount; n++)
         {
-            const ImDrawList* cmd_list = main_draw_data->CmdLists[n];
-            memcpy(vtxDst, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * sizeof(ImDrawVert));
-            memcpy(idxDst, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx));
-            vtxDst += cmd_list->VtxBuffer.Size;
-            idxDst += cmd_list->IdxBuffer.Size;
+            const ImDrawList* cmd_list      = main_draw_data->CmdLists[n];
+            size_t            copy_vtx_size = cmd_list->VtxBuffer.Size * sizeof(ImDrawVert);
+            size_t            copy_idx_size = cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx);
+            memcpy(vtx_dst, cmd_list->VtxBuffer.Data, copy_vtx_size);
+            memcpy(idx_dst, cmd_list->IdxBuffer.Data, copy_idx_size);
+            vtx_dst += cmd_list->VtxBuffer.Size;
+            idx_dst += cmd_list->IdxBuffer.Size;
         }
 
         // Flush to make writes visible to GPU
+        m_vertex_buffer->flush();
         m_index_buffer->flush();
-        m_index_buffer->flush();
+
+        // m_vertex_buffer->unmap();
+        // m_index_buffer->unmap();
 
         m_can_draw = true;
     }

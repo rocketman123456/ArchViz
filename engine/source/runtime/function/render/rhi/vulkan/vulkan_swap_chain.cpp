@@ -94,19 +94,14 @@ namespace ArchViz
         create_info.imageArrayLayers = 1;
         create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        m_indices                            = VulkanUtils::findQueueFamilies(m_device->m_physical_device, m_instance->m_surface);
-        std::set<uint32_t>    queue_families = {m_indices.m_graphics_family.value(), m_indices.m_present_family.value(), m_indices.m_compute_family.value()};
-        std::vector<uint32_t> families;
-        for (auto family : queue_families)
-        {
-            families.push_back(family);
-        }
+        m_indices          = VulkanUtils::findQueueFamilies(m_device->m_physical_device, m_instance->m_surface);
+        uint32_t indices[] = {m_indices.m_graphics_family.value(), m_indices.m_present_family.value()};
 
-        if (families.size() > 1)
+        if (m_indices.m_graphics_family.value() != m_indices.m_present_family.value())
         {
             create_info.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
-            create_info.queueFamilyIndexCount = static_cast<uint32_t>(families.size());
-            create_info.pQueueFamilyIndices   = families.data();
+            create_info.queueFamilyIndexCount = 2;
+            create_info.pQueueFamilyIndices   = indices;
         }
         else
         {
