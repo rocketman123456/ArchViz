@@ -13,6 +13,7 @@
 #include "runtime/resource/config_manager/config_manager.h"
 
 #include "runtime/core/base/macro.h"
+#include <GLFW/glfw3.h>
 
 #define GLFW_INCLUDE_NONE
 // #include "backends/imgui_impl_glfw.h"
@@ -67,7 +68,7 @@ namespace ArchViz
         // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
         auto font_path = m_config_manager->getRootFolder() / "asset-test/data/font/MiSans-Normal.ttf";
         // io.Fonts->AddFontDefault();
-        ImFont* font = io.Fonts->AddFontFromFileTTF(font_path.generic_string().c_str(), 16.0f);
+        ImFont* font = io.Fonts->AddFontFromFileTTF(font_path.generic_string().c_str(), 16.0f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
         ASSERT(font);
 
         unsigned char* font_data;
@@ -346,11 +347,35 @@ namespace ArchViz
     {
         ImGuiIO& io = ImGui::GetIO();
 
-        // glfwGetWindowSize(bd->Window, &w, &h);
-        io.DisplaySize = ImVec2(width, height);
+#ifdef __MACH__
 
+        int   w, h;
+        int   fw, fh;
         float scale_x, scale_y;
-        glfwGetWindowContentScale(m_window, &scale_x, &scale_y);
+        glfwGetWindowSize(m_window, &w, &h);
+        glfwGetFramebufferSize(m_window, &fw, &fh);
+        scale_x = (float)fw / (float)w;
+        scale_y = (float)fh / (float)h;
+
+        io.DisplaySize             = ImVec2(width, height);
+        io.DisplayFramebufferScale = ImVec2(scale_x, scale_y);
+
+        int left  = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT);
+        int right = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT);
+
+        double x, y;
+        glfwGetCursorPos(m_window, &x, &y);
+
+        LOG_DEBUG("size: {}, {}, scale: {}, {}, pos: {}, {}", w, h, scale_x, scale_y, x, y);
+
+        io.MousePos     = ImVec2(x * scale_x, y * scale_y);
+        io.MouseDown[0] = left;
+        io.MouseDown[1] = right;
+#else
+        float scale_x, scale_y;
+        glfwGetWindowContentScale(m_window, scale_x, scale_y);
+
+        io.DisplaySize             = ImVec2(width, height);
         io.DisplayFramebufferScale = ImVec2(scale_x, scale_y);
 
         int left  = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT);
@@ -362,6 +387,7 @@ namespace ArchViz
         io.MousePos     = ImVec2(x, y);
         io.MouseDown[0] = left;
         io.MouseDown[1] = right;
+#endif
 
         m_push_const.scale     = {2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y};
         m_push_const.translate = {-1.0f, -1.0f};
@@ -379,7 +405,7 @@ namespace ArchViz
         ImGui::Text("Hello, world %d", 123);
         ImGui::End();
 
-        ImGui::Begin("ArchViz-Test");
+        ImGui::Begin(u8"ArchViz 测试");
         ImGui::Text("Hello, world %d", 123);
         ImGui::End();
 
