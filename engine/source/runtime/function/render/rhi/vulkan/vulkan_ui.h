@@ -72,7 +72,6 @@ namespace ArchViz
         VkPipeline       m_pipeline;
 
         VkCommandPool   m_command_pool;
-        VkCommandBuffer m_command_buffer;
 
         VkRenderPass m_ui_pass;
 

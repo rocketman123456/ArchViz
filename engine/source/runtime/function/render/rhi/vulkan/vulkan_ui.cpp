@@ -373,7 +373,7 @@ namespace ArchViz
         io.MouseDown[1] = right;
 #else
         float scale_x, scale_y;
-        glfwGetWindowContentScale(m_window, scale_x, scale_y);
+        glfwGetWindowContentScale(m_window, &scale_x, &scale_y);
 
         io.DisplaySize             = ImVec2(width, height);
         io.DisplayFramebufferScale = ImVec2(scale_x, scale_y);
@@ -397,19 +397,87 @@ namespace ArchViz
 
     void VulkanUI::render()
     {
+        static bool opt_fullscreen = false;
+        static bool opt_padding    = false;
+
+        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+        dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+        window_flags |= ImGuiWindowFlags_NoBackground;
+
         ImGuiIO& io = ImGui::GetIO();
 
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+        if (!opt_padding)
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+        ImGui::Begin("DockSpace Demo", nullptr, window_flags);
+        {
+            if (!opt_padding)
+                ImGui::PopStyleVar();
+
+            if (opt_fullscreen)
+                ImGui::PopStyleVar(2);
+
+            if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+            {
+                ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+                ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+            }
+
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("Options"))
+                {
+                    // Disabling fullscreen would allow the window to be moved to the front of other windows,
+                    // which we can't undo at the moment without finer window depth/z control.
+                    // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
+                    ImGui::MenuItem("Padding", NULL, &opt_padding);
+                    ImGui::Separator();
+
+                    if (ImGui::MenuItem("Flag: NoSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
+                    {
+                        dockspace_flags ^= ImGuiDockNodeFlags_NoSplit;
+                    }
+                    if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0))
+                    {
+                        dockspace_flags ^= ImGuiDockNodeFlags_NoResize;
+                    }
+                    if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0))
+                    {
+                        dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode;
+                    }
+                    if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))
+                    {
+                        dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar;
+                    }
+                    if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen))
+                    {
+                        dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode;
+                    }
+                    ImGui::Separator();
+
+                    ImGui::EndMenu();
+                }
+
+                ImGui::EndMenuBar();
+            }
+        }
+        ImGui::End();
+
+        // ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
         ImGui::Begin("ArchViz");
-        ImGui::Text("Hello, world %d", 123);
+        {
+            ImGui::Text("Hello, world %d", 123);
+        }
         ImGui::End();
 
-        ImGui::Begin(u8"ArchViz æµ‹è¯•");
-        ImGui::Text("Hello, world %d", 123);
+        ImGui::Begin(u8"ArchViz ²âÊÔ");
+        {
+            ImGui::Text("Hello, world %d", 123);
+        }
         ImGui::End();
-
-        // ImGui::ShowDemoWindow();
 
         ImGui::Render();
 

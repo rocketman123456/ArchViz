@@ -57,8 +57,6 @@ namespace ArchViz
 
         void createCommandPool();
 
-        void createImGui();
-
         void createDepthResources();
         void createFramebuffers();
 
@@ -75,6 +73,8 @@ namespace ArchViz
         void createDescriptorSets();
 
         void createSyncObjects();
+
+        void createImGui();
 
     private:
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);

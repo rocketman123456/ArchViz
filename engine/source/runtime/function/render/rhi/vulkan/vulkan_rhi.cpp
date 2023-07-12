@@ -188,27 +188,6 @@ namespace ArchViz
         m_vulkan_pipeline->initialize();
     }
 
-    void VulkanRHI::createImGui()
-    {
-        m_vulkan_ui = std::make_shared<VulkanUI>();
-
-        m_vulkan_ui->m_window = m_initialize_info.window_system->getWindow();
-
-        m_vulkan_ui->m_instance        = m_vulkan_instance;
-        m_vulkan_ui->m_device          = m_vulkan_device;
-        m_vulkan_ui->m_image_count     = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
-        m_vulkan_ui->m_image_format    = m_vulkan_swap_chain->m_swap_chain_image_format;
-        m_vulkan_ui->m_command_pool    = m_command_pool;
-        m_vulkan_ui->m_command_buffer  = m_transfer_buffer;
-        m_vulkan_ui->m_descriptor_pool = m_descriptor_pool;
-        m_vulkan_ui->m_asset_manager   = m_asset_manager;
-        m_vulkan_ui->m_config_manager  = m_config_manager;
-        m_vulkan_ui->m_pipeline_cache  = m_pipeline_cache;
-        m_vulkan_ui->m_ui_pass         = m_vulkan_render_pass->m_render_pass;
-
-        m_vulkan_ui->initialize();
-    }
-
     void VulkanRHI::createDepthResources()
     {
         m_depth_format = VulkanUtils::findDepthFormat(m_vulkan_device->m_physical_device);
@@ -518,6 +497,26 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createImGui()
+    {
+        m_vulkan_ui = std::make_shared<VulkanUI>();
+
+        m_vulkan_ui->m_window = m_initialize_info.window_system->getWindow();
+
+        m_vulkan_ui->m_instance        = m_vulkan_instance;
+        m_vulkan_ui->m_device          = m_vulkan_device;
+        m_vulkan_ui->m_image_count     = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
+        m_vulkan_ui->m_image_format    = m_vulkan_swap_chain->m_swap_chain_image_format;
+        m_vulkan_ui->m_command_pool    = m_command_pool;
+        m_vulkan_ui->m_descriptor_pool = m_descriptor_pool;
+        m_vulkan_ui->m_asset_manager   = m_asset_manager;
+        m_vulkan_ui->m_config_manager  = m_config_manager;
+        m_vulkan_ui->m_pipeline_cache  = m_pipeline_cache;
+        m_vulkan_ui->m_ui_pass         = m_vulkan_render_pass->m_render_pass;
+
+        m_vulkan_ui->initialize();
+    }
+
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
         m_initialize_info = initialize_info;
@@ -536,8 +535,6 @@ namespace ArchViz
 
         createCommandPool();
 
-        createImGui();
-
         createDepthResources();
         createFramebuffers();
 
@@ -553,6 +550,8 @@ namespace ArchViz
         createDescriptorSets();
 
         createSyncObjects();
+
+        createImGui();
     }
 
     void VulkanRHI::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index)
