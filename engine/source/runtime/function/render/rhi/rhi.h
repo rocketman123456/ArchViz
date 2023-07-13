@@ -32,6 +32,9 @@ namespace ArchViz
         virtual void prepareContext()                        = 0;
         virtual void render()                                = 0;
 
+        // for debug
+        virtual void setFPS(uint32_t fps) = 0;
+
         virtual void createSwapChain()   = 0;
         virtual void recreateSwapChain() = 0;
 

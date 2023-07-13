@@ -33,6 +33,7 @@ namespace ArchViz
     class VulkanBufferVMA : public VulkanBuffer
     {
     public:
-        VmaAllocator m_allocator = nullptr;
+        VmaAllocator  m_allocator = nullptr;
+        VmaAllocation m_allocation;
     };
 } // namespace ArchViz

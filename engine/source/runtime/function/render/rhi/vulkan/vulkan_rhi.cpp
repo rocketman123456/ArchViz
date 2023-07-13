@@ -569,6 +569,12 @@ namespace ArchViz
         createImGui();
     }
 
+    void VulkanRHI::setFPS(uint32_t fps)
+    {
+        m_fps = fps;
+        m_vulkan_ui->setFPS(m_fps);
+    }
+
     void VulkanRHI::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index)
     {
         VkCommandBufferBeginInfo begin_info {};

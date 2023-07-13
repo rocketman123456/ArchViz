@@ -40,6 +40,9 @@ namespace ArchViz
         void prepareContext() override;
         void render() override;
 
+        // for debug
+        void setFPS(uint32_t fps) override;
+
         void clear() override;
 
         void createSwapChain() override;
@@ -86,6 +89,8 @@ namespace ArchViz
         const int  MAX_FRAMES_IN_FLIGHT       = 2;
 
         bool m_framebuffer_resized = false;
+
+        uint32_t m_fps;
 
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;
@@ -135,6 +140,12 @@ namespace ArchViz
         // The main purpose of a command pool is to be a (mostly) single-threaded allocator for the storage used by a set of command buffers which are filled by that thread.
         VkCommandPool                m_command_pool;
         std::vector<VkCommandBuffer> m_command_buffers;
+
+        // TODO : add a simple compute pass
+        std::vector<VkDescriptorSet> m_compute_descriptor_sets;
+        std::vector<VkCommandBuffer> m_compute_command_buffers;
+        std::vector<VkSemaphore>     m_compute_finished_semaphores;
+        std::vector<VkFence>         m_compute_in_flight_fences;
 
         VkCommandBuffer m_transfer_buffer;
 

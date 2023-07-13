@@ -1,6 +1,6 @@
 #include "runtime/function/render/render_camera.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     void RenderCamera::setCurrentCameraType(RenderCameraType type)
     {
@@ -94,7 +94,7 @@ namespace Piccolo
 
     Matrix4x4 RenderCamera::getPersProjMatrix() const
     {
-        Matrix4x4 fix_mat(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        Matrix4x4 fix_mat({1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1});
         Matrix4x4 proj_mat = fix_mat * Math::makePerspectiveMatrix(Radian(Degree(m_fovy)), m_aspect, m_znear, m_zfar);
 
         return proj_mat;

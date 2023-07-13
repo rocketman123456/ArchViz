@@ -14,6 +14,10 @@ namespace ArchViz
     class VulkanBufferUtils
     {
     public:
+        static void createBufferVMA(std::shared_ptr<VulkanDevice> device, VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VmaAllocation& allocation);
+
+        static void destroyBufferVMA(std::shared_ptr<VulkanDevice> device, VkBuffer& buffer, VmaAllocation& allocation);
+
         static void createBuffer(std::shared_ptr<VulkanDevice> device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory);
 
         static void copyBuffer(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);

@@ -4,7 +4,7 @@
 
 #include <mutex>
 
-namespace Piccolo
+namespace ArchViz
 {
     enum class RenderCameraType : int
     {

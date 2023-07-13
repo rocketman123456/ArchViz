@@ -49,7 +49,7 @@ namespace ArchViz
         std::vector<VkQueueFamilyProperties> m_queue_family_properties;
         std::vector<std::string>             m_supported_extensions;
 
-        VkCommandPool m_command_pool = VK_NULL_HANDLE;
+        VkCommandPool   m_command_pool   = VK_NULL_HANDLE;
 
         QueueFamilyIndices m_indices;
 

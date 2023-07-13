@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     steady_clock::time_point last_time_point = steady_clock::now();
     steady_clock::time_point current_time_point;
 
-    float    fps_alpha        = 1.f / 100;
+    float    fps_alpha        = 1.f / 1000;
     uint64_t frame_count      = 0;
     float    average_duration = 0;
 
@@ -72,13 +72,11 @@ int main(int argc, char** argv)
         {
             average_duration = average_duration * (1 - fps_alpha) + delta_time * fps_alpha;
         }
-        int fps = static_cast<int>(1.f / average_duration);
+        uint32_t fps = static_cast<uint32_t>(1.f / average_duration);
 
-        std::string title = std::string("ArchViz - " + std::to_string(fps) + " FPS");
-
-        window_system->setTitle(title.c_str());
         window_system->pollEvents();
 
+        render_system->setFPS(fps);
         render_system->tick(delta_time);
     }
 

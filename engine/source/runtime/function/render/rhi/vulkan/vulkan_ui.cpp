@@ -25,6 +25,8 @@
 
 namespace ArchViz
 {
+    void VulkanUI::setFPS(uint32_t fps) { m_fps = fps; }
+
     void VulkanUI::initialize()
     {
         IMGUI_CHECKVERSION();
@@ -469,7 +471,7 @@ namespace ArchViz
 
         ImGui::Begin("ArchViz");
         {
-            ImGui::Text("Hello, world %d", 123);
+            ImGui::Text("FPS %d", m_fps);
         }
         ImGui::End();
 

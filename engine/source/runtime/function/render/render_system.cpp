@@ -1,4 +1,5 @@
 #include "runtime/function/render/render_system.h"
+#include "runtime/function/render/render_camera.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
 
 #include "runtime/resource/asset_manager/asset_manager.h"
@@ -33,6 +34,8 @@ namespace ArchViz
         m_rhi->setAssetManager(m_asset_manager);
         m_rhi->initialize(rhi_init_info);
     }
+
+    void RenderSystem::setFPS(uint32_t fps) { m_rhi->setFPS(fps); }
 
     void RenderSystem::tick(float delta_time)
     {

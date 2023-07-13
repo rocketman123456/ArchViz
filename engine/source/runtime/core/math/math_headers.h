@@ -1,6 +1,6 @@
 #pragma once
 
-#include "runtime/core/math/axis_aligned.h"
+#include "runtime/core/math/geometry/axis_aligned.h"
 #include "runtime/core/math/math.h"
 #include "runtime/core/math/math_marcos.h"
 #include "runtime/core/math/math_type.h"

@@ -24,6 +24,8 @@ namespace ArchViz
         void initialize();
         void clear();
 
+        void setFPS(uint32_t fps);
+
         void prepareContext(float width, float height);
         void renderUI();
         void renderFinish();
@@ -47,6 +49,8 @@ namespace ArchViz
 
     public:
         GLFWwindow* m_window;
+
+        uint32_t m_fps;
 
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<ConfigManager> m_config_manager;

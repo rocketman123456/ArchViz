@@ -2,11 +2,25 @@
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
 
-
 #include "runtime/core/base/macro.h"
 
 namespace ArchViz
 {
+    void VulkanBufferUtils::createBufferVMA(std::shared_ptr<VulkanDevice> device, VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VmaAllocation& allocation)
+    {
+        VkBufferCreateInfo buffer_info {};
+        buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_info.size  = size;
+        buffer_info.usage = usage;
+
+        VmaAllocationCreateInfo alloc_info {};
+        alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
+
+        vmaCreateBuffer(device->m_assets_allocator, &buffer_info, &alloc_info, &buffer, &allocation, nullptr);
+    }
+
+    void VulkanBufferUtils::destroyBufferVMA(std::shared_ptr<VulkanDevice> device, VkBuffer& buffer, VmaAllocation& allocation) { vmaDestroyBuffer(device->m_assets_allocator, buffer, allocation); }
+
     void VulkanBufferUtils::createBuffer(std::shared_ptr<VulkanDevice> device,
                                          VkDeviceSize                  size,
                                          VkBufferUsageFlags            usage,
@@ -23,6 +37,7 @@ namespace ArchViz
             size += free_size;
         }
 
+        // TODO : add all create info into function call
         VkBufferCreateInfo buffer_info {};
         buffer_info.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         buffer_info.size        = size;

@@ -7,9 +7,10 @@
 namespace ArchViz
 {
     class WindowSystem;
-    class RHI;
     class ConfigManager;
     class AssetManager;
+    class RenderCamera;
+    class RHI;
 
     struct RenderSystemInitInfo
     {
@@ -31,6 +32,7 @@ namespace ArchViz
         ~RenderSystem();
 
         void initialize(RenderSystemInitInfo init_info);
+        void setFPS(uint32_t fps);
         void tick(float delta_time);
         void clear();
 
