@@ -9,7 +9,7 @@
 
 namespace ArchViz
 {
-    FMatrix4 look_at(const FVector3& eye, const FVector3& center, const FVector3& up)
+    FMatrix4 GraphicsUtils::lookAt(const FVector3& eye, const FVector3& center, const FVector3& up)
     {
         FVector3 f   = (center - eye).normalized();
         FVector3 u   = up.normalized();
@@ -32,7 +32,7 @@ namespace ArchViz
         return mat;
     }
 
-    FMatrix4 perspective(float fovy, float ratio, float znear, float zfar)
+    FMatrix4 GraphicsUtils::perspective(float fovy, float ratio, float znear, float zfar)
     {
         FMatrix4 tr = FMatrix4::Zero();
 
@@ -52,7 +52,7 @@ namespace ArchViz
         return tr;
     }
 
-    FMatrix4 orthogonal(float left, float right, float bottom, float top, float znear, float zfar)
+    FMatrix4 GraphicsUtils::orthogonal(float left, float right, float bottom, float top, float znear, float zfar)
     {
         FMatrix4 mat = FMatrix4::Identity();
         mat(0, 0)    = 2.0f / (right - left);

@@ -1,5 +1,6 @@
 #pragma once
 #include "runtime/core/math/math.h"
+#include "runtime/core/math/math_type.h"
 #include "runtime/core/math/matrix/matrix3.h"
 #include "runtime/core/math/quaternion.h"
 #include "runtime/core/math/vector/vector3.h"
@@ -160,6 +161,14 @@ namespace ArchViz
             float_array[13] = m_rows[3][1];
             float_array[14] = m_rows[3][2];
             float_array[15] = m_rows[3][3];
+        }
+
+        FMatrix4 toMatrix() const
+        {
+            FMatrix4 mat;
+            mat << m_rows[0][0], m_rows[0][1], m_rows[0][2], m_rows[0][3], m_rows[1][0], m_rows[1][1], m_rows[1][2], m_rows[1][3], m_rows[2][0], m_rows[2][1], m_rows[2][2], m_rows[2][3], m_rows[3][0],
+                m_rows[3][1], m_rows[3][2], m_rows[3][3];
+            return mat;
         }
 
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3

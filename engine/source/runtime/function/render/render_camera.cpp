@@ -1,113 +1,102 @@
 #include "runtime/function/render/render_camera.h"
 
+#include "runtime/core/base/macro.h"
+#include "runtime/core/math/graphics_utils.h"
+
+#include <cmath>
+
 namespace ArchViz
 {
-    void RenderCamera::setCurrentCameraType(RenderCameraType type)
+    void RenderCamera::setPerspective(float fov, float ratio, float znear, float zfar)
     {
-        std::lock_guard<std::mutex> lock_guard(m_view_matrix_mutex);
-        m_current_camera_type = type;
+        m_fov   = fov;
+        m_ratio = ratio;
+        m_znear = znear;
+        m_zfar  = zfar;
     }
 
-    void RenderCamera::setMainViewMatrix(const Matrix4x4& view_matrix, RenderCameraType type)
+    void RenderCamera::setOrthogonal(float left, float right, float bottom, float top, float znear, float zfar)
     {
-        std::lock_guard<std::mutex> lock_guard(m_view_matrix_mutex);
-        m_current_camera_type                   = type;
-        m_view_matrices[MAIN_VIEW_MATRIX_INDEX] = view_matrix;
-
-        Vector3 s  = Vector3(view_matrix[0][0], view_matrix[0][1], view_matrix[0][2]);
-        Vector3 u  = Vector3(view_matrix[1][0], view_matrix[1][1], view_matrix[1][2]);
-        Vector3 f  = Vector3(-view_matrix[2][0], -view_matrix[2][1], -view_matrix[2][2]);
-        m_position = s * (-view_matrix[0][3]) + u * (-view_matrix[1][3]) + f * view_matrix[2][3];
+        m_left   = left;
+        m_right_ = right;
+        m_bottom = bottom;
+        m_top    = top;
+        m_znear  = znear;
+        m_zfar   = zfar;
     }
 
-    void RenderCamera::move(Vector3 delta) { m_position += delta; }
-
-    void RenderCamera::rotate(Vector2 delta)
+    void RenderCamera::move(CameraMovement direction, float dt)
     {
-        // rotation around x, y axis
-        delta = Vector2(Radian(Degree(delta.x)).valueRadians(), Radian(Degree(delta.y)).valueRadians());
-
-        // limit pitch
-        float dot = m_up_axis.dotProduct(forward());
-        if ((dot < -0.99f && delta.x > 0.0f) || // angle nearing 180 degrees
-            (dot > 0.99f && delta.x < 0.0f))    // angle nearing 0 degrees
-            delta.x = 0.0f;
-
-        // pitch is relative to current sideways rotation
-        // yaw happens independently
-        // this prevents roll
-        Quaternion pitch, yaw;
-        pitch.fromAngleAxis(Radian(delta.x), X);
-        yaw.fromAngleAxis(Radian(delta.y), Z);
-
-        m_rotation = pitch * m_rotation * yaw;
-
-        m_invRotation = m_rotation.conjugate();
+        float velocity = m_speed * dt;
+        if (direction == CameraMovement::Forward)
+            m_position += m_front * velocity;
+        if (direction == CameraMovement::Backward)
+            m_position -= m_front * velocity;
+        if (direction == CameraMovement::Left)
+            m_position -= m_right * velocity;
+        if (direction == CameraMovement::Right)
+            m_position += m_right * velocity;
     }
 
-    void RenderCamera::zoom(float offset)
+    void RenderCamera::rotate(float dx, float dy)
     {
-        // > 0 = zoom in (decrease FOV by <offset> angles)
-        m_fovx = Math::clamp(m_fovx - offset, MIN_FOV, MAX_FOV);
-    }
+        float xoffset = dx * m_sensitivity;
+        float yoffset = dy * m_sensitivity;
 
-    void RenderCamera::lookAt(const Vector3& position, const Vector3& target, const Vector3& up)
-    {
-        m_position = position;
+        m_yaw += xoffset;
+        m_pitch += yoffset;
 
-        // model rotation
-        // maps vectors to camera space (x, y, z)
-        Vector3 forward = (target - position).normalisedCopy();
-        m_rotation      = forward.getRotationTo(Y);
+        bool constrain_pitch = true;
 
-        // correct the up vector
-        // the cross product of non-orthogonal vectors is not normalized
-        Vector3 right  = forward.crossProduct(up.normalisedCopy()).normalisedCopy();
-        Vector3 orthUp = right.crossProduct(forward);
-
-        Quaternion upRotation = (m_rotation * orthUp).getRotationTo(Z);
-
-        m_rotation = Quaternion(upRotation) * m_rotation;
-
-        // inverse of the model rotation
-        // maps camera space vectors to model vectors
-        m_invRotation = m_rotation.conjugate();
-    }
-
-    Matrix4x4 RenderCamera::getViewMatrix()
-    {
-        std::lock_guard<std::mutex> lock_guard(m_view_matrix_mutex);
-        auto                        view_matrix = Matrix4x4::IDENTITY;
-        switch (m_current_camera_type)
+        // make sure that when pitch is out of bounds, screen doesn't get flipped
+        if (constrain_pitch)
         {
-            case RenderCameraType::Editor:
-                view_matrix = Math::makeLookAtMatrix(position(), position() + forward(), up());
+            if (m_pitch > 89.0f)
+                m_pitch = 89.0f;
+            if (m_pitch < -89.0f)
+                m_pitch = -89.0f;
+        }
+
+        // update Front, Right and Up Vectors using the updated Euler angles
+        updateCameraVectors();
+    }
+
+    void RenderCamera::updateCameraVectors()
+    {
+        // calculate the new Front vector
+        FVector3 front;
+        front[0] = cos(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
+        front[1] = sin(Degree(m_pitch).valueRadians());
+        front[2] = sin(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
+
+        m_front = front.normalized();
+        // also re-calculate the Right and Up vector
+        m_right = m_front.cross(m_world_up).normalized();
+        m_up    = m_right.cross(m_front).normalized();
+    }
+
+    void RenderCamera::update()
+    {
+        std::lock_guard<std::mutex> lock_guard(m_view_matrix_mutex);
+
+        switch (m_type)
+        {
+            case RenderCameraType::Perspective:
+                updatePerspective();
                 break;
-            case RenderCameraType::Motor:
-                view_matrix = m_view_matrices[MAIN_VIEW_MATRIX_INDEX];
+            case RenderCameraType::Orthogonal:
+                updateOrthogonal();
                 break;
             default:
                 break;
         }
-        return view_matrix;
+        updateView();
     }
 
-    Matrix4x4 RenderCamera::getPersProjMatrix() const
-    {
-        Matrix4x4 fix_mat({1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1});
-        Matrix4x4 proj_mat = fix_mat * Math::makePerspectiveMatrix(Radian(Degree(m_fovy)), m_aspect, m_znear, m_zfar);
+    void RenderCamera::updatePerspective() { m_projction = GraphicsUtils::perspective(m_fov, m_ratio, m_znear, m_zfar); }
 
-        return proj_mat;
-    }
+    void RenderCamera::updateOrthogonal() { m_projction = GraphicsUtils::orthogonal(m_left, m_right_, m_bottom, m_top, m_znear, m_zfar); }
 
-    void RenderCamera::setAspect(float aspect)
-    {
-        m_aspect = aspect;
+    void RenderCamera::updateView() { m_view = GraphicsUtils::lookAt(m_position, m_position + m_front, m_up); }
 
-        // 1 / tan(fovy * 0.5) / aspect = 1 / tan(fovx * 0.5)
-        // 1 / tan(fovy * 0.5) = aspect / tan(fovx * 0.5)
-        // tan(fovy * 0.5) = tan(fovx * 0.5) / aspect
-
-        m_fovy = Radian(Math::atan(Math::tan(Radian(Degree(m_fovx) * 0.5f)) / m_aspect) * 2.0f).valueDegrees();
-    }
-} // namespace Piccolo
+} // namespace ArchViz

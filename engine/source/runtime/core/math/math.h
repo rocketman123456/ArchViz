@@ -113,7 +113,7 @@ namespace ArchViz
             return *this;
         }
         Degree& operator=(const Degree& d) = default;
-        Degree& operator                   =(const Radian& r)
+        Degree& operator=(const Radian& r)
         {
             m_deg = r.valueDegrees();
             return *this;
@@ -256,13 +256,9 @@ namespace ArchViz
         }
 
         static Matrix4x4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, const Matrix4x4* reflect_matrix = nullptr);
-
         static Matrix4x4 makeLookAtMatrix(const Vector3& eye_position, const Vector3& target_position, const Vector3& up_dir);
-
         static Matrix4x4 makePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar);
-
         static Matrix4x4 makeOrthographicProjectionMatrix(float left, float right, float bottom, float top, float znear, float zfar);
-
         static Matrix4x4 makeOrthographicProjectionMatrix01(float left, float right, float bottom, float top, float znear, float zfar);
     };
 
@@ -288,22 +284,15 @@ namespace ArchViz
     }
 
     inline float Radian::valueDegrees() const { return Math::radiansToDegrees(m_rad); }
-
     inline float Radian::valueAngleUnits() const { return Math::radiansToAngleUnits(m_rad); }
-
     inline float Degree::valueRadians() const { return Math::degreesToRadians(m_deg); }
-
     inline float Degree::valueAngleUnits() const { return Math::degreesToAngleUnits(m_deg); }
 
     inline Angle::operator Radian() const { return Radian(Math::angleUnitsToRadians(m_angle)); }
-
     inline Angle::operator Degree() const { return Degree(Math::angleUnitsToDegrees(m_angle)); }
 
     inline Radian operator*(float a, const Radian& b) { return Radian(a * b.valueRadians()); }
-
     inline Radian operator/(float a, const Radian& b) { return Radian(a / b.valueRadians()); }
-
     inline Degree operator*(float a, const Degree& b) { return Degree(a * b.valueDegrees()); }
-
     inline Degree operator/(float a, const Degree& b) { return Degree(a / b.valueDegrees()); }
 } // namespace ArchViz

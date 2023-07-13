@@ -13,9 +13,9 @@
 #include "runtime/resource/config_manager/config_manager.h"
 
 #include "runtime/core/base/macro.h"
-#include <GLFW/glfw3.h>
 
 #define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 // #include "backends/imgui_impl_glfw.h"
 // #include "backends/imgui_impl_vulkan.h"
 #include "imgui.h"

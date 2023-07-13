@@ -279,6 +279,14 @@ namespace ArchViz
         m_vulkan_texture->m_command_pool   = m_command_pool;
         m_vulkan_texture->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         m_vulkan_texture->initizlize("asset-test/data/model/viking_room/viking_room.png");
+
+        m_vulkan_texture_ui                   = std::make_shared<VulkanTexture>();
+        m_vulkan_texture_ui->m_asset_manager  = m_asset_manager;
+        m_vulkan_texture_ui->m_config_manager = m_config_manager;
+        m_vulkan_texture_ui->m_device         = m_vulkan_device;
+        m_vulkan_texture_ui->m_command_pool   = m_command_pool;
+        m_vulkan_texture_ui->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
     }
 
     void VulkanRHI::loadModel()
@@ -515,14 +523,6 @@ namespace ArchViz
 
         m_vulkan_ui->initialize();
 
-        m_vulkan_texture_ui                   = std::make_shared<VulkanTexture>();
-        m_vulkan_texture_ui->m_asset_manager  = m_asset_manager;
-        m_vulkan_texture_ui->m_config_manager = m_config_manager;
-        m_vulkan_texture_ui->m_device         = m_vulkan_device;
-        m_vulkan_texture_ui->m_command_pool   = m_command_pool;
-        m_vulkan_texture_ui->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
-
         m_vulkan_texture->m_descriptor_set_layout = m_vulkan_ui->m_descriptor_set_layout;
         m_vulkan_texture->m_descriptor_pool       = m_vulkan_ui->m_descriptor_pool;
         m_vulkan_texture->createDescriptorSet();
@@ -650,14 +650,13 @@ namespace ArchViz
         auto  currentTime = std::chrono::high_resolution_clock::now();
         float time        = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-        UniformBufferObject ubo {};
-        ubo.model                   = FMatrix4::Identity();
-        ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
-        ubo.view                    = look_at({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
-        ubo.proj                    = perspective(45.0f, (float)m_vulkan_swap_chain->m_swap_chain_extent.width / (float)m_vulkan_swap_chain->m_swap_chain_extent.height, 0.1f, 10.0f);
-        ubo.proj(1, 1)              = ubo.proj(1, 1) * -1;
+        // m_ubo.model                   = FMatrix4::Identity();
+        // m_ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
+        // m_ubo.view       = GraphicsUtils::lookAt({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+        // m_ubo.proj       = GraphicsUtils::perspective(45.0f, (float)m_vulkan_swap_chain->m_swap_chain_extent.width / (float)m_vulkan_swap_chain->m_swap_chain_extent.height, 0.1f, 10.0f);
+        m_ubo.proj(1, 1) = m_ubo.proj(1, 1) * -1;
 
-        memcpy(m_uniform_buffers_mapped[current_image], &ubo, sizeof(ubo));
+        memcpy(m_uniform_buffers_mapped[current_image], &m_ubo, sizeof(m_ubo));
     }
 
     void VulkanRHI::drawFrame()

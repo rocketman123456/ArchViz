@@ -10,6 +10,7 @@ namespace ArchViz
     class ConfigManager;
     class AssetManager;
     class RenderCamera;
+    class VulkanRHI;
     class RHI;
 
     struct RenderSystemInitInfo
@@ -40,20 +41,25 @@ namespace ArchViz
         void setAssetManager(std::shared_ptr<AssetManager> asset_manager);
 
     private:
-        void processSwapData();
+        void processSwapData(float delta_time);
+
+        void onMouseCallback(double x, double y);
+        //void onKeyCallback(int, int, int, int);
 
     private:
         // RENDER_PIPELINE_TYPE m_render_pipeline_type {RENDER_PIPELINE_TYPE::DEFERRED_PIPELINE};
 
         // RenderSwapContext m_swap_context;
 
-        std::shared_ptr<RHI> m_rhi;
-        // std::shared_ptr<RenderCamera>       m_render_camera;
+        std::shared_ptr<VulkanRHI>    m_rhi;
+        std::shared_ptr<RenderCamera> m_render_camera;
+
         // std::shared_ptr<RenderScene>        m_render_scene;
         // std::shared_ptr<RenderResourceBase> m_render_resource;
         // std::shared_ptr<RenderPipelineBase> m_render_pipeline;
 
         std::shared_ptr<ConfigManager> m_config_manager;
         std::shared_ptr<AssetManager>  m_asset_manager;
+        std::shared_ptr<WindowSystem>  m_window_system;
     };
 } // namespace ArchViz

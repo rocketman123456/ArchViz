@@ -6,65 +6,73 @@
 
 namespace ArchViz
 {
-    enum class RenderCameraType : int
+    enum class RenderCameraType : uint32_t
     {
-        Editor,
-        Motor
+        Perspective,
+        Orthogonal,
+    };
+
+    enum class CameraMovement : uint32_t
+    {
+        Forward,
+        Backward,
+        Left,
+        Right
     };
 
     class RenderCamera
     {
     public:
-        RenderCameraType m_current_camera_type {RenderCameraType::Editor};
+        void setPerspective(float fov, float ratio, float znear, float zfar);
+        void setOrthogonal(float left, float right, float bottom, float top, float znear, float zfar);
 
-        static const Vector3 X, Y, Z;
+        void update();
 
-        Vector3    m_position {0.0f, 0.0f, 0.0f};
-        Quaternion m_rotation {Quaternion::IDENTITY};
-        Quaternion m_invRotation {Quaternion::IDENTITY};
-        float      m_znear {1000.0f};
-        float      m_zfar {0.1f};
-        Vector3    m_up_axis {Z};
-
-        static constexpr float MIN_FOV {10.0f};
-        static constexpr float MAX_FOV {89.0f};
-        static constexpr int   MAIN_VIEW_MATRIX_INDEX {0};
-
-        std::vector<Matrix4x4> m_view_matrices {Matrix4x4::IDENTITY};
-
-        void setCurrentCameraType(RenderCameraType type);
-        void setMainViewMatrix(const Matrix4x4& view_matrix, RenderCameraType type = RenderCameraType::Editor);
-
-        void move(Vector3 delta);
-        void rotate(Vector2 delta);
-        void zoom(float offset);
-        void lookAt(const Vector3& position, const Vector3& target, const Vector3& up);
-
-        void setAspect(float aspect);
-        void setFOVx(float fovx) { m_fovx = fovx; }
-
-        Vector3    position() const { return m_position; }
-        Quaternion rotation() const { return m_rotation; }
-
-        Vector3   forward() const { return (m_invRotation * Y); }
-        Vector3   up() const { return (m_invRotation * Z); }
-        Vector3   right() const { return (m_invRotation * X); }
-        Vector2   getFOV() const { return {m_fovx, m_fovy}; }
-        Matrix4x4 getViewMatrix();
-        Matrix4x4 getPersProjMatrix() const;
-        Matrix4x4 getLookAtMatrix() const { return Math::makeLookAtMatrix(position(), position() + forward(), up()); }
-        float     getFovYDeprecated() const { return m_fovy; }
+        void move(CameraMovement direction, float dt);
+        void rotate(float dx, float dy);
 
     protected:
-        float m_aspect {0.f};
-        float m_fovx {Degree(89.f).valueDegrees()};
-        float m_fovy {0.f};
+        void updatePerspective();
+        void updateOrthogonal();
 
+        void updateView();
+
+        void updateCameraVectors();
+
+    public:
+        RenderCameraType m_type {RenderCameraType::Perspective};
+
+        FVector3 m_position {0, 0, 0};
+        FVector3 m_front {1, 0, 0};
+        FVector3 m_up {0, 0, 1};
+        FVector3 m_right {0, 1, 0};
+        FVector3 m_world_up {0, 0, 1};
+
+        float m_speed {0.1};
+        float m_sensitivity {0.5};
+
+        float m_yaw;
+        float m_pitch;
+
+        FQuaternion m_rotation;
+
+        FMatrix4 m_view;
+        FMatrix4 m_projction;
+
+    protected:
+        float m_fov;
+        float m_ratio;
+
+        float m_znear;
+        float m_zfar;
+
+        float m_left;
+        float m_right_;
+        float m_bottom;
+        float m_top;
+
+    protected:
         std::mutex m_view_matrix_mutex;
     };
 
-    inline const Vector3 RenderCamera::X = {1.0f, 0.0f, 0.0f};
-    inline const Vector3 RenderCamera::Y = {0.0f, 1.0f, 0.0f};
-    inline const Vector3 RenderCamera::Z = {0.0f, 0.0f, 1.0f};
-
-} // namespace Piccolo
+} // namespace ArchViz

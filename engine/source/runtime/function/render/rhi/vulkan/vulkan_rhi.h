@@ -92,8 +92,8 @@ namespace ArchViz
 
         uint32_t m_fps;
 
-        std::shared_ptr<AssetManager>  m_asset_manager;
-        std::shared_ptr<ConfigManager> m_config_manager;
+        std::shared_ptr<AssetManager>  m_asset_manager;  // for debug, or use global
+        std::shared_ptr<ConfigManager> m_config_manager; // for debug, or use global
 
         RHIInitInfo m_initialize_info;
 
@@ -124,6 +124,17 @@ namespace ArchViz
 
         std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
+        std::vector<VkSemaphore> m_image_available_semaphores;
+        std::vector<VkSemaphore> m_render_finished_semaphores;
+        std::vector<VkFence>     m_in_flight_fences;
+        uint32_t                 m_current_frame = 0;
+
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+
         VkDescriptorSetLayout        m_descriptor_set_layout;
         VkDescriptorPool             m_descriptor_pool;
         std::vector<VkDescriptorSet> m_descriptor_sets;
@@ -141,18 +152,21 @@ namespace ArchViz
         VkCommandPool                m_command_pool;
         std::vector<VkCommandBuffer> m_command_buffers;
 
+        VkCommandBuffer m_transfer_buffer;
+
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+
         // TODO : add a simple compute pass
         std::vector<VkDescriptorSet> m_compute_descriptor_sets;
         std::vector<VkCommandBuffer> m_compute_command_buffers;
+        std::vector<VkBuffer>        m_shader_storage_buffers;
+        std::vector<VkDeviceMemory>  m_shader_storage_buffers_memory;
         std::vector<VkSemaphore>     m_compute_finished_semaphores;
         std::vector<VkFence>         m_compute_in_flight_fences;
-
-        VkCommandBuffer m_transfer_buffer;
-
-        std::vector<VkSemaphore> m_image_available_semaphores;
-        std::vector<VkSemaphore> m_render_finished_semaphores;
-        std::vector<VkFence>     m_in_flight_fences;
-        uint32_t                 m_current_frame = 0;
 
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------
@@ -162,5 +176,8 @@ namespace ArchViz
 
         std::vector<Vertex>   m_vertices;
         std::vector<uint32_t> m_indices;
+
+    public:
+        UniformBufferObject m_ubo;
     };
 } // namespace ArchViz
