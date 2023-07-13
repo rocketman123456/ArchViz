@@ -29,6 +29,6 @@ namespace ArchViz
 
         static void copyBufferToImage(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
-        static void generateMipmaps(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
+        static void generateMipmaps(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkImage image, VkFormat image_format, int32_t tex_width, int32_t tex_height, uint32_t mip_levels);
     };
 } // namespace ArchViz

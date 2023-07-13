@@ -1,5 +1,5 @@
-#include "runtime/function/render/rhi/vulkan/vulkan_shader_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_header_includer.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_shader_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_header_includer.h"
 
 #include "runtime/core/base/macro.h"
 #include "runtime/core/string/string_utils.h"

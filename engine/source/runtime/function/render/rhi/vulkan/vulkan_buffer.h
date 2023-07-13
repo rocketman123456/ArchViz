@@ -2,6 +2,8 @@
 
 #include <volk.h>
 
+#include <vk_mem_alloc.h>
+
 namespace ArchViz
 {
     class VulkanBuffer
@@ -26,5 +28,11 @@ namespace ArchViz
         VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
         VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
         void     destroy();
+    };
+
+    class VulkanBufferVMA : public VulkanBuffer
+    {
+    public:
+        VmaAllocator m_allocator = nullptr;
     };
 } // namespace ArchViz

@@ -1,6 +1,7 @@
-#include "runtime/function/render/rhi/vulkan/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
+
 
 #include "runtime/core/base/macro.h"
 
@@ -81,6 +82,15 @@ namespace ArchViz
         vkQueueWaitIdle(device->m_transfer_queue);
 
         vkFreeCommandBuffers(device->m_device, command_pool, 1, &command_buffer);
+    }
+
+    void VulkanBufferUtils::destroyBuffer(std::shared_ptr<VulkanDevice> device, VkBuffer& buffer, VkDeviceMemory& buffer_memory)
+    {
+        vkDestroyBuffer(device->m_device, buffer, nullptr);
+        vkFreeMemory(device->m_device, buffer_memory, nullptr);
+
+        buffer        = VK_NULL_HANDLE;
+        buffer_memory = VK_NULL_HANDLE;
     }
 
     VkCommandBuffer VulkanBufferUtils::beginSingleTimeCommands(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool)

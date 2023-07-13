@@ -2,7 +2,7 @@
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
-#include "runtime/function/render/rhi/vulkan/vulkan_shader_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_shader_utils.h"
 
 #include <filesystem>
 #include <iostream>

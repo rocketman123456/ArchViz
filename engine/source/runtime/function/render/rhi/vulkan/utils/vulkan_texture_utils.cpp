@@ -1,7 +1,8 @@
-#include "runtime/function/render/rhi/vulkan/vulkan_texture_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
+
 
 #include "runtime/core/base/macro.h"
 
@@ -171,11 +172,11 @@ namespace ArchViz
     }
 
     void
-    VulkanTextureUtils::generateMipmaps(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
+    VulkanTextureUtils::generateMipmaps(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkImage image, VkFormat image_format, int32_t tex_width, int32_t tex_height, uint32_t mip_levels)
     {
         // Check if image format supports linear blitting
         VkFormatProperties formatProperties;
-        vkGetPhysicalDeviceFormatProperties(device->m_physical_device, imageFormat, &formatProperties);
+        vkGetPhysicalDeviceFormatProperties(device->m_physical_device, image_format, &formatProperties);
 
         if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
         {
@@ -194,10 +195,10 @@ namespace ArchViz
         barrier.subresourceRange.layerCount     = 1;
         barrier.subresourceRange.levelCount     = 1;
 
-        int32_t mipWidth  = texWidth;
-        int32_t mipHeight = texHeight;
+        int32_t mipWidth  = tex_width;
+        int32_t mipHeight = tex_height;
 
-        for (uint32_t i = 1; i < mipLevels; i++)
+        for (uint32_t i = 1; i < mip_levels; i++)
         {
             barrier.subresourceRange.baseMipLevel = i - 1;
             barrier.oldLayout                     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -236,7 +237,7 @@ namespace ArchViz
                 mipHeight /= 2;
         }
 
-        barrier.subresourceRange.baseMipLevel = mipLevels - 1;
+        barrier.subresourceRange.baseMipLevel = mip_levels - 1;
         barrier.oldLayout                     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         barrier.newLayout                     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         barrier.srcAccessMask                 = VK_ACCESS_TRANSFER_WRITE_BIT;

@@ -1,8 +1,8 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_texture_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
@@ -109,10 +109,9 @@ namespace ArchViz
 
         VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mip_levels);
         VulkanTextureUtils::copyBufferToImage(m_device, m_command_pool, staging_buffer, m_image, static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
-        //VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_image_layout, m_mip_levels);
+        // VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_image_layout, m_mip_levels);
 
-        vkDestroyBuffer(m_device->m_device, staging_buffer, nullptr);
-        vkFreeMemory(m_device->m_device, staging_buffer_memory, nullptr);
+        VulkanBufferUtils::destroyBuffer(m_device, staging_buffer, staging_buffer_memory);
 
         VulkanTextureUtils::generateMipmaps(m_device, m_command_pool, m_image, m_format, m_width, m_height, m_mip_levels);
     }

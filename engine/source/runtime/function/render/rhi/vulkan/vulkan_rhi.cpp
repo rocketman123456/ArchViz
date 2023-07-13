@@ -1,5 +1,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_pipeline.h"
@@ -7,9 +9,7 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_utils.h"
 
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
@@ -345,8 +345,7 @@ namespace ArchViz
 
         VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_vertex_buffer, buffer_size);
 
-        vkDestroyBuffer(m_vulkan_device->m_device, staging_buffer, nullptr);
-        vkFreeMemory(m_vulkan_device->m_device, staging_buffer_memory, nullptr);
+        VulkanBufferUtils::destroyBuffer(m_vulkan_device, staging_buffer, staging_buffer_memory);
     }
 
     void VulkanRHI::createIndexBuffer()
@@ -749,8 +748,7 @@ namespace ArchViz
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            vkDestroyBuffer(m_vulkan_device->m_device, m_uniform_buffers[i], nullptr);
-            vkFreeMemory(m_vulkan_device->m_device, m_uniform_buffers_memory[i], nullptr);
+            VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
         }
 
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
@@ -764,11 +762,8 @@ namespace ArchViz
         m_vulkan_ui->clear();
         m_vulkan_ui.reset();
 
-        vkDestroyBuffer(m_vulkan_device->m_device, m_index_buffer, nullptr);
-        vkFreeMemory(m_vulkan_device->m_device, m_index_buffer_memory, nullptr);
-
-        vkDestroyBuffer(m_vulkan_device->m_device, m_vertex_buffer, nullptr);
-        vkFreeMemory(m_vulkan_device->m_device, m_vertex_buffer_memory, nullptr);
+        VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_index_buffer, m_index_buffer_memory);
+        VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_vertex_buffer, m_vertex_buffer_memory);
 
         vkDestroyImageView(m_vulkan_device->m_device, m_depth_image_view, nullptr);
         vkDestroyImage(m_vulkan_device->m_device, m_depth_image, nullptr);
