@@ -159,7 +159,7 @@ namespace ArchViz
             return;
         }
 
-        // Create Descriptor Set
+        // create descriptor set
         VkDescriptorSetAllocateInfo alloc_info = {};
         alloc_info.sType                       = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         alloc_info.descriptorPool              = m_descriptor_pool;

@@ -731,15 +731,18 @@ namespace ArchViz
         vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
 
         updateUniformBuffer(m_current_frame);
+    }
 
+    void VulkanRHI::render()
+    {
         m_vulkan_ui->prepareContext(m_vulkan_swap_chain->m_swap_chain_extent.width, m_vulkan_swap_chain->m_swap_chain_extent.height);
         m_vulkan_ui->renderUI();
         m_vulkan_ui->showImage(m_vulkan_texture, "simple texture");
         m_vulkan_ui->showImage(m_vulkan_texture_ui, "simple texture 2");
         m_vulkan_ui->renderFinish();
-    }
 
-    void VulkanRHI::render() { drawFrame(); }
+        drawFrame();
+    }
 
     void VulkanRHI::clear()
     {

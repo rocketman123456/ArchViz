@@ -523,8 +523,8 @@ namespace ArchViz
             return;
         }
 
-        // Vertex buffer
-        if ((m_vertex_buffer->buffer == VK_NULL_HANDLE) || (m_vertex_count != main_draw_data->TotalVtxCount))
+        // Resize Vertex buffer
+        if ((m_vertex_buffer->buffer == VK_NULL_HANDLE) || (m_vertex_count < main_draw_data->TotalVtxCount))
         {
             // TODO : use fence or semphore to wait
             m_device->wait();
@@ -546,7 +546,7 @@ namespace ArchViz
             m_vertex_buffer->map();
         }
 
-        // Index buffer
+        // Resize Index buffer
         if ((m_index_buffer->buffer == VK_NULL_HANDLE) || (m_index_count < main_draw_data->TotalIdxCount))
         {
             // TODO : use fence or semphore to wait
@@ -588,9 +588,6 @@ namespace ArchViz
         m_vertex_buffer->flush();
         m_index_buffer->flush();
 
-        // m_vertex_buffer->unmap();
-        // m_index_buffer->unmap();
-
         // VkExtent2D extend {};
         // extend.width  = io.DisplaySize.x;
         // extend.height = io.DisplaySize.y;
@@ -612,7 +609,6 @@ namespace ArchViz
         // vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
         {
-            vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &m_descriptor_set, 0, nullptr);
             vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
             VkViewport viewport {};
@@ -645,11 +641,26 @@ namespace ArchViz
                     {
                         const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[j];
                         VkRect2D         scissorRect;
+
+                        VkDescriptorSet desc_set = (VkDescriptorSet)pcmd->TextureId;
+                        if (sizeof(ImTextureID) < sizeof(ImU64))
+                        {
+                            // We don't support texture switches if ImTextureID hasn't been redefined to be 64-bit.
+                            // Do a flaky check that other textures haven't been used.
+                            desc_set = m_descriptor_set;
+                        }
+                        if (desc_set == VK_NULL_HANDLE)
+                        {
+                            desc_set = m_descriptor_set;
+                        }
+                        vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1, &desc_set, 0, nullptr);
+
                         scissorRect.offset.x      = std::max((int32_t)(pcmd->ClipRect.x), 0);
                         scissorRect.offset.y      = std::max((int32_t)(pcmd->ClipRect.y), 0);
                         scissorRect.extent.width  = (uint32_t)(pcmd->ClipRect.z - pcmd->ClipRect.x);
                         scissorRect.extent.height = (uint32_t)(pcmd->ClipRect.w - pcmd->ClipRect.y);
                         vkCmdSetScissor(command_buffer, 0, 1, &scissorRect);
+
                         vkCmdDrawIndexed(command_buffer, pcmd->ElemCount, 1, index_offset, vertex_offset, 0);
                         index_offset += pcmd->ElemCount;
                     }
