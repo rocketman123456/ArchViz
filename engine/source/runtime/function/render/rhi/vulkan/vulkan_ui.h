@@ -25,8 +25,11 @@ namespace ArchViz
         void clear();
 
         void prepareContext(float width, float height);
-        void render();
+        void renderUI();
+        void renderFinish();
         void recordCommandBuffer(VkCommandBuffer command_buffer, VkFramebuffer frame_buffer);
+
+        void showImage(std::shared_ptr<VulkanTexture> image, const std::string& name);
 
     private:
         void createRenderPass();

@@ -19,6 +19,7 @@ namespace ArchViz
     {
     public:
         explicit VulkanDevice(bool enable_validation) : m_enable_validation_layers(enable_validation) {}
+        ~VulkanDevice() = default;
 
         void connect(std::shared_ptr<VulkanInstance> instance);
         void initialize();
@@ -52,13 +53,13 @@ namespace ArchViz
 
         QueueFamilyIndices m_indices;
 
-        VkQueue m_graphics_queue;
-        VkQueue m_compute_queue;
-        VkQueue m_present_queue;
-        VkQueue m_transfer_queue;
+        VkQueue m_graphics_queue = VK_NULL_HANDLE;
+        VkQueue m_compute_queue  = VK_NULL_HANDLE;
+        VkQueue m_present_queue  = VK_NULL_HANDLE;
+        VkQueue m_transfer_queue = VK_NULL_HANDLE;
 
         // asset allocator use VMA library
-        VmaAllocator m_assets_allocator;
+        VmaAllocator m_assets_allocator = nullptr;
 
         // TODO
     };

@@ -4,11 +4,6 @@
 
 #include "runtime/core/base/macro.h"
 
-#define VMA_IMPLEMENTATION 1
-#define VMA_STATIC_VULKAN_FUNCTIONS 0
-#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
-#include <vk_mem_alloc.h>
-
 #include <set>
 
 namespace ArchViz
@@ -35,6 +30,8 @@ namespace ArchViz
 
     void VulkanDevice::clear()
     {
+        vmaDestroyAllocator(m_assets_allocator);
+
         if (m_command_pool != VK_NULL_HANDLE)
         {
             vkDestroyCommandPool(m_device, m_command_pool, nullptr);

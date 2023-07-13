@@ -142,7 +142,7 @@ namespace ArchViz
 
         for (size_t i = 0; i < m_images.size(); i++)
         {
-            m_buffers[i].view = VulkanTextureUtils::createImageView(m_device, m_images[i], m_swap_chain_image_format, VK_IMAGE_ASPECT_COLOR_BIT);
+            m_buffers[i].view = VulkanTextureUtils::createImageView(m_device, m_images[i], m_swap_chain_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
         }
     }
 

@@ -100,6 +100,8 @@ namespace ArchViz
 
         std::shared_ptr<VulkanTexture> m_vulkan_texture;
 
+        std::shared_ptr<VulkanTexture> m_vulkan_texture_ui;
+
         std::shared_ptr<VulkanUI> m_vulkan_ui;
 
         // ---------------------------------------------------------------------------

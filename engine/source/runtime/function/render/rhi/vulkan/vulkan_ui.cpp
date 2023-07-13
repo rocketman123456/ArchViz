@@ -395,7 +395,7 @@ namespace ArchViz
         ImGui::NewFrame();
     }
 
-    void VulkanUI::render()
+    void VulkanUI::renderUI()
     {
         static bool opt_fullscreen = false;
         static bool opt_padding    = false;
@@ -478,6 +478,22 @@ namespace ArchViz
             ImGui::Text("Hello, world %d", 123);
         }
         ImGui::End();
+    }
+
+    void VulkanUI::showImage(std::shared_ptr<VulkanTexture> image, const std::string& name)
+    {
+        ImGui::Begin(name.c_str());
+        {
+            ImGui::Text("pointer = %p", image->m_descriptor_set);
+            ImGui::Text("size = %d x %d", image->m_width, image->m_height);
+            ImGui::Image((ImTextureID)image->m_descriptor_set, ImVec2(image->m_width, image->m_height));
+        }
+        ImGui::End();
+    }
+
+    void VulkanUI::renderFinish()
+    {
+        ImGuiIO& io = ImGui::GetIO();
 
         ImGui::Render();
 

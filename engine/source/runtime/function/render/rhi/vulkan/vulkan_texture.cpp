@@ -9,7 +9,6 @@
 
 #include "runtime/core/base/macro.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include <filesystem>
@@ -25,10 +24,11 @@ namespace ArchViz
         stbi_uc*     pixels     = stbi_load(image_path.generic_string().c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
         VkDeviceSize image_size = tex_width * tex_height * 4;
 
-        m_width  = tex_width;
-        m_height = tex_height;
-
-        // stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp)
+        m_width      = tex_width;
+        m_height     = tex_height;
+        m_channel    = tex_channels;
+        m_mip_levels = static_cast<uint32_t>(std::floor(std::log2(std::max(m_width, m_height)))) + 1;
+        m_format     = VK_FORMAT_R8G8B8A8_SRGB;
 
         if (!pixels)
         {
@@ -36,37 +36,56 @@ namespace ArchViz
             LOG_FATAL("failed to load texture image!");
         }
 
-        VkBuffer       staging_buffer;
-        VkDeviceMemory staging_buffer_memory;
-        auto           usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        auto           flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        VulkanBufferUtils::createBuffer(m_device, image_size, usage, flag, staging_buffer, staging_buffer_memory);
-
-        void* data;
-        vkMapMemory(m_device->m_device, staging_buffer_memory, 0, image_size, 0, &data);
-        {
-            memcpy(data, pixels, static_cast<size_t>(image_size));
-        }
-        vkUnmapMemory(m_device->m_device, staging_buffer_memory);
+        createTextureImage(pixels, image_size);
 
         stbi_image_free(pixels);
+    }
 
-        m_format          = VK_FORMAT_R8G8B8A8_SRGB;
-        m_tiling          = VK_IMAGE_TILING_OPTIMAL;
-        m_usage           = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-        m_memory_property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+    void VulkanTexture::createTextureImageFromMemory(const uint8_t* image_data, const VkDeviceSize size)
+    {
+        int          tex_width, tex_height, tex_channels;
+        stbi_uc*     pixels     = stbi_load_from_memory(pixels, size, &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
+        VkDeviceSize image_size = tex_width * tex_height * 4;
 
-        VulkanTextureUtils::createImage(m_device, tex_width, tex_height, m_format, m_tiling, m_usage, m_memory_property, m_image, m_device_memory);
+        m_width      = tex_width;
+        m_height     = tex_height;
+        m_channel    = tex_channels;
+        m_mip_levels = static_cast<uint32_t>(std::floor(std::log2(std::max(m_width, m_height)))) + 1;
+        m_format     = VK_FORMAT_R8G8B8A8_SRGB;
 
-        VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        VulkanTextureUtils::copyBufferToImage(m_device, m_command_pool, staging_buffer, m_image, static_cast<uint32_t>(tex_width), static_cast<uint32_t>(tex_height));
-        VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        createTextureImage(pixels, image_size);
 
-        vkDestroyBuffer(m_device->m_device, staging_buffer, nullptr);
-        vkFreeMemory(m_device->m_device, staging_buffer_memory, nullptr);
+        stbi_image_free(pixels);
     }
 
     void VulkanTexture::createTextureImageFromMemory(const uint8_t* pixels, const VkDeviceSize image_size, VkFormat format, uint32_t width, uint32_t height)
+    {
+        m_width      = width;
+        m_height     = height;
+        m_mip_levels = static_cast<uint32_t>(std::floor(std::log2(std::max(m_width, m_height)))) + 1;
+        m_format     = format;
+
+        if (format >= VK_FORMAT_R8G8B8A8_UNORM && format <= VK_FORMAT_B8G8R8A8_SRGB)
+        {
+            m_channel = 4;
+        }
+        else if (format >= VK_FORMAT_R8G8B8_UNORM && format <= VK_FORMAT_B8G8R8_SRGB)
+        {
+            m_channel = 3;
+        }
+        else if (format >= VK_FORMAT_R8G8_UNORM && format <= VK_FORMAT_R8G8_SRGB)
+        {
+            m_channel = 3;
+        }
+        else if (format >= VK_FORMAT_R8_UNORM && format <= VK_FORMAT_R8_SRGB)
+        {
+            m_channel = 3;
+        }
+
+        createTextureImage(pixels, image_size);
+    }
+
+    void VulkanTexture::createTextureImage(const uint8_t* pixels, const size_t image_size)
     {
         VkBuffer       staging_buffer;
         VkDeviceMemory staging_buffer_memory;
@@ -81,25 +100,27 @@ namespace ArchViz
         }
         vkUnmapMemory(m_device->m_device, staging_buffer_memory);
 
-        m_format          = format;
         m_tiling          = VK_IMAGE_TILING_OPTIMAL;
-        m_usage           = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        m_usage           = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         m_memory_property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        m_image_layout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        VulkanTextureUtils::createImage(m_device, width, height, m_format, m_tiling, m_usage, m_memory_property, m_image, m_device_memory);
+        VulkanTextureUtils::createImage(m_device, m_width, m_height, m_mip_levels, m_format, m_tiling, m_usage, m_memory_property, m_image, m_device_memory);
 
-        VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, m_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        VulkanTextureUtils::copyBufferToImage(m_device, m_command_pool, staging_buffer, m_image, width, height);
-        VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, m_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mip_levels);
+        VulkanTextureUtils::copyBufferToImage(m_device, m_command_pool, staging_buffer, m_image, static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
+        //VulkanTextureUtils::transitionImageLayout(m_device, m_command_pool, m_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_image_layout, m_mip_levels);
 
         vkDestroyBuffer(m_device->m_device, staging_buffer, nullptr);
         vkFreeMemory(m_device->m_device, staging_buffer_memory, nullptr);
+
+        VulkanTextureUtils::generateMipmaps(m_device, m_command_pool, m_image, m_format, m_width, m_height, m_mip_levels);
     }
 
     void VulkanTexture::createTextureImageView()
     {
         // create image view
-        m_view = VulkanTextureUtils::createImageView(m_device, m_image, m_format, VK_IMAGE_ASPECT_COLOR_BIT);
+        m_view = VulkanTextureUtils::createImageView(m_device, m_image, m_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
     }
 
     void VulkanTexture::createTextureSampler()
@@ -121,6 +142,8 @@ namespace ArchViz
         sampler_info.compareEnable           = VK_FALSE;
         sampler_info.compareOp               = VK_COMPARE_OP_ALWAYS;
         sampler_info.mipmapMode              = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        sampler_info.minLod                  = -1000;
+        sampler_info.maxLod                  = 1000;
         // sampler_info.anisotropyEnable        = VK_FALSE;
         // sampler_info.maxAnisotropy           = 1.0f;
 
@@ -128,6 +151,40 @@ namespace ArchViz
         {
             LOG_FATAL("failed to create texture sampler!");
         }
+    }
+
+    void VulkanTexture::createDescriptorSet()
+    {
+        if (m_descriptor_pool == VK_NULL_HANDLE || m_descriptor_set_layout == VK_NULL_HANDLE)
+        {
+            return;
+        }
+
+        // Create Descriptor Set
+        VkDescriptorSetAllocateInfo alloc_info = {};
+        alloc_info.sType                       = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.descriptorPool              = m_descriptor_pool;
+        alloc_info.descriptorSetCount          = 1;
+        alloc_info.pSetLayouts                 = &m_descriptor_set_layout;
+        if (vkAllocateDescriptorSets(m_device->m_device, &alloc_info, &m_descriptor_set) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create vulkan texture descriptor set");
+        }
+
+        // update descriptor set
+        VkDescriptorImageInfo desc_image[1] {};
+        desc_image[0].sampler     = m_sampler;
+        desc_image[0].imageView   = m_view;
+        desc_image[0].imageLayout = m_image_layout;
+
+        VkWriteDescriptorSet write_desc[1] {};
+        write_desc[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_desc[0].dstSet          = m_descriptor_set;
+        write_desc[0].descriptorCount = 1;
+        write_desc[0].descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write_desc[0].pImageInfo      = desc_image;
+
+        vkUpdateDescriptorSets(m_device->m_device, 1, write_desc, 0, nullptr);
     }
 
     void VulkanTexture::initizlize(const std::string& image_uri)
@@ -140,6 +197,13 @@ namespace ArchViz
     void VulkanTexture::initialize(const uint8_t* pixels, const VkDeviceSize image_size, VkFormat format, uint32_t width, uint32_t height)
     {
         createTextureImageFromMemory(pixels, image_size, format, width, height);
+        createTextureImageView();
+        createTextureSampler();
+    }
+
+    void VulkanTexture::initialize(const uint8_t* pixels, const VkDeviceSize image_size)
+    {
+        createTextureImageFromMemory(pixels, image_size);
         createTextureImageView();
         createTextureSampler();
     }

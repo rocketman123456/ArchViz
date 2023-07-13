@@ -139,7 +139,7 @@ namespace ArchViz
 
         VkDescriptorPoolCreateInfo pool_info {};
         pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
         pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
         pool_info.pPoolSizes    = pool_sizes.data();
         pool_info.maxSets       = static_cast<uint32_t>(pool_sizes.size() * descriptor_count);
@@ -195,15 +195,16 @@ namespace ArchViz
         VulkanTextureUtils::createImage(m_vulkan_device,
                                         m_vulkan_swap_chain->m_swap_chain_extent.width,
                                         m_vulkan_swap_chain->m_swap_chain_extent.height,
+                                        1,
                                         m_depth_format,
                                         VK_IMAGE_TILING_OPTIMAL,
                                         VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                         m_depth_image,
                                         m_depth_image_memory);
-        m_depth_image_view = VulkanTextureUtils::createImageView(m_vulkan_device, m_depth_image, m_depth_format, VK_IMAGE_ASPECT_DEPTH_BIT);
+        m_depth_image_view = VulkanTextureUtils::createImageView(m_vulkan_device, m_depth_image, m_depth_format, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
 
-        VulkanTextureUtils::transitionImageLayout(m_vulkan_device, m_command_pool, m_depth_image, m_depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+        VulkanTextureUtils::transitionImageLayout(m_vulkan_device, m_command_pool, m_depth_image, m_depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
     }
 
     void VulkanRHI::createFramebuffers()
@@ -278,7 +279,6 @@ namespace ArchViz
         m_vulkan_texture->m_command_pool   = m_command_pool;
         m_vulkan_texture->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         m_vulkan_texture->initizlize("asset-test/data/model/viking_room/viking_room.png");
-        // m_vulkan_texture->initizlize("asset-test/data/texture/object/texture.jpg");
     }
 
     void VulkanRHI::loadModel()
@@ -515,6 +515,22 @@ namespace ArchViz
         m_vulkan_ui->m_ui_pass         = m_vulkan_render_pass->m_render_pass;
 
         m_vulkan_ui->initialize();
+
+        m_vulkan_texture_ui                   = std::make_shared<VulkanTexture>();
+        m_vulkan_texture_ui->m_asset_manager  = m_asset_manager;
+        m_vulkan_texture_ui->m_config_manager = m_config_manager;
+        m_vulkan_texture_ui->m_device         = m_vulkan_device;
+        m_vulkan_texture_ui->m_command_pool   = m_command_pool;
+        m_vulkan_texture_ui->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
+
+        m_vulkan_texture->m_descriptor_set_layout = m_vulkan_ui->m_descriptor_set_layout;
+        m_vulkan_texture->m_descriptor_pool       = m_vulkan_ui->m_descriptor_pool;
+        m_vulkan_texture->createDescriptorSet();
+
+        m_vulkan_texture_ui->m_descriptor_set_layout = m_vulkan_ui->m_descriptor_set_layout;
+        m_vulkan_texture_ui->m_descriptor_pool       = m_vulkan_ui->m_descriptor_pool;
+        m_vulkan_texture_ui->createDescriptorSet();
     }
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
@@ -712,7 +728,10 @@ namespace ArchViz
         updateUniformBuffer(m_current_frame);
 
         m_vulkan_ui->prepareContext(m_vulkan_swap_chain->m_swap_chain_extent.width, m_vulkan_swap_chain->m_swap_chain_extent.height);
-        m_vulkan_ui->render();
+        m_vulkan_ui->renderUI();
+        m_vulkan_ui->showImage(m_vulkan_texture, "simple texture");
+        m_vulkan_ui->showImage(m_vulkan_texture_ui, "simple texture 2");
+        m_vulkan_ui->renderFinish();
     }
 
     void VulkanRHI::render() { drawFrame(); }
@@ -735,6 +754,9 @@ namespace ArchViz
         }
 
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
+
+        m_vulkan_texture_ui->clear();
+        m_vulkan_texture_ui.reset();
 
         m_vulkan_texture->clear();
         m_vulkan_texture.reset();
