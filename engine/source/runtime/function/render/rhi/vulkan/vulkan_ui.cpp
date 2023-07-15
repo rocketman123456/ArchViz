@@ -70,7 +70,7 @@ namespace ArchViz
         // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
         auto font_path = m_config_manager->getRootFolder() / "asset-test/data/font/MiSans-Normal.ttf";
         // io.Fonts->AddFontDefault();
-        ImFont* font = io.Fonts->AddFontFromFileTTF(font_path.generic_string().c_str(), 16.0f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+        ImFont* font = io.Fonts->AddFontFromFileTTF(font_path.generic_string().c_str(), 40.0f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
         ASSERT(font);
 
         unsigned char* font_data;
@@ -350,7 +350,6 @@ namespace ArchViz
         ImGuiIO& io = ImGui::GetIO();
 
 #ifdef __MACH__
-
         int   w, h;
         int   fw, fh;
         float scale_x, scale_y;

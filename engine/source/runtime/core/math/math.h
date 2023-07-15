@@ -1,5 +1,5 @@
 #pragma once
-
+#include "runtime/core/math/math_type.h"
 #include "runtime/core/math/random.h"
 
 #include <algorithm>
@@ -260,6 +260,10 @@ namespace ArchViz
         static Matrix4x4 makePerspectiveMatrix(Radian fovy, float aspect, float znear, float zfar);
         static Matrix4x4 makeOrthographicProjectionMatrix(float left, float right, float bottom, float top, float znear, float zfar);
         static Matrix4x4 makeOrthographicProjectionMatrix01(float left, float right, float bottom, float top, float znear, float zfar);
+
+        static FMatrix4 lookAt(const FVector3& eye, const FVector3& center, const FVector3& up);
+        static FMatrix4 perspective(float fov, float ratio, float znear, float zfar);
+        static FMatrix4 orthogonal(float left, float right, float bottom, float top, float znear, float zfar);
     };
 
     // these functions could not be defined within the class definition of class

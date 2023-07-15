@@ -1,7 +1,7 @@
 #include "runtime/function/render/render_camera.h"
 
 #include "runtime/core/base/macro.h"
-#include "runtime/core/math/graphics_utils.h"
+#include "runtime/core/math/math.h"
 
 #include <cmath>
 
@@ -25,9 +25,15 @@ namespace ArchViz
         m_zfar   = zfar;
     }
 
+    void RenderCamera::setViewPort(float width, float height)
+    {
+        m_width  = width;
+        m_height = height;
+    }
+
     void RenderCamera::move(CameraMovement direction, float dt)
     {
-        float velocity = m_speed * dt;
+        float velocity = m_move_speed * dt;
         if (direction == CameraMovement::Forward)
             m_position += m_front * velocity;
         if (direction == CameraMovement::Backward)
@@ -40,8 +46,8 @@ namespace ArchViz
 
     void RenderCamera::rotate(float dx, float dy)
     {
-        float xoffset = dx * m_sensitivity;
-        float yoffset = dy * m_sensitivity;
+        float xoffset = dx * m_mouse_speed;
+        float yoffset = dy * m_mouse_speed;
 
         m_yaw += xoffset;
         m_pitch += yoffset;
@@ -66,8 +72,8 @@ namespace ArchViz
         // calculate the new Front vector
         FVector3 front;
         front[0] = cos(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
-        front[1] = sin(Degree(m_pitch).valueRadians());
-        front[2] = sin(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
+        front[1] = sin(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
+        front[2] = sin(Degree(m_pitch).valueRadians());
 
         m_front = front.normalized();
         // also re-calculate the Right and Up vector
@@ -93,10 +99,10 @@ namespace ArchViz
         updateView();
     }
 
-    void RenderCamera::updatePerspective() { m_projction = GraphicsUtils::perspective(m_fov, m_ratio, m_znear, m_zfar); }
+    void RenderCamera::updatePerspective() { m_projction = Math::perspective(m_fov, m_ratio, m_znear, m_zfar); }
 
-    void RenderCamera::updateOrthogonal() { m_projction = GraphicsUtils::orthogonal(m_left, m_right_, m_bottom, m_top, m_znear, m_zfar); }
+    void RenderCamera::updateOrthogonal() { m_projction = Math::orthogonal(m_left, m_right_, m_bottom, m_top, m_znear, m_zfar); }
 
-    void RenderCamera::updateView() { m_view = GraphicsUtils::lookAt(m_position, m_position + m_front, m_up); }
+    void RenderCamera::updateView() { m_view = Math::lookAt(m_position, m_position + m_front, m_up); }
 
 } // namespace ArchViz

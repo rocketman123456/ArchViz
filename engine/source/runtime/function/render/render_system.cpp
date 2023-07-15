@@ -7,6 +7,8 @@
 
 #include "runtime/function/window/window_system.h"
 
+#include "runtime/core/math/math.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -47,8 +49,6 @@ namespace ArchViz
         {
             float xoffset = x - last_x;
             float yoffset = last_y - y;
-
-            LOG_DEBUG("rot delta : {}, {}", xoffset, yoffset);
             m_render_camera->rotate(xoffset, yoffset);
         }
 
@@ -71,7 +71,8 @@ namespace ArchViz
         m_render_camera->m_right       = FVector3({1, 0, 0}).normalized();
         m_render_camera->m_up          = {0.0f, 0.0f, 1.0f};
         m_render_camera->m_world_up    = {0.0f, 0.0f, 1.0f};
-        m_render_camera->m_sensitivity = 0.1;
+        m_render_camera->m_move_speed  = 1.0;
+        m_render_camera->m_mouse_speed = 0.1;
 
         m_rhi = std::make_shared<VulkanRHI>();
         m_rhi->setConfigManager(m_config_manager);
@@ -79,7 +80,6 @@ namespace ArchViz
         m_rhi->initialize(rhi_init_info);
 
         rhi_init_info.window_system->registerOnCursorPosFunc(std::bind(&RenderSystem::onMouseCallback, this, std::placeholders::_1, std::placeholders::_2));
-        // rhi_init_info.window_system->registerOnKeyFunc(std::bind(&RenderSystem::onKeyCallback, this));
     }
 
     void RenderSystem::setFPS(uint32_t fps) { m_rhi->setFPS(fps); }
@@ -118,7 +118,10 @@ namespace ArchViz
 
         int width, height;
         glfwGetWindowSize(m_window_system->getWindow(), &width, &height);
+        m_render_camera->m_width  = width;
+        m_render_camera->m_height = height;
         m_render_camera->setPerspective(45.0f, (float)width / (float)height, 0.1, 100.0f);
+        m_render_camera->setViewPort((float)width, (float)height);
 
         m_render_camera->update();
 
@@ -128,6 +131,7 @@ namespace ArchViz
         m_rhi->m_ubo.view  = m_render_camera->m_view;
         m_rhi->m_ubo.proj  = m_render_camera->m_projction;
         m_rhi->m_ubo.model = model;
+        // m_rhi->m_ubo.proj(1, 1) = m_rhi->m_ubo.proj(1, 1) * -1.0f; // vulkan's screen coordinate y axis is inerted
     }
 
     void RenderSystem::clear()

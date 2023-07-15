@@ -44,7 +44,6 @@ namespace ArchViz
         void processSwapData(float delta_time);
 
         void onMouseCallback(double x, double y);
-        //void onKeyCallback(int, int, int, int);
 
     private:
         // RENDER_PIPELINE_TYPE m_render_pipeline_type {RENDER_PIPELINE_TYPE::DEFERRED_PIPELINE};

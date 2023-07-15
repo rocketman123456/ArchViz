@@ -75,7 +75,7 @@ namespace ArchViz
             if (shift > std::numeric_limits<float>::epsilon())
             {
                 const FVector3 axis          = m_point_prev.cross(m_point_cur);
-                rot_matrix.block<3, 3>(0, 0) = Eigen::AngleAxisf(shift * speed, axis);
+                rot_matrix.block<3, 3>(0, 0) = Eigen::AngleAxisf(shift * speed, axis).matrix();
             }
 
             m_rotation_delta = rot_matrix;
@@ -107,7 +107,7 @@ namespace ArchViz
 
             proj[2] = sqrtf(1.001f - Length * Length);
 
-            return proj.normalize();
+            return proj.normalized();
         }
 
     private:
