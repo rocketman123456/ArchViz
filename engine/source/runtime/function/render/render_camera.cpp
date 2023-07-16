@@ -17,12 +17,12 @@ namespace ArchViz
 
     void RenderCamera::setOrthogonal(float left, float right, float bottom, float top, float znear, float zfar)
     {
-        m_left   = left;
-        m_right_ = right;
-        m_bottom = bottom;
-        m_top    = top;
-        m_znear  = znear;
-        m_zfar   = zfar;
+        m_left_edge   = left;
+        m_right_edge  = right;
+        m_bottom_edge = bottom;
+        m_top_edge    = top;
+        m_znear       = znear;
+        m_zfar        = zfar;
     }
 
     void RenderCamera::setViewPort(float width, float height)
@@ -46,22 +46,7 @@ namespace ArchViz
 
     void RenderCamera::rotate(float dx, float dy)
     {
-        float xoffset = dx * m_mouse_speed;
-        float yoffset = dy * m_mouse_speed;
-
-        m_yaw += xoffset;
-        m_pitch += yoffset;
-
-        bool constrain_pitch = true;
-
-        // make sure that when pitch is out of bounds, screen doesn't get flipped
-        if (constrain_pitch)
-        {
-            if (m_pitch > 89.0f)
-                m_pitch = 89.0f;
-            if (m_pitch < -89.0f)
-                m_pitch = -89.0f;
-        }
+        m_rotation = m_rotation + FVector3({dy * m_rotate_speed, -dx * m_rotate_speed, 0.0f});
 
         // update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
@@ -70,39 +55,57 @@ namespace ArchViz
     void RenderCamera::updateCameraVectors()
     {
         // calculate the new Front vector
-        FVector3 front;
-        front[0] = cos(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
-        front[1] = sin(Degree(m_yaw).valueRadians()) * cos(Degree(m_pitch).valueRadians());
-        front[2] = sin(Degree(m_pitch).valueRadians());
+        m_front[0] = -cos(Math::degreesToRadians(m_rotation[0]) * (m_filp_y ? -1.0f : 1.0f)) * sin(Math::degreesToRadians(m_rotation[1]));
+        m_front[1] = sin(Math::degreesToRadians(m_rotation[0]));
+        m_front[2] = cos(Math::degreesToRadians(m_rotation[0])) * cos(Math::degreesToRadians(m_rotation[1]));
+        m_front.normalize();
 
-        m_front = front.normalized();
-        // also re-calculate the Right and Up vector
-        m_right = m_front.cross(m_world_up).normalized();
-        m_up    = m_right.cross(m_front).normalized();
+        //// also re-calculate the Right and Up vector
+        m_right = m_world_up.cross(m_front).normalized();
+        m_up    = m_front.cross(m_right).normalized();
     }
 
     void RenderCamera::update()
     {
         std::lock_guard<std::mutex> lock_guard(m_view_matrix_mutex);
 
-        switch (m_type)
-        {
-            case RenderCameraType::Perspective:
-                updatePerspective();
-                break;
-            case RenderCameraType::Orthogonal:
-                updateOrthogonal();
-                break;
-            default:
-                break;
-        }
         updateView();
+        updatePerspective();
     }
 
     void RenderCamera::updatePerspective() { m_projction = Math::perspective(m_fov, m_ratio, m_znear, m_zfar); }
 
-    void RenderCamera::updateOrthogonal() { m_projction = Math::orthogonal(m_left, m_right_, m_bottom, m_top, m_znear, m_zfar); }
+    void RenderCamera::updateOrthogonal() { m_projction = Math::orthogonal(m_left_edge, m_right_edge, m_bottom_edge, m_top_edge, m_znear, m_zfar); }
 
-    void RenderCamera::updateView() { m_view = Math::lookAt(m_position, m_position + m_front, m_up); }
+    void RenderCamera::updateView()
+    {
+        // m_view = Math::lookAt(m_position, m_position + m_front, m_up);
+        FMatrix4 rot_mat   = FMatrix4::Identity();
+        FMatrix4 trans_mat = FMatrix4::Identity();
+
+        float angle_x = Math::degreesToRadians(m_rotation[0]);
+        float angle_y = Math::degreesToRadians(m_rotation[1]);
+        float angle_z = Math::degreesToRadians(m_rotation[2]);
+
+        rot_mat.block<3, 3>(0, 0) = rot_mat.block<3, 3>(0, 0) * Eigen::AngleAxisf(angle_x, FVector3({1.0f, 0.0f, 0.0f})).toRotationMatrix();
+        rot_mat.block<3, 3>(0, 0) = rot_mat.block<3, 3>(0, 0) * Eigen::AngleAxisf(angle_y, FVector3({0.0f, 1.0f, 0.0f})).toRotationMatrix();
+        rot_mat.block<3, 3>(0, 0) = rot_mat.block<3, 3>(0, 0) * Eigen::AngleAxisf(angle_z, FVector3({0.0f, 0.0f, 1.0f})).toRotationMatrix();
+
+        FVector3 translation = m_position;
+        if (m_filp_y)
+        {
+            translation[2] *= -1.0f;
+        }
+        trans_mat.block<3, 1>(0, 3) = translation;
+
+        if (m_type == RenderCameraType::FirstPerson)
+        {
+            m_view = rot_mat * trans_mat;
+        }
+        else
+        {
+            m_view = trans_mat * rot_mat;
+        }
+    }
 
 } // namespace ArchViz

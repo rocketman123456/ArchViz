@@ -64,15 +64,15 @@ namespace ArchViz
 
         m_window_system = init_info.window_system;
 
-        m_render_camera                = std::make_shared<RenderCamera>();
-        m_render_camera->m_type        = RenderCameraType::Perspective;
-        m_render_camera->m_position    = {0, 2, 0};
-        m_render_camera->m_front       = FVector3({0, -1, 0}).normalized();
-        m_render_camera->m_right       = FVector3({1, 0, 0}).normalized();
-        m_render_camera->m_up          = {0.0f, 0.0f, 1.0f};
-        m_render_camera->m_world_up    = {0.0f, 0.0f, 1.0f};
-        m_render_camera->m_move_speed  = 1.0;
-        m_render_camera->m_mouse_speed = 0.1;
+        m_render_camera                 = std::make_shared<RenderCamera>();
+        m_render_camera->m_type         = RenderCameraType::LookAt;
+        m_render_camera->m_position     = {0, 0, 0};
+        m_render_camera->m_front        = {0.0f, 0.0f, -1.0f};
+        m_render_camera->m_up           = {0.0f, 1.0f, 0.0f};
+        m_render_camera->m_world_up     = {0.0f, 1.0f, 0.0f};
+        m_render_camera->m_right        = m_render_camera->m_front.cross(m_render_camera->m_world_up);
+        m_render_camera->m_move_speed   = 1.0;
+        m_render_camera->m_rotate_speed = 0.1;
 
         m_rhi = std::make_shared<VulkanRHI>();
         m_rhi->setConfigManager(m_config_manager);

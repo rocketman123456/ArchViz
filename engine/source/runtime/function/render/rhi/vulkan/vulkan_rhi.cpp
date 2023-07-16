@@ -604,6 +604,7 @@ namespace ArchViz
             {
                 vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline);
 
+                // https://www.saschawillems.de/blog/2019/03/29/flipping-the-vulkan-viewport/
                 VkViewport viewport {};
                 viewport.x        = 0.0f;
                 viewport.y        = (float)m_vulkan_swap_chain->m_swap_chain_extent.height;
@@ -644,17 +645,7 @@ namespace ArchViz
 
     void VulkanRHI::updateUniformBuffer(uint32_t current_image)
     {
-        // static auto startTime = std::chrono::high_resolution_clock::now();
-
-        // auto  currentTime = std::chrono::high_resolution_clock::now();
-        // float time        = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-        // m_ubo.model                   = FMatrix4::Identity();
-        // m_ubo.model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
-        // m_ubo.view       = GraphicsUtils::lookAt({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
-        // m_ubo.proj       = GraphicsUtils::perspective(45.0f, (float)m_vulkan_swap_chain->m_swap_chain_extent.width / (float)m_vulkan_swap_chain->m_swap_chain_extent.height, 0.1f, 10.0f);
-        // m_ubo.proj(1, 1) = m_ubo.proj(1, 1) * -1;
-
+        // update required data
         memcpy(m_uniform_buffers_mapped[current_image], &m_ubo, sizeof(m_ubo));
     }
 

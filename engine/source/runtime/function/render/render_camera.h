@@ -10,6 +10,8 @@ namespace ArchViz
     {
         Perspective,
         Orthogonal,
+        FirstPerson,
+        LookAt,
     };
 
     enum class CameraMovement : uint32_t
@@ -41,25 +43,30 @@ namespace ArchViz
         void updateCameraVectors();
 
     public:
-        RenderCameraType m_type {RenderCameraType::Perspective};
+        RenderCameraType m_type {RenderCameraType::FirstPerson};
+
+        bool m_filp_y {false};
 
         FVector3 m_position {FVector3::Zero()};
+        // FVector3 m_view_position {FVector3::Zero()};
+
         FVector3 m_front {FVector3::Zero()};
         FVector3 m_up {FVector3::Zero()};
         FVector3 m_right {FVector3::Zero()};
         FVector3 m_world_up {FVector3::Zero()};
 
         float m_move_speed {1.};
-        float m_mouse_speed {0.1};
+        float m_rotate_speed {0.1};
 
         float m_zoom;
         float m_width;
         float m_height;
 
-        float m_yaw;
-        float m_pitch;
+        // float m_yaw;
+        // float m_pitch;
 
-        FQuaternion m_rotation {FQuaternion::Identity()};
+        // FQuaternion m_rotation {FQuaternion::Identity()};
+        FVector3 m_rotation {FVector3::Zero()};
 
         FMatrix4 m_view {FMatrix4::Identity()};
         FMatrix4 m_projction {FMatrix4::Identity()};
@@ -72,10 +79,10 @@ namespace ArchViz
         float m_znear;
         float m_zfar;
 
-        float m_left;
-        float m_right_;
-        float m_bottom;
-        float m_top;
+        float m_left_edge;
+        float m_right_edge;
+        float m_bottom_edge;
+        float m_top_edge;
 
     protected:
         std::mutex m_view_matrix_mutex;
