@@ -92,7 +92,8 @@ namespace ArchViz
         void createImGui();
 
     private:
-        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+        void recordComputeCommandBuffer(VkCommandBuffer commandBuffer);
+        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image_index);
         void updateUniformBuffer(uint32_t current_image);
         void drawFrame();
 

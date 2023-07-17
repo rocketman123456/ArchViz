@@ -924,6 +924,28 @@ namespace ArchViz
     // ---------------------------------------------------------------------------
     // ---------------------------------------------------------------------------
 
+    void VulkanRHI::recordComputeCommandBuffer(VkCommandBuffer commandBuffer)
+    {
+        VkCommandBufferBeginInfo beginInfo {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to begin recording compute command buffer!");
+        }
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline);
+
+        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline_layout, 0, 1, &m_compute_descriptor_sets[m_current_frame], 0, nullptr);
+
+        vkCmdDispatch(commandBuffer, k_particle_count / 256, 1, 1);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to record compute command buffer!");
+        }
+    }
+
     void VulkanRHI::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index)
     {
         VkCommandBufferBeginInfo begin_info {};
@@ -999,8 +1021,38 @@ namespace ArchViz
         memcpy(m_uniform_buffers_mapped[current_image], &m_ubo, sizeof(m_ubo));
     }
 
+    void VulkanRHI::prepareContext()
+    {
+        // wait compute fence (first render pass)
+        // Compute submission
+        vkWaitForFences(m_vulkan_device->m_device, 1, &m_compute_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
+    }
+
     void VulkanRHI::drawFrame()
     {
+        VkSubmitInfo submitInfo {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        updateUniformBuffer(m_current_frame);
+
+        vkResetFences(m_vulkan_device->m_device, 1, &m_compute_in_flight_fences[m_current_frame]);
+
+        vkResetCommandBuffer(m_compute_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
+        recordComputeCommandBuffer(m_compute_command_buffers[m_current_frame]);
+
+        submitInfo.commandBufferCount   = 1;
+        submitInfo.pCommandBuffers      = &m_compute_command_buffers[m_current_frame];
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores    = &m_compute_finished_semaphores[m_current_frame];
+
+        if (vkQueueSubmit(m_vulkan_device->m_compute_queue, 1, &submitInfo, m_compute_in_flight_fences[m_current_frame]) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to submit compute command buffer!");
+        };
+
+        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
+
         // TODO : Although many drivers and platforms trigger VK_ERROR_OUT_OF_DATE_KHR automatically after a window resize, it is not guaranteed to happen.
         // That's why we'll add some extra code to also handle resizes explicitly.
 
@@ -1023,13 +1075,13 @@ namespace ArchViz
         vkResetCommandBuffer(m_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(m_command_buffers[m_current_frame], image_index);
 
-        VkSemaphore          wait_semaphores[]   = {m_image_available_semaphores[m_current_frame]};
-        VkPipelineStageFlags wait_stages[]       = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        VkSemaphore          wait_semaphores[]   = {m_compute_finished_semaphores[m_current_frame], m_image_available_semaphores[m_current_frame]};
+        VkPipelineStageFlags wait_stages[]       = {VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         VkSemaphore          signal_semaphores[] = {m_render_finished_semaphores[m_current_frame]};
 
         VkSubmitInfo submit_info {};
         submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.waitSemaphoreCount   = 1;
+        submit_info.waitSemaphoreCount   = 2;
         submit_info.pWaitSemaphores      = wait_semaphores;
         submit_info.pWaitDstStageMask    = wait_stages;
         submit_info.commandBufferCount   = 1;
@@ -1062,14 +1114,6 @@ namespace ArchViz
         }
 
         m_current_frame = (m_current_frame + 1) % k_max_frames_in_flight;
-    }
-
-    void VulkanRHI::prepareContext()
-    {
-        vkWaitForFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
-        vkResetFences(m_vulkan_device->m_device, 1, &m_in_flight_fences[m_current_frame]);
-
-        updateUniformBuffer(m_current_frame);
     }
 
     void VulkanRHI::render()
