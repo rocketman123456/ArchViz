@@ -223,38 +223,6 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createComputeDescriptorSetLayout()
-    {
-        std::array<VkDescriptorSetLayoutBinding, 3> layoutBindings {};
-        layoutBindings[0].binding            = 0;
-        layoutBindings[0].descriptorCount    = 1;
-        layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layoutBindings[0].pImmutableSamplers = nullptr;
-        layoutBindings[0].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
-
-        layoutBindings[1].binding            = 1;
-        layoutBindings[1].descriptorCount    = 1;
-        layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        layoutBindings[1].pImmutableSamplers = nullptr;
-        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
-
-        layoutBindings[2].binding            = 2;
-        layoutBindings[2].descriptorCount    = 1;
-        layoutBindings[2].descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        layoutBindings[2].pImmutableSamplers = nullptr;
-        layoutBindings[2].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
-
-        VkDescriptorSetLayoutCreateInfo layoutInfo {};
-        layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = 3;
-        layoutInfo.pBindings    = layoutBindings.data();
-
-        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layoutInfo, nullptr, &m_compute_descriptor_set_layout) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create compute descriptor set layout!");
-        }
-    }
-
     void VulkanRHI::createBindlessDescriptorSetLayout()
     {
         if (!m_bindless_supported)
@@ -334,47 +302,6 @@ namespace ArchViz
         m_vulkan_pipeline->m_descriptor_set_layout = m_descriptor_set_layout;
 
         m_vulkan_pipeline->initialize();
-    }
-
-    void VulkanRHI::createComputePipeline()
-    {
-        ShaderModuleConfig config;
-        config.m_comp_shader = "shader/glsl/shader_compute.comp";
-
-        std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
-
-        shader->m_device         = m_vulkan_device;
-        shader->m_config_manager = m_config_manager;
-        shader->m_asset_manager  = m_asset_manager;
-        shader->initialize();
-
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
-        pipelineLayoutInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts    = &m_compute_descriptor_set_layout;
-
-        if (vkCreatePipelineLayout(m_vulkan_device->m_device, &pipelineLayoutInfo, nullptr, &m_compute_pipeline_layout) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create compute pipeline layout!");
-        }
-
-        VkPipelineShaderStageCreateInfo compute_shader_stage_info {};
-        compute_shader_stage_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        compute_shader_stage_info.stage  = VK_SHADER_STAGE_COMPUTE_BIT;
-        compute_shader_stage_info.module = shader->m_comp_shader;
-        compute_shader_stage_info.pName  = "main";
-
-        VkComputePipelineCreateInfo pipelineInfo {};
-        pipelineInfo.sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-        pipelineInfo.layout = m_compute_pipeline_layout;
-        pipelineInfo.stage  = compute_shader_stage_info;
-
-        if (vkCreateComputePipelines(m_vulkan_device->m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_compute_pipeline) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create compute pipeline!");
-        }
-
-        shader->clear();
     }
 
     void VulkanRHI::createCommandPool()
@@ -641,6 +568,79 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createComputeDescriptorSetLayout()
+    {
+        std::array<VkDescriptorSetLayoutBinding, 3> layoutBindings {};
+        layoutBindings[0].binding            = 0;
+        layoutBindings[0].descriptorCount    = 1;
+        layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBindings[0].pImmutableSamplers = nullptr;
+        layoutBindings[0].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        layoutBindings[1].binding            = 1;
+        layoutBindings[1].descriptorCount    = 1;
+        layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[1].pImmutableSamplers = nullptr;
+        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        layoutBindings[2].binding            = 2;
+        layoutBindings[2].descriptorCount    = 1;
+        layoutBindings[2].descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[2].pImmutableSamplers = nullptr;
+        layoutBindings[2].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        VkDescriptorSetLayoutCreateInfo layoutInfo {};
+        layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = 3;
+        layoutInfo.pBindings    = layoutBindings.data();
+
+        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layoutInfo, nullptr, &m_compute_descriptor_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create compute descriptor set layout!");
+        }
+    }
+
+    void VulkanRHI::createComputePipeline()
+    {
+        ShaderModuleConfig config;
+        config.m_comp_shader = "shader/glsl/shader_compute.comp";
+
+        std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
+
+        shader->m_device         = m_vulkan_device;
+        shader->m_config_manager = m_config_manager;
+        shader->m_asset_manager  = m_asset_manager;
+        shader->initialize();
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
+        pipelineLayoutInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts    = &m_compute_descriptor_set_layout;
+
+        if (vkCreatePipelineLayout(m_vulkan_device->m_device, &pipelineLayoutInfo, nullptr, &m_compute_pipeline_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create compute pipeline layout!");
+        }
+
+        VkPipelineShaderStageCreateInfo compute_shader_stage_info {};
+        compute_shader_stage_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        compute_shader_stage_info.stage  = VK_SHADER_STAGE_COMPUTE_BIT;
+        compute_shader_stage_info.module = shader->m_comp_shader;
+        compute_shader_stage_info.pName  = "main";
+
+        VkComputePipelineCreateInfo pipelineInfo {};
+        pipelineInfo.sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        pipelineInfo.layout = m_compute_pipeline_layout;
+        pipelineInfo.stage  = compute_shader_stage_info;
+
+        if (vkCreateComputePipelines(m_vulkan_device->m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_compute_pipeline) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create compute pipeline!");
+        }
+
+        shader->clear();
+    }
+
     void VulkanRHI::createShaderStorageBuffers()
     {
         // Initialize particles
@@ -883,12 +883,11 @@ namespace ArchViz
         createBindlessDescriptorPool();
 
         createDescriptorSetLayout();
-        createComputeDescriptorSetLayout();
+
         createBindlessDescriptorSetLayout();
 
         createRenderPass();
         createGraphicsPipeline();
-        createComputePipeline();
 
         createCommandPool();
 
@@ -906,6 +905,8 @@ namespace ArchViz
         createUniformBuffers();
         createDescriptorSets();
 
+        createComputeDescriptorSetLayout();
+        createComputePipeline();
         createShaderStorageBuffers();
         createComputeDescriptorSets();
         createComputeCommandBuffers();
