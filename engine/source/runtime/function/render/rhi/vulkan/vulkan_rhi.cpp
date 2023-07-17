@@ -109,43 +109,144 @@ namespace ArchViz
         // Since DescriptorSet should be treated as asset in Vulkan, DescriptorPool
         // should be big enough, and thus we can sub-allocate DescriptorSet from
         // DescriptorPool merely as we sub-allocate Buffer/Image from DeviceMemory.
-
-        const uint32_t descriptor_count = 1000;
-
         std::array<VkDescriptorPoolSize, 11> pool_sizes {};
         pool_sizes[0].type             = VK_DESCRIPTOR_TYPE_SAMPLER;
-        pool_sizes[0].descriptorCount  = descriptor_count;
+        pool_sizes[0].descriptorCount  = k_global_pool_elements;
         pool_sizes[1].type             = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        pool_sizes[1].descriptorCount  = descriptor_count;
+        pool_sizes[1].descriptorCount  = k_global_pool_elements;
         pool_sizes[2].type             = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        pool_sizes[2].descriptorCount  = descriptor_count;
+        pool_sizes[2].descriptorCount  = k_global_pool_elements;
         pool_sizes[3].type             = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        pool_sizes[3].descriptorCount  = descriptor_count;
+        pool_sizes[3].descriptorCount  = k_global_pool_elements;
         pool_sizes[4].type             = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        pool_sizes[4].descriptorCount  = descriptor_count;
+        pool_sizes[4].descriptorCount  = k_global_pool_elements;
         pool_sizes[5].type             = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-        pool_sizes[5].descriptorCount  = descriptor_count;
+        pool_sizes[5].descriptorCount  = k_global_pool_elements;
         pool_sizes[6].type             = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        pool_sizes[6].descriptorCount  = descriptor_count;
+        pool_sizes[6].descriptorCount  = k_global_pool_elements;
         pool_sizes[7].type             = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        pool_sizes[7].descriptorCount  = descriptor_count;
+        pool_sizes[7].descriptorCount  = k_global_pool_elements;
         pool_sizes[8].type             = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        pool_sizes[8].descriptorCount  = descriptor_count;
+        pool_sizes[8].descriptorCount  = k_global_pool_elements;
         pool_sizes[9].type             = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
-        pool_sizes[9].descriptorCount  = descriptor_count;
+        pool_sizes[9].descriptorCount  = k_global_pool_elements;
         pool_sizes[10].type            = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-        pool_sizes[10].descriptorCount = descriptor_count;
+        pool_sizes[10].descriptorCount = k_global_pool_elements;
 
         VkDescriptorPoolCreateInfo pool_info {};
         pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
         pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
         pool_info.pPoolSizes    = pool_sizes.data();
-        pool_info.maxSets       = static_cast<uint32_t>(pool_sizes.size() * descriptor_count);
+        pool_info.maxSets       = static_cast<uint32_t>(pool_sizes.size() * k_global_pool_elements);
 
         if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
         {
-            LOG_FATAL("failed to create ui discriptor pool");
+            LOG_FATAL("failed to create global discriptor pool");
+        }
+    }
+
+    void VulkanRHI::createBindlessDescriptorPool()
+    {
+        if (!m_bindless_supported)
+            return;
+
+        // Since DescriptorSet should be treated as asset in Vulkan, DescriptorPool
+        // should be big enough, and thus we can sub-allocate DescriptorSet from
+        // DescriptorPool merely as we sub-allocate Buffer/Image from DeviceMemory.
+        std::array<VkDescriptorPoolSize, 2> pool_sizes_bindless {};
+        pool_sizes_bindless[0].type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        pool_sizes_bindless[0].descriptorCount = k_max_bindless_resources;
+        pool_sizes_bindless[1].type            = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        pool_sizes_bindless[1].descriptorCount = k_max_bindless_resources;
+
+        VkDescriptorPoolCreateInfo bindless_pool_info {};
+        bindless_pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        bindless_pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+        bindless_pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes_bindless.size());
+        bindless_pool_info.pPoolSizes    = pool_sizes_bindless.data();
+        bindless_pool_info.maxSets       = static_cast<uint32_t>(pool_sizes_bindless.size() * k_max_bindless_resources);
+
+        m_bindless_pool_size = pool_sizes_bindless.size();
+
+        if (vkCreateDescriptorPool(m_vulkan_device->m_device, &bindless_pool_info, nullptr, &m_bindless_pool) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create bindless discriptor pool");
+        }
+        {
+            m_bindless_pool_size = pool_sizes_bindless.size();
+        }
+    }
+
+    void VulkanRHI::createDescriptorSetLayout()
+    {
+        VkDescriptorSetLayoutBinding ubo_layout_binding {};
+        ubo_layout_binding.binding            = 0;
+        ubo_layout_binding.descriptorCount    = 1;
+        ubo_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        ubo_layout_binding.pImmutableSamplers = nullptr;
+        ubo_layout_binding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+
+        VkDescriptorSetLayoutBinding sampler_layout_binding {};
+        sampler_layout_binding.binding            = 1;
+        sampler_layout_binding.descriptorCount    = 1;
+        sampler_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 2> bindings = {ubo_layout_binding, sampler_layout_binding};
+
+        VkDescriptorSetLayoutCreateInfo layout_info {};
+        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings    = bindings.data();
+
+        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create descriptor set layout!");
+        }
+    }
+
+    void VulkanRHI::createBindlessDescriptorSetLayout()
+    {
+        if (!m_bindless_supported)
+            return;
+
+        VkDescriptorSetLayoutBinding vk_binding[4];
+
+        VkDescriptorSetLayoutBinding& image_sampler_binding {vk_binding[0]};
+        image_sampler_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        image_sampler_binding.descriptorCount    = k_max_bindless_resources;
+        image_sampler_binding.binding            = k_bindless_texture_binding;
+        image_sampler_binding.stageFlags         = VK_SHADER_STAGE_ALL;
+        image_sampler_binding.pImmutableSamplers = nullptr;
+
+        VkDescriptorSetLayoutBinding& storage_image_binding {vk_binding[1]};
+        storage_image_binding.descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        storage_image_binding.descriptorCount    = k_max_bindless_resources;
+        storage_image_binding.binding            = k_bindless_texture_binding + 1;
+        storage_image_binding.stageFlags         = VK_SHADER_STAGE_ALL;
+        storage_image_binding.pImmutableSamplers = nullptr;
+
+        VkDescriptorBindingFlags bindless_flags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT;
+        VkDescriptorBindingFlags binding_flags[4];
+        binding_flags[0] = bindless_flags;
+        binding_flags[1] = bindless_flags;
+
+        VkDescriptorSetLayoutBindingFlagsCreateInfoEXT extended_info {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT, nullptr};
+        extended_info.bindingCount  = m_bindless_pool_size;
+        extended_info.pBindingFlags = binding_flags;
+
+        VkDescriptorSetLayoutCreateInfo layout_info {};
+        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = m_bindless_pool_size;
+        layout_info.pBindings    = vk_binding;
+        layout_info.flags        = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT;
+        layout_info.pNext        = &extended_info;
+
+        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layout_info, nullptr, &m_bindless_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create bindless descriptor set layout!");
         }
     }
 
@@ -245,13 +346,13 @@ namespace ArchViz
 
     void VulkanRHI::createCommandBuffer()
     {
-        m_command_buffers.resize(MAX_FRAMES_IN_FLIGHT);
+        m_command_buffers.resize(k_max_frames_in_flight);
 
         VkCommandBufferAllocateInfo alloc_info {};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         alloc_info.commandPool        = m_command_pool;
         alloc_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        alloc_info.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
+        alloc_info.commandBufferCount = k_max_frames_in_flight;
 
         if (vkAllocateCommandBuffers(m_vulkan_device->m_device, &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
         {
@@ -386,11 +487,11 @@ namespace ArchViz
     {
         VkDeviceSize buffer_size = sizeof(UniformBufferObject);
 
-        m_uniform_buffers.resize(MAX_FRAMES_IN_FLIGHT);
-        m_uniform_buffers_memory.resize(MAX_FRAMES_IN_FLIGHT);
-        m_uniform_buffers_mapped.resize(MAX_FRAMES_IN_FLIGHT);
+        m_uniform_buffers.resize(k_max_frames_in_flight);
+        m_uniform_buffers_memory.resize(k_max_frames_in_flight);
+        m_uniform_buffers_mapped.resize(k_max_frames_in_flight);
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             auto usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
             auto flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -400,52 +501,23 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createDescriptorSetLayout()
-    {
-        VkDescriptorSetLayoutBinding ubo_layout_binding {};
-        ubo_layout_binding.binding            = 0;
-        ubo_layout_binding.descriptorCount    = 1;
-        ubo_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        ubo_layout_binding.pImmutableSamplers = nullptr;
-        ubo_layout_binding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
-
-        VkDescriptorSetLayoutBinding sampler_layout_binding {};
-        sampler_layout_binding.binding            = 1;
-        sampler_layout_binding.descriptorCount    = 1;
-        sampler_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        sampler_layout_binding.pImmutableSamplers = nullptr;
-        sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        std::array<VkDescriptorSetLayoutBinding, 2> bindings = {ubo_layout_binding, sampler_layout_binding};
-
-        VkDescriptorSetLayoutCreateInfo layout_info {};
-        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
-        layout_info.pBindings    = bindings.data();
-
-        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create descriptor set layout!");
-        }
-    }
-
     void VulkanRHI::createDescriptorSets()
     {
-        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, m_descriptor_set_layout);
+        std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_descriptor_set_layout);
 
         VkDescriptorSetAllocateInfo alloc_info {};
         alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         alloc_info.descriptorPool     = m_descriptor_pool;
-        alloc_info.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+        alloc_info.descriptorSetCount = static_cast<uint32_t>(k_max_frames_in_flight);
         alloc_info.pSetLayouts        = layouts.data();
 
-        m_descriptor_sets.resize(MAX_FRAMES_IN_FLIGHT);
+        m_descriptor_sets.resize(k_max_frames_in_flight);
         if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &alloc_info, m_descriptor_sets.data()) != VK_SUCCESS)
         {
             LOG_FATAL("failed to allocate descriptor sets!");
         }
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             VkDescriptorBufferInfo buffer_info {};
             buffer_info.buffer = m_uniform_buffers[i];
@@ -479,11 +551,36 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createBindlessDescriptorSets()
+    {
+        if (!m_bindless_supported)
+            return;
+
+        uint32_t max_binding = k_max_bindless_resources - 1;
+
+        VkDescriptorSetVariableDescriptorCountAllocateInfoEXT count_info {};
+        count_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
+        count_info.descriptorSetCount = 1;
+        count_info.pDescriptorCounts  = &max_binding; // This number is the max allocatable count
+
+        VkDescriptorSetAllocateInfo alloc_info {};
+        alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.descriptorPool     = m_bindless_pool;
+        alloc_info.descriptorSetCount = 1;
+        alloc_info.pSetLayouts        = &m_bindless_set_layout;
+        // alloc_info.pNext = &count_info;
+
+        if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &alloc_info, &m_bindless_set) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate bindless descriptor sets!");
+        }
+    }
+
     void VulkanRHI::createSyncObjects()
     {
-        m_image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        m_render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        m_in_flight_fences.resize(MAX_FRAMES_IN_FLIGHT);
+        m_image_available_semaphores.resize(k_max_frames_in_flight);
+        m_render_finished_semaphores.resize(k_max_frames_in_flight);
+        m_in_flight_fences.resize(k_max_frames_in_flight);
 
         VkSemaphoreCreateInfo semaphore_info {};
         semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -492,7 +589,7 @@ namespace ArchViz
         fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
@@ -542,8 +639,9 @@ namespace ArchViz
         createSwapChain();
 
         createDescriptorPool();
-
+        createBindlessDescriptorPool();
         createDescriptorSetLayout();
+        createBindlessDescriptorSetLayout();
         createRenderPass();
         createGraphicsPipeline();
 
@@ -562,6 +660,8 @@ namespace ArchViz
         createIndexBuffer();
         createUniformBuffers();
         createDescriptorSets();
+
+        createBindlessDescriptorSets();
 
         createSyncObjects();
 
@@ -711,7 +811,7 @@ namespace ArchViz
             LOG_FATAL("failed to present swap chain image!");
         }
 
-        m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+        m_current_frame = (m_current_frame + 1) % k_max_frames_in_flight;
     }
 
     void VulkanRHI::prepareContext()
@@ -737,14 +837,14 @@ namespace ArchViz
     {
         m_vulkan_device->wait();
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphores[i], nullptr);
             vkDestroySemaphore(m_vulkan_device->m_device, m_render_finished_semaphores[i], nullptr);
             vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fences[i], nullptr);
         }
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
         }
@@ -770,6 +870,12 @@ namespace ArchViz
         for (auto framebuffer : m_swap_chain_framebuffers)
         {
             vkDestroyFramebuffer(m_vulkan_device->m_device, framebuffer, nullptr);
+        }
+
+        if (m_bindless_supported)
+        {
+            vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_bindless_set_layout, nullptr);
+            vkDestroyDescriptorPool(m_vulkan_device->m_device, m_bindless_pool, nullptr);
         }
 
         vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_descriptor_set_layout, nullptr);

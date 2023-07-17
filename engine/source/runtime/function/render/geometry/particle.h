@@ -4,6 +4,8 @@
 
 #include <volk.h>
 
+#include <array>
+
 namespace ArchViz
 {
     struct Particle

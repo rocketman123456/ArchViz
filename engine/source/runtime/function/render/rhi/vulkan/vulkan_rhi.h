@@ -54,6 +54,10 @@ namespace ArchViz
         void createVulkanDevice();
 
         void createDescriptorPool();
+        void createBindlessDescriptorPool();
+
+        void createDescriptorSetLayout();
+        void createBindlessDescriptorSetLayout();
 
         void createRenderPass();
         void createGraphicsPipeline();
@@ -72,8 +76,9 @@ namespace ArchViz
         void createVertexBuffer();
         void createIndexBuffer();
         void createUniformBuffers();
-        void createDescriptorSetLayout();
         void createDescriptorSets();
+
+        void createBindlessDescriptorSets();
 
         void createSyncObjects();
 
@@ -86,9 +91,14 @@ namespace ArchViz
 
     private:
         const bool m_enable_validation_layers = true;
-        const int  MAX_FRAMES_IN_FLIGHT       = 2;
+
+        const uint32_t k_max_frames_in_flight     = 2;
+        const uint32_t k_global_pool_elements     = 128;
+        const uint32_t k_bindless_texture_binding = 10;
+        const uint32_t k_max_bindless_resources   = 1024;
 
         bool m_framebuffer_resized = false;
+        bool m_bindless_supported  = true;
 
         uint32_t m_fps;
 
@@ -135,8 +145,13 @@ namespace ArchViz
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------
 
-        VkDescriptorSetLayout        m_descriptor_set_layout;
+        uint32_t              m_bindless_pool_size;
+        VkDescriptorPool      m_bindless_pool;
+        VkDescriptorSetLayout m_bindless_set_layout;
+        VkDescriptorSet       m_bindless_set;
+
         VkDescriptorPool             m_descriptor_pool;
+        VkDescriptorSetLayout        m_descriptor_set_layout;
         std::vector<VkDescriptorSet> m_descriptor_sets;
 
         std::vector<VkBuffer>       m_uniform_buffers;
