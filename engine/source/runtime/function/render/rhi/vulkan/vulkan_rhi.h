@@ -49,6 +49,12 @@ namespace ArchViz
         void recreateSwapChain() override;
 
     private:
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+
         void createInstance();
 
         void createVulkanDevice();
@@ -57,12 +63,10 @@ namespace ArchViz
         void createBindlessDescriptorPool();
 
         void createDescriptorSetLayout();
-        void createComputeDescriptorSetLayout();
         void createBindlessDescriptorSetLayout();
 
         void createRenderPass();
         void createGraphicsPipeline();
-        void createComputePipeline();
 
         void createCommandPool();
 
@@ -71,8 +75,9 @@ namespace ArchViz
 
         void createCommandBuffer();
 
+        // TODO : move to scene part
         void createTextureImage();
-
+        // TODO : move to scene part
         void loadModel();
 
         void createVertexBuffer();
@@ -80,14 +85,29 @@ namespace ArchViz
         void createUniformBuffers();
         void createDescriptorSets();
 
-        void createShaderStorageBuffers();
-        void createComputeDescriptorSets();
-        void createComputeCommandBuffers();
-        void createComputeSyncObjects();
-
         void createBindlessDescriptorSets();
 
         void createSyncObjects();
+
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+
+        void createComputeDescriptorSetLayout();
+        void createComputePipeline();
+        void createShaderStorageBuffers();
+        void createComputeDescriptorSets();
+        void createComputeCommandBuffers();
+        void createComputeUniformBuffers();
+        void createComputeSyncObjects();
+
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
 
         void createImGui();
 
@@ -198,6 +218,11 @@ namespace ArchViz
         std::vector<VkBuffer>       m_shader_storage_buffers;
         std::vector<VkDeviceMemory> m_shader_storage_buffers_memory;
 
+        // TODO : add particle ubo
+        std::vector<VkBuffer>       m_particle_uniform_buffers;
+        std::vector<VkDeviceMemory> m_particle_uniform_buffers_memory;
+        std::vector<void*>          m_particle_uniform_buffers_mapped;
+
         std::vector<VkSemaphore> m_compute_finished_semaphores;
         std::vector<VkFence>     m_compute_in_flight_fences;
 
@@ -212,5 +237,7 @@ namespace ArchViz
 
     public:
         UniformBufferObject m_ubo;
+
+        float m_dt;
     };
 } // namespace ArchViz

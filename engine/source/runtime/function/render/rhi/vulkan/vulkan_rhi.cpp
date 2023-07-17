@@ -568,6 +568,61 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createBindlessDescriptorSets()
+    {
+        if (!m_bindless_supported)
+            return;
+
+        uint32_t max_binding = k_max_bindless_resources - 1;
+
+        VkDescriptorSetVariableDescriptorCountAllocateInfoEXT count_info {};
+        count_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
+        count_info.descriptorSetCount = 1;
+        count_info.pDescriptorCounts  = &max_binding; // This number is the max allocatable count
+
+        VkDescriptorSetAllocateInfo alloc_info {};
+        alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.descriptorPool     = m_bindless_pool;
+        alloc_info.descriptorSetCount = 1;
+        alloc_info.pSetLayouts        = &m_bindless_set_layout;
+        // alloc_info.pNext = &count_info;
+
+        if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &alloc_info, &m_bindless_set) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate bindless descriptor sets!");
+        }
+    }
+
+    void VulkanRHI::createSyncObjects()
+    {
+        m_image_available_semaphores.resize(k_max_frames_in_flight);
+        m_render_finished_semaphores.resize(k_max_frames_in_flight);
+        m_in_flight_fences.resize(k_max_frames_in_flight);
+
+        VkSemaphoreCreateInfo semaphore_info {};
+        semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        VkFenceCreateInfo fence_info {};
+        fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(m_vulkan_device->m_device, &fence_info, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS)
+            {
+                LOG_FATAL("failed to create synchronization objects for a frame!");
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
     void VulkanRHI::createComputeDescriptorSetLayout()
     {
         std::array<VkDescriptorSetLayoutBinding, 3> layoutBindings {};
@@ -692,6 +747,24 @@ namespace ArchViz
         vkFreeMemory(m_vulkan_device->m_device, stagingBufferMemory, nullptr);
     }
 
+    void VulkanRHI::createComputeUniformBuffers()
+    {
+        VkDeviceSize buffer_size = sizeof(float);
+
+        m_particle_uniform_buffers.resize(k_max_frames_in_flight);
+        m_particle_uniform_buffers_memory.resize(k_max_frames_in_flight);
+        m_particle_uniform_buffers_mapped.resize(k_max_frames_in_flight);
+
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            auto usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+            auto flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, flag, m_particle_uniform_buffers[i], m_particle_uniform_buffers_memory[i]);
+
+            vkMapMemory(m_vulkan_device->m_device, m_particle_uniform_buffers_memory[i], 0, buffer_size, 0, &m_particle_uniform_buffers_mapped[i]);
+        }
+    }
+
     void VulkanRHI::createComputeDescriptorSets()
     {
         std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_compute_descriptor_set_layout);
@@ -711,9 +784,9 @@ namespace ArchViz
         for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             VkDescriptorBufferInfo uniformBufferInfo {};
-            uniformBufferInfo.buffer = m_uniform_buffers[i];
+            uniformBufferInfo.buffer = m_particle_uniform_buffers[i];
             uniformBufferInfo.offset = 0;
-            uniformBufferInfo.range  = sizeof(UniformBufferObject);
+            uniformBufferInfo.range  = sizeof(float);
 
             std::array<VkWriteDescriptorSet, 3> descriptorWrites {};
             descriptorWrites[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -792,54 +865,11 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createBindlessDescriptorSets()
-    {
-        if (!m_bindless_supported)
-            return;
-
-        uint32_t max_binding = k_max_bindless_resources - 1;
-
-        VkDescriptorSetVariableDescriptorCountAllocateInfoEXT count_info {};
-        count_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
-        count_info.descriptorSetCount = 1;
-        count_info.pDescriptorCounts  = &max_binding; // This number is the max allocatable count
-
-        VkDescriptorSetAllocateInfo alloc_info {};
-        alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        alloc_info.descriptorPool     = m_bindless_pool;
-        alloc_info.descriptorSetCount = 1;
-        alloc_info.pSetLayouts        = &m_bindless_set_layout;
-        // alloc_info.pNext = &count_info;
-
-        if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &alloc_info, &m_bindless_set) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to allocate bindless descriptor sets!");
-        }
-    }
-
-    void VulkanRHI::createSyncObjects()
-    {
-        m_image_available_semaphores.resize(k_max_frames_in_flight);
-        m_render_finished_semaphores.resize(k_max_frames_in_flight);
-        m_in_flight_fences.resize(k_max_frames_in_flight);
-
-        VkSemaphoreCreateInfo semaphore_info {};
-        semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-        VkFenceCreateInfo fence_info {};
-        fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
-        {
-            if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
-                vkCreateFence(m_vulkan_device->m_device, &fence_info, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS)
-            {
-                LOG_FATAL("failed to create synchronization objects for a frame!");
-            }
-        }
-    }
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     void VulkanRHI::createImGui()
     {
@@ -868,6 +898,12 @@ namespace ArchViz
         m_vulkan_texture_ui->m_descriptor_pool       = m_vulkan_ui->m_descriptor_pool;
         m_vulkan_texture_ui->createDescriptorSet();
     }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     void VulkanRHI::initialize(RHIInitInfo initialize_info)
     {
@@ -905,16 +941,17 @@ namespace ArchViz
         createUniformBuffers();
         createDescriptorSets();
 
-        createComputeDescriptorSetLayout();
-        createComputePipeline();
-        createShaderStorageBuffers();
-        createComputeDescriptorSets();
-        createComputeCommandBuffers();
-        createComputeSyncObjects();
-
         createBindlessDescriptorSets();
 
         createSyncObjects();
+
+        createComputeDescriptorSetLayout();
+        createComputePipeline();
+        createShaderStorageBuffers();
+        createComputeUniformBuffers();
+        createComputeDescriptorSets();
+        createComputeCommandBuffers();
+        createComputeSyncObjects();
 
         createImGui();
     }
@@ -1018,6 +1055,9 @@ namespace ArchViz
 
     void VulkanRHI::updateUniformBuffer(uint32_t current_image)
     {
+        m_dt = 1.0f;
+        // update particle ubo
+        memcpy(m_particle_uniform_buffers_mapped[current_image], &m_dt, sizeof(float));
         // update required data
         memcpy(m_uniform_buffers_mapped[current_image], &m_ubo, sizeof(m_ubo));
     }
@@ -1164,6 +1204,11 @@ namespace ArchViz
             vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphores[i], nullptr);
             vkDestroySemaphore(m_vulkan_device->m_device, m_render_finished_semaphores[i], nullptr);
             vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fences[i], nullptr);
+        }
+
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_particle_uniform_buffers[i], m_particle_uniform_buffers_memory[i]);
         }
 
         for (size_t i = 0; i < k_max_frames_in_flight; i++)
