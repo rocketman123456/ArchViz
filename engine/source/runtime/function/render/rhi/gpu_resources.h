@@ -8,6 +8,7 @@
 #include <vk_mem_alloc.h>
 
 #include <limits>
+#include <string>
 
 namespace ArchViz
 {
@@ -130,12 +131,12 @@ namespace ArchViz
         uint32_t                size         = 0;
         void*                   initial_data = nullptr;
 
-        const char* name = nullptr;
+        std::string name {};
 
         BufferCreation& reset();
         BufferCreation& set(VkBufferUsageFlags flags, ResourceUsageType::Enum usage, uint32_t size);
         BufferCreation& setData(void* data);
-        BufferCreation& setName(const char* name);
+        BufferCreation& setName(const std::string& name);
 
     }; // struct BufferCreation
 
@@ -153,12 +154,12 @@ namespace ArchViz
         VkFormat          format = VK_FORMAT_UNDEFINED;
         TextureType::Enum type   = TextureType::Texture2D;
 
-        const char* name = nullptr;
+        std::string name {};
 
         TextureCreation& setSize(uint16_t width, uint16_t height, uint16_t depth);
         TextureCreation& setFlags(uint8_t mipmaps, uint8_t flags);
         TextureCreation& setFormatType(VkFormat format, TextureType::Enum type);
-        TextureCreation& setName(const char* name);
+        TextureCreation& setName(const std::string& name);
         TextureCreation& setData(void* data);
 
     }; // struct TextureCreation
@@ -173,21 +174,21 @@ namespace ArchViz
         VkSamplerAddressMode address_mode_v = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         VkSamplerAddressMode address_mode_w = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-        const char* name = nullptr;
+        std::string name {};
 
         SamplerCreation& setMinMagMip(VkFilter min, VkFilter mag, VkSamplerMipmapMode mip);
         SamplerCreation& setAddressModeU(VkSamplerAddressMode u);
         SamplerCreation& setAddressModeUV(VkSamplerAddressMode u, VkSamplerAddressMode v);
         SamplerCreation& setAddressModeUVW(VkSamplerAddressMode u, VkSamplerAddressMode v, VkSamplerAddressMode w);
-        SamplerCreation& setName(const char* name);
+        SamplerCreation& setName(const std::string& name);
 
     }; // struct SamplerCreation
 
     struct ShaderStage
     {
-        const char*           code      = nullptr;
-        uint32_t              code_size = 0;
-        VkShaderStageFlagBits type      = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
+        std::string           code {};
+        uint32_t              code_size {0};
+        VkShaderStageFlagBits type = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
 
     }; // struct ShaderStage
 
@@ -195,15 +196,15 @@ namespace ArchViz
     {
         ShaderStage stages[k_max_shader_stages];
 
-        const char* name = nullptr;
+        std::string name {};
 
         uint32_t stages_count = 0;
         uint32_t spv_input    = 0;
 
         // Building helpers
         ShaderStateCreation& reset();
-        ShaderStateCreation& setName(const char* name);
-        ShaderStateCreation& addStage(const char* code, uint32_t code_size, VkShaderStageFlagBits type);
+        ShaderStateCreation& setName(const std::string& name);
+        ShaderStateCreation& addStage(const std::string& code, uint32_t code_size, VkShaderStageFlagBits type);
         ShaderStateCreation& setSpvInput(bool value);
 
     }; // struct ShaderStateCreation
@@ -218,20 +219,20 @@ namespace ArchViz
             VkDescriptorType type  = VK_DESCRIPTOR_TYPE_MAX_ENUM;
             uint16_t         start = 0;
             uint16_t         count = 0;
-            const char*      name  = nullptr; // Comes from external memory.
-        };                                    // struct Binding
+            std::string      name {}; // Comes from external memory.
+        };                            // struct Binding
 
         Binding  bindings[k_max_descriptors_per_set];
         uint32_t num_bindings = 0;
         uint32_t set_index    = 0;
 
-        const char* name = nullptr;
+        std::string name {};
 
         // Building helpers
         DescriptorSetLayoutCreation& reset();
         DescriptorSetLayoutCreation& addBinding(const Binding& binding);
         DescriptorSetLayoutCreation& addBindingAtIndex(const Binding& binding, int index);
-        DescriptorSetLayoutCreation& setName(const char* name);
+        DescriptorSetLayoutCreation& setName(const std::string& name);
         DescriptorSetLayoutCreation& setSetIndex(uint32_t index);
 
     }; // struct DescriptorSetLayoutCreation
@@ -248,7 +249,7 @@ namespace ArchViz
         DescriptorSetLayoutHandle layout;
         uint32_t                  num_resources = 0;
 
-        const char* name = nullptr;
+        std::string name {};
 
         // Building helpers
         DescriptorSetCreation& reset();
@@ -256,7 +257,7 @@ namespace ArchViz
         DescriptorSetCreation& texture(TextureHandle texture, uint16_t binding);
         DescriptorSetCreation& buffer(BufferHandle buffer, uint16_t binding);
         DescriptorSetCreation& textureSampler(TextureHandle texture, SamplerHandle sampler, uint16_t binding); // TODO: separate samplers from textures
-        DescriptorSetCreation& setName(const char* name);
+        DescriptorSetCreation& setName(const std::string& name);
 
     }; // struct DescriptorSetCreation
 
@@ -347,13 +348,13 @@ namespace ArchViz
         RenderPassOperation::Enum depth_operation   = RenderPassOperation::DontCare;
         RenderPassOperation::Enum stencil_operation = RenderPassOperation::DontCare;
 
-        const char* name = nullptr;
+        std::string name {};
 
         RenderPassCreation& reset();
         RenderPassCreation& addRenderTexture(TextureHandle texture);
         RenderPassCreation& setScaling(float scale_x, float scale_y, uint8_t resize);
         RenderPassCreation& setDepthStencilTexture(TextureHandle texture);
-        RenderPassCreation& setName(const char* name);
+        RenderPassCreation& setName(const std::string& name);
         RenderPassCreation& setType(RenderPassType::Enum type);
         RenderPassCreation& setOperations(RenderPassOperation::Enum color, RenderPassOperation::Enum depth, RenderPassOperation::Enum stencil);
 
@@ -376,7 +377,7 @@ namespace ArchViz
 
         uint32_t num_active_layouts = 0;
 
-        const char* name = nullptr;
+        std::string name {};
 
         PipelineCreation& addDescriptorSetLayout(DescriptorSetLayoutHandle handle);
         RenderPassOutput& renderPassOutput();
@@ -417,7 +418,7 @@ namespace ArchViz
         uint16_t count = 0;
         uint16_t set   = 0;
 
-        const char* name = nullptr;
+        std::string name {};
     }; // struct ResourceBinding
 
     // API-agnostic descriptions ////////////////////////////////////////////////////
@@ -427,8 +428,8 @@ namespace ArchViz
     struct ShaderStateDescription
     {
 
-        void*       native_handle = nullptr;
-        const char* name          = nullptr;
+        void*       native_handle {nullptr};
+        std::string name {};
 
     }; // struct ShaderStateDescription
 
@@ -438,7 +439,7 @@ namespace ArchViz
     {
 
         void*       native_handle = nullptr;
-        const char* name          = nullptr;
+        std::string name {};
 
         VkBufferUsageFlags      type_flags = 0;
         ResourceUsageType::Enum usage      = ResourceUsageType::Immutable;
@@ -453,7 +454,7 @@ namespace ArchViz
     {
 
         void*       native_handle = nullptr;
-        const char* name          = nullptr;
+        std::string name {};
 
         uint16_t width          = 1;
         uint16_t height         = 1;
@@ -471,8 +472,7 @@ namespace ArchViz
     //
     struct SamplerDescription
     {
-
-        const char* name = nullptr;
+        std::string name {};
 
         VkFilter            min_filter = VK_FILTER_NEAREST;
         VkFilter            mag_filter = VK_FILTER_NEAREST;
@@ -587,7 +587,6 @@ namespace ArchViz
     //
     struct Buffer
     {
-
         VkBuffer vk_buffer;
         // VmaAllocation  vma_allocation;
         VkDeviceMemory vk_device_memory;
@@ -601,7 +600,7 @@ namespace ArchViz
         BufferHandle handle;
         BufferHandle parent_buffer;
 
-        const char* name = nullptr;
+        std::string name {};
 
     }; // struct BufferVulkan
 
@@ -620,7 +619,7 @@ namespace ArchViz
         VkSamplerAddressMode address_mode_v = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         VkSamplerAddressMode address_mode_w = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-        const char* name = nullptr;
+        std::string name {};
 
     }; // struct SamplerVulkan
 
@@ -646,7 +645,7 @@ namespace ArchViz
 
         Sampler* sampler = nullptr;
 
-        const char* name = nullptr;
+        std::string name {};
     }; // struct TextureVulkan
 
     //
@@ -655,7 +654,7 @@ namespace ArchViz
     {
         VkPipelineShaderStageCreateInfo shader_stage_info[k_max_shader_stages];
 
-        const char* name = nullptr;
+        std::string name {};
 
         uint32_t active_shaders    = 0;
         bool     graphics_pipeline = false;
@@ -672,7 +671,7 @@ namespace ArchViz
         uint16_t         count = 0;
         uint16_t         set   = 0;
 
-        const char* name = nullptr;
+        std::string name {};
     }; // struct ResourceBindingVulkan
 
     //
@@ -751,6 +750,6 @@ namespace ArchViz
         uint8_t resize             = 0;
         uint8_t num_render_targets = 0;
 
-        const char* name = nullptr;
+        std::string name {};
     }; // struct RenderPass
 } // namespace ArchViz

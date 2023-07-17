@@ -77,7 +77,7 @@ namespace ArchViz
         return *this;
     }
 
-    BufferCreation& BufferCreation::setName(const char* name_)
+    BufferCreation& BufferCreation::setName(const std::string& name_)
     {
         name = name_;
 
@@ -110,7 +110,7 @@ namespace ArchViz
         return *this;
     }
 
-    TextureCreation& TextureCreation::setName(const char* name_)
+    TextureCreation& TextureCreation::setName(const std::string& name_)
     {
         name = name_;
 
@@ -158,7 +158,7 @@ namespace ArchViz
         return *this;
     }
 
-    SamplerCreation& SamplerCreation::setName(const char* name_)
+    SamplerCreation& SamplerCreation::setName(const std::string& name_)
     {
         name = name_;
 
@@ -173,14 +173,14 @@ namespace ArchViz
         return *this;
     }
 
-    ShaderStateCreation& ShaderStateCreation::setName(const char* name_)
+    ShaderStateCreation& ShaderStateCreation::setName(const std::string& name_)
     {
         name = name_;
 
         return *this;
     }
 
-    ShaderStateCreation& ShaderStateCreation::addStage(const char* code, uint32_t code_size, VkShaderStageFlagBits type)
+    ShaderStateCreation& ShaderStateCreation::addStage(const std::string& code, uint32_t code_size, VkShaderStageFlagBits type)
     {
         stages[stages_count].code      = code;
         stages[stages_count].code_size = code_size;
@@ -217,7 +217,7 @@ namespace ArchViz
         return *this;
     }
 
-    DescriptorSetLayoutCreation& DescriptorSetLayoutCreation::setName(const char* name_)
+    DescriptorSetLayoutCreation& DescriptorSetLayoutCreation::setName(const std::string& name_)
     {
         name = name_;
         return *this;
@@ -267,7 +267,7 @@ namespace ArchViz
         return *this;
     }
 
-    DescriptorSetCreation& DescriptorSetCreation::setName(const char* name_)
+    DescriptorSetCreation& DescriptorSetCreation::setName(const std::string& name_)
     {
         name = name_;
         return *this;
@@ -371,7 +371,7 @@ namespace ArchViz
         return *this;
     }
 
-    RenderPassCreation& RenderPassCreation::setName(const char* name_)
+    RenderPassCreation& RenderPassCreation::setName(const std::string& name_)
     {
         name = name_;
 

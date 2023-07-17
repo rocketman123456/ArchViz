@@ -1,11 +1,12 @@
+// https://github.com/KhronosGroup/SPIRV-Reflect
 #pragma once
-
 #include "runtime/function/render/rhi/gpu_resources.h"
 
 #include <volk.h>
 
-#include <spirv/1.0/spirv.h>
+#include <spirv/1.2/spirv.h>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -17,12 +18,12 @@ namespace ArchViz
 
         struct ParseResult
         {
-            uint32_t                    set_count;
-            DescriptorSetLayoutCreation sets[MAX_SET_COUNT];
+            uint32_t                    set_count {0};
+            DescriptorSetLayoutCreation sets[MAX_SET_COUNT] {};
         };
 
         VkShaderStageFlags parse_execution_model(SpvExecutionModel model);
 
-        void parse_binary(const std::vector<uint32_t>& data, std::vector<uint8_t>& name_buffer, ParseResult& parse_result);
+        void parse_binary(const std::vector<uint32_t>& data, std::string& name_buffer, ParseResult& parse_result);
     } // namespace SPIRV
 } // namespace ArchViz

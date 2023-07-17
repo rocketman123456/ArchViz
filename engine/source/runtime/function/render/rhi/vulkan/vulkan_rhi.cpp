@@ -26,19 +26,8 @@
 #include <tiny_obj_loader.h>
 
 #include <random>
+#include <stdlib.h>
 #include <unordered_map>
-
-#if defined(__GNUC__)
-// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
-#if defined(__linux__)
-#include <stdlib.h>
-#elif defined(__MACH__)
-// https://developer.apple.com/library/archive/documentation/Porting/Conceptual/PortingUnix/compiling/compiling.html
-#include <stdlib.h>
-#else
-#error Unknown Platform
-#endif
-#endif
 
 namespace ArchViz
 {

@@ -156,6 +156,7 @@ namespace ArchViz
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------
 
+        // TODO add pipeline cache storage to increase creation speed
         VkPipelineCache m_pipeline_cache;
 
         VkFormat       m_depth_format;

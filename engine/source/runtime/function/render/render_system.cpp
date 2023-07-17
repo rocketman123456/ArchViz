@@ -66,8 +66,8 @@ namespace ArchViz
 
         m_render_camera                 = std::make_shared<RenderCamera>();
         m_render_camera->m_type         = RenderCameraType::LookAt;
-        m_render_camera->m_position     = {0, 0, 0};
-        m_render_camera->m_front        = {0.0f, 0.0f, -1.0f};
+        m_render_camera->m_position     = {0, 0, 2};
+        m_render_camera->m_front        = {0.0f, 0.0f, 1.0f};
         m_render_camera->m_up           = {0.0f, 1.0f, 0.0f};
         m_render_camera->m_world_up     = {0.0f, 1.0f, 0.0f};
         m_render_camera->m_right        = m_render_camera->m_front.cross(m_render_camera->m_world_up);
@@ -103,6 +103,7 @@ namespace ArchViz
         auto  currentTime = std::chrono::high_resolution_clock::now();
         float time        = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+        // TODO : move to input manager or scene manager
         int right = glfwGetMouseButton(m_window_system->getWindow(), GLFW_MOUSE_BUTTON_RIGHT);
         if (right)
         {
@@ -128,8 +129,8 @@ namespace ArchViz
         FMatrix4 model {FMatrix4::Identity()};
         model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
 
-        m_rhi->m_ubo.view  = m_render_camera->m_view;
-        m_rhi->m_ubo.proj  = m_render_camera->m_projction;
+        m_rhi->m_ubo.view  = Math::lookAt({2, 2, 2}, {0, 0, 0}, {0, 0, 1});                         // m_render_camera->m_view;
+        m_rhi->m_ubo.proj  = Math::perspective(45.0f, (float)width / (float)height, 0.01f, 100.0f); // m_render_camera->m_projction;
         m_rhi->m_ubo.model = model;
         // m_rhi->m_ubo.proj(1, 1) = m_rhi->m_ubo.proj(1, 1) * -1.0f; // vulkan's screen coordinate y axis is inerted
     }

@@ -82,3 +82,6 @@
 [submodule "engine/3rd_party/tlsf"]
 	path = engine/3rd_party/tlsf
 	url = https://github.com/mattconte/tlsf.git
+[submodule "engine/3rd_party/SPIRV-Reflect"]
+	path = engine/3rd_party/SPIRV-Reflect
+	url = https://github.com/KhronosGroup/SPIRV-Reflect.git

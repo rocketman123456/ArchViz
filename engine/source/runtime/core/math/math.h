@@ -1,4 +1,5 @@
 #pragma once
+#include "runtime/core/base/macro.h"
 #include "runtime/core/math/math_type.h"
 #include "runtime/core/math/random.h"
 
@@ -34,6 +35,17 @@ namespace ArchViz
     class Matrix3x3;
     class Matrix4x4;
     class Quaternion;
+
+    template<typename To, typename From>
+    To safe_cast(From a)
+    {
+        To result = (To)a;
+
+        From check = (From)result;
+        ASSERT(check == result);
+
+        return result;
+    }
 
     class Radian
     {
