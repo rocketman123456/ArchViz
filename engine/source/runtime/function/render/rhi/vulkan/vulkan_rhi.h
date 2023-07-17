@@ -57,10 +57,12 @@ namespace ArchViz
         void createBindlessDescriptorPool();
 
         void createDescriptorSetLayout();
+        void createComputeDescriptorSetLayout();
         void createBindlessDescriptorSetLayout();
 
         void createRenderPass();
         void createGraphicsPipeline();
+        void createComputePipeline();
 
         void createCommandPool();
 
@@ -78,6 +80,11 @@ namespace ArchViz
         void createUniformBuffers();
         void createDescriptorSets();
 
+        void createShaderStorageBuffers();
+        void createComputeDescriptorSets();
+        void createComputeCommandBuffers();
+        void createComputeSyncObjects();
+
         void createBindlessDescriptorSets();
 
         void createSyncObjects();
@@ -92,7 +99,10 @@ namespace ArchViz
     private:
         const bool m_enable_validation_layers = true;
 
-        const uint32_t k_max_frames_in_flight     = 2;
+        const uint32_t k_max_frames_in_flight = 2;
+
+        const uint32_t k_particle_count = 8192;
+
         const uint32_t k_global_pool_elements     = 128;
         const uint32_t k_bindless_texture_binding = 10;
         const uint32_t k_max_bindless_resources   = 1024;
@@ -176,12 +186,19 @@ namespace ArchViz
         // ---------------------------------------------------------------------------
 
         // TODO : add a simple compute pass
+        VkDescriptorSetLayout        m_compute_descriptor_set_layout;
         std::vector<VkDescriptorSet> m_compute_descriptor_sets;
+
+        VkPipelineLayout m_compute_pipeline_layout;
+        VkPipeline       m_compute_pipeline;
+
         std::vector<VkCommandBuffer> m_compute_command_buffers;
-        std::vector<VkBuffer>        m_shader_storage_buffers;
-        std::vector<VkDeviceMemory>  m_shader_storage_buffers_memory;
-        std::vector<VkSemaphore>     m_compute_finished_semaphores;
-        std::vector<VkFence>         m_compute_in_flight_fences;
+
+        std::vector<VkBuffer>       m_shader_storage_buffers;
+        std::vector<VkDeviceMemory> m_shader_storage_buffers_memory;
+
+        std::vector<VkSemaphore> m_compute_finished_semaphores;
+        std::vector<VkFence>     m_compute_in_flight_fences;
 
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------

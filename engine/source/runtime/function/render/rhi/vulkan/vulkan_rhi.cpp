@@ -11,6 +11,9 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
 
+#include "runtime/function/render/geometry/particle.h"
+#include "runtime/function/render/geometry/vertex.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -22,6 +25,7 @@
 // TODO : move this to asset loader part
 #include <tiny_obj_loader.h>
 
+#include <random>
 #include <unordered_map>
 
 #if defined(__GNUC__)
@@ -49,6 +53,18 @@ namespace ArchViz
         ASSERT(asset_manager);
         m_asset_manager = asset_manager;
     }
+
+    void VulkanRHI::setFPS(uint32_t fps)
+    {
+        m_fps = fps;
+        m_vulkan_ui->setFPS(m_fps);
+    }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     void VulkanRHI::createInstance()
     {
@@ -207,6 +223,38 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createComputeDescriptorSetLayout()
+    {
+        std::array<VkDescriptorSetLayoutBinding, 3> layoutBindings {};
+        layoutBindings[0].binding            = 0;
+        layoutBindings[0].descriptorCount    = 1;
+        layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBindings[0].pImmutableSamplers = nullptr;
+        layoutBindings[0].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        layoutBindings[1].binding            = 1;
+        layoutBindings[1].descriptorCount    = 1;
+        layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[1].pImmutableSamplers = nullptr;
+        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        layoutBindings[2].binding            = 2;
+        layoutBindings[2].descriptorCount    = 1;
+        layoutBindings[2].descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        layoutBindings[2].pImmutableSamplers = nullptr;
+        layoutBindings[2].stageFlags         = VK_SHADER_STAGE_COMPUTE_BIT;
+
+        VkDescriptorSetLayoutCreateInfo layoutInfo {};
+        layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = 3;
+        layoutInfo.pBindings    = layoutBindings.data();
+
+        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layoutInfo, nullptr, &m_compute_descriptor_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create compute descriptor set layout!");
+        }
+    }
+
     void VulkanRHI::createBindlessDescriptorSetLayout()
     {
         if (!m_bindless_supported)
@@ -288,6 +336,60 @@ namespace ArchViz
         m_vulkan_pipeline->initialize();
     }
 
+    void VulkanRHI::createComputePipeline()
+    {
+        ShaderModuleConfig config;
+        config.m_comp_shader = "shader/glsl/shader_compute.comp";
+
+        std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
+
+        shader->m_device         = m_vulkan_device;
+        shader->m_config_manager = m_config_manager;
+        shader->m_asset_manager  = m_asset_manager;
+        shader->initialize();
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
+        pipelineLayoutInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts    = &m_compute_descriptor_set_layout;
+
+        if (vkCreatePipelineLayout(m_vulkan_device->m_device, &pipelineLayoutInfo, nullptr, &m_compute_pipeline_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create compute pipeline layout!");
+        }
+
+        VkPipelineShaderStageCreateInfo compute_shader_stage_info {};
+        compute_shader_stage_info.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        compute_shader_stage_info.stage  = VK_SHADER_STAGE_COMPUTE_BIT;
+        compute_shader_stage_info.module = shader->m_comp_shader;
+        compute_shader_stage_info.pName  = "main";
+
+        VkComputePipelineCreateInfo pipelineInfo {};
+        pipelineInfo.sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        pipelineInfo.layout = m_compute_pipeline_layout;
+        pipelineInfo.stage  = compute_shader_stage_info;
+
+        if (vkCreateComputePipelines(m_vulkan_device->m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_compute_pipeline) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create compute pipeline!");
+        }
+
+        shader->clear();
+    }
+
+    void VulkanRHI::createCommandPool()
+    {
+        VkCommandPoolCreateInfo pool_info {};
+        pool_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        pool_info.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        pool_info.queueFamilyIndex = m_vulkan_device->m_indices.m_graphics_family.value();
+
+        if (vkCreateCommandPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create command pool!");
+        }
+    }
+
     void VulkanRHI::createDepthResources()
     {
         m_depth_format = VulkanUtils::findDepthFormat(m_vulkan_device->m_physical_device);
@@ -328,19 +430,6 @@ namespace ArchViz
             {
                 LOG_FATAL("failed to create framebuffer!");
             }
-        }
-    }
-
-    void VulkanRHI::createCommandPool()
-    {
-        VkCommandPoolCreateInfo pool_info {};
-        pool_info.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        pool_info.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        pool_info.queueFamilyIndex = m_vulkan_device->m_indices.m_graphics_family.value();
-
-        if (vkCreateCommandPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create command pool!");
         }
     }
 
@@ -389,6 +478,7 @@ namespace ArchViz
         m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
     }
 
+    // TODO : move this to scene management
     void VulkanRHI::loadModel()
     {
         std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
@@ -551,6 +641,157 @@ namespace ArchViz
         }
     }
 
+    void VulkanRHI::createShaderStorageBuffers()
+    {
+        // Initialize particles
+        std::default_random_engine            rnd_engine(0); //(unsigned)time(nullptr));
+        std::uniform_real_distribution<float> rnd_dist(0.0f, 1.0f);
+
+        // Initial particle positions on a circle
+        std::vector<Particle> particles(k_particle_count);
+        for (auto& particle : particles)
+        {
+            float r           = 0.25f * sqrt(rnd_dist(rnd_engine));
+            float theta       = rnd_dist(rnd_engine) * 2.0f * 3.14159265358979323846f;
+            float x           = r * cos(theta) * (float)m_vulkan_swap_chain->m_swap_chain_extent.height / (float)m_vulkan_swap_chain->m_swap_chain_extent.width;
+            float y           = r * sin(theta);
+            particle.position = {x, y};
+            particle.velocity = FVector2(x, y).normalized() * 0.00025f;
+            particle.color    = {rnd_dist(rnd_engine), rnd_dist(rnd_engine), rnd_dist(rnd_engine), 1.0f};
+        }
+
+        VkDeviceSize buffer_size = sizeof(Particle) * k_particle_count;
+
+        // Create a staging buffer used to upload data to the gpu
+        VkBuffer       stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        VulkanBufferUtils::createBuffer(
+            m_vulkan_device, buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+        void* data;
+        vkMapMemory(m_vulkan_device->m_device, stagingBufferMemory, 0, buffer_size, 0, &data);
+        memcpy(data, particles.data(), (size_t)buffer_size);
+        vkUnmapMemory(m_vulkan_device->m_device, stagingBufferMemory);
+
+        m_shader_storage_buffers.resize(k_max_frames_in_flight);
+        m_shader_storage_buffers_memory.resize(k_max_frames_in_flight);
+
+        // Copy initial particle data to all storage buffers
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            VulkanBufferUtils::createBuffer(m_vulkan_device,
+                                            buffer_size,
+                                            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                            m_shader_storage_buffers[i],
+                                            m_shader_storage_buffers_memory[i]);
+            VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, stagingBuffer, m_shader_storage_buffers[i], buffer_size);
+        }
+
+        vkDestroyBuffer(m_vulkan_device->m_device, stagingBuffer, nullptr);
+        vkFreeMemory(m_vulkan_device->m_device, stagingBufferMemory, nullptr);
+    }
+
+    void VulkanRHI::createComputeDescriptorSets()
+    {
+        std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_compute_descriptor_set_layout);
+
+        VkDescriptorSetAllocateInfo allocInfo {};
+        allocInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool     = m_descriptor_pool;
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(k_max_frames_in_flight);
+        allocInfo.pSetLayouts        = layouts.data();
+
+        m_compute_descriptor_sets.resize(k_max_frames_in_flight);
+        if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &allocInfo, m_compute_descriptor_sets.data()) != VK_SUCCESS)
+        {
+            LOG_ERROR("failed to allocate compute descriptor sets!");
+        }
+
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            VkDescriptorBufferInfo uniformBufferInfo {};
+            uniformBufferInfo.buffer = m_uniform_buffers[i];
+            uniformBufferInfo.offset = 0;
+            uniformBufferInfo.range  = sizeof(UniformBufferObject);
+
+            std::array<VkWriteDescriptorSet, 3> descriptorWrites {};
+            descriptorWrites[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[0].dstSet          = m_compute_descriptor_sets[i];
+            descriptorWrites[0].dstBinding      = 0;
+            descriptorWrites[0].dstArrayElement = 0;
+            descriptorWrites[0].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pBufferInfo     = &uniformBufferInfo;
+
+            VkDescriptorBufferInfo storageBufferInfoLastFrame {};
+            storageBufferInfoLastFrame.buffer = m_shader_storage_buffers[(i - 1) % k_max_frames_in_flight];
+            storageBufferInfoLastFrame.offset = 0;
+            storageBufferInfoLastFrame.range  = sizeof(Particle) * k_particle_count;
+
+            descriptorWrites[1].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[1].dstSet          = m_compute_descriptor_sets[i];
+            descriptorWrites[1].dstBinding      = 1;
+            descriptorWrites[1].dstArrayElement = 0;
+            descriptorWrites[1].descriptorType  = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            descriptorWrites[1].descriptorCount = 1;
+            descriptorWrites[1].pBufferInfo     = &storageBufferInfoLastFrame;
+
+            VkDescriptorBufferInfo storageBufferInfoCurrentFrame {};
+            storageBufferInfoCurrentFrame.buffer = m_shader_storage_buffers[i];
+            storageBufferInfoCurrentFrame.offset = 0;
+            storageBufferInfoCurrentFrame.range  = sizeof(Particle) * k_particle_count;
+
+            descriptorWrites[2].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[2].dstSet          = m_compute_descriptor_sets[i];
+            descriptorWrites[2].dstBinding      = 2;
+            descriptorWrites[2].dstArrayElement = 0;
+            descriptorWrites[2].descriptorType  = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            descriptorWrites[2].descriptorCount = 1;
+            descriptorWrites[2].pBufferInfo     = &storageBufferInfoCurrentFrame;
+
+            vkUpdateDescriptorSets(m_vulkan_device->m_device, 3, descriptorWrites.data(), 0, nullptr);
+        }
+    }
+
+    void VulkanRHI::createComputeCommandBuffers()
+    {
+        m_compute_command_buffers.resize(k_max_frames_in_flight);
+
+        VkCommandBufferAllocateInfo allocInfo {};
+        allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool        = m_command_pool;
+        allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = (uint32_t)m_compute_command_buffers.size();
+
+        if (vkAllocateCommandBuffers(m_vulkan_device->m_device, &allocInfo, m_compute_command_buffers.data()) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to allocate compute command buffers!");
+        }
+    }
+
+    void VulkanRHI::createComputeSyncObjects()
+    {
+        m_compute_finished_semaphores.resize(k_max_frames_in_flight);
+        m_compute_in_flight_fences.resize(k_max_frames_in_flight);
+
+        VkSemaphoreCreateInfo semaphoreInfo {};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        VkFenceCreateInfo fenceInfo {};
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphoreInfo, nullptr, &m_compute_finished_semaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(m_vulkan_device->m_device, &fenceInfo, nullptr, &m_compute_in_flight_fences[i]) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to create compute synchronization objects for a frame!");
+            }
+        }
+    }
+
     void VulkanRHI::createBindlessDescriptorSets()
     {
         if (!m_bindless_supported)
@@ -640,10 +881,14 @@ namespace ArchViz
 
         createDescriptorPool();
         createBindlessDescriptorPool();
+
         createDescriptorSetLayout();
+        createComputeDescriptorSetLayout();
         createBindlessDescriptorSetLayout();
+
         createRenderPass();
         createGraphicsPipeline();
+        createComputePipeline();
 
         createCommandPool();
 
@@ -661,6 +906,11 @@ namespace ArchViz
         createUniformBuffers();
         createDescriptorSets();
 
+        createShaderStorageBuffers();
+        createComputeDescriptorSets();
+        createComputeCommandBuffers();
+        createComputeSyncObjects();
+
         createBindlessDescriptorSets();
 
         createSyncObjects();
@@ -668,11 +918,11 @@ namespace ArchViz
         createImGui();
     }
 
-    void VulkanRHI::setFPS(uint32_t fps)
-    {
-        m_fps = fps;
-        m_vulkan_ui->setFPS(m_fps);
-    }
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     void VulkanRHI::recordCommandBuffer(VkCommandBuffer command_buffer, uint32_t image_index)
     {
@@ -833,9 +1083,36 @@ namespace ArchViz
         drawFrame();
     }
 
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
     void VulkanRHI::clear()
     {
         m_vulkan_device->wait();
+
+        m_vulkan_texture_ui->clear();
+        m_vulkan_texture_ui.reset();
+
+        m_vulkan_texture->clear();
+        m_vulkan_texture.reset();
+
+        m_vulkan_ui->clear();
+        m_vulkan_ui.reset();
+
+        m_vulkan_pipeline->clear();
+        m_vulkan_pipeline.reset();
+
+        m_vulkan_render_pass->clear();
+        m_vulkan_render_pass.reset();
+
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            vkDestroySemaphore(m_vulkan_device->m_device, m_compute_finished_semaphores[i], nullptr);
+            vkDestroyFence(m_vulkan_device->m_device, m_compute_in_flight_fences[i], nullptr);
+        }
 
         for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
@@ -849,16 +1126,12 @@ namespace ArchViz
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
         }
 
+        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        {
+            VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_shader_storage_buffers[i], m_shader_storage_buffers_memory[i]);
+        }
+
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
-
-        m_vulkan_texture_ui->clear();
-        m_vulkan_texture_ui.reset();
-
-        m_vulkan_texture->clear();
-        m_vulkan_texture.reset();
-
-        m_vulkan_ui->clear();
-        m_vulkan_ui.reset();
 
         VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_index_buffer, m_index_buffer_memory);
         VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_vertex_buffer, m_vertex_buffer_memory);
@@ -872,23 +1145,21 @@ namespace ArchViz
             vkDestroyFramebuffer(m_vulkan_device->m_device, framebuffer, nullptr);
         }
 
+        vkDestroyPipeline(m_vulkan_device->m_device, m_compute_pipeline, nullptr);
+        vkDestroyPipelineLayout(m_vulkan_device->m_device, m_compute_pipeline_layout, nullptr);
+
         if (m_bindless_supported)
         {
             vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_bindless_set_layout, nullptr);
             vkDestroyDescriptorPool(m_vulkan_device->m_device, m_bindless_pool, nullptr);
         }
 
+        vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_compute_descriptor_set_layout, nullptr);
         vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_descriptor_set_layout, nullptr);
 
         vkDestroyDescriptorPool(m_vulkan_device->m_device, m_descriptor_pool, nullptr);
 
-        m_vulkan_pipeline->clear();
-        m_vulkan_pipeline.reset();
-
         vkDestroyPipelineCache(m_vulkan_device->m_device, m_pipeline_cache, nullptr);
-
-        m_vulkan_render_pass->clear();
-        m_vulkan_render_pass.reset();
 
         m_vulkan_swap_chain->clear();
         m_vulkan_swap_chain.reset();
