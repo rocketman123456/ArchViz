@@ -49,12 +49,6 @@ namespace ArchViz
         bool operator==(const Vertex& other) const { return pos == other.pos && color == other.color && tex_coord == other.tex_coord; }
     };
 
-    struct UniformBufferObject
-    {
-        alignas(16) FMatrix4 model;
-        alignas(16) FMatrix4 view;
-        alignas(16) FMatrix4 proj;
-    };
 } // namespace ArchViz
 
 namespace std

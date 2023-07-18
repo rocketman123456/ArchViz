@@ -2,6 +2,8 @@
 #include "runtime/function/render/rhi/rhi.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 
+#include "runtime/function/render/geometry/light.h"
+#include "runtime/function/render/geometry/particle.h"
 #include "runtime/function/render/geometry/vertex.h"
 
 #include <volk.h>
@@ -26,6 +28,13 @@ namespace ArchViz
     class VulkanUI;
     class VulkanTexture;
     class Vertex;
+
+    struct UniformBufferObject
+    {
+        alignas(16) FMatrix4 model;
+        alignas(16) FMatrix4 view;
+        alignas(16) FMatrix4 proj;
+    };
 
     class VulkanRHI : public RHI
     {

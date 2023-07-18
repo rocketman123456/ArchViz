@@ -1,5 +1,6 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/utils/vulkan_debug_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
@@ -60,6 +61,8 @@ namespace ArchViz
         m_vulkan_instance = std::make_shared<VulkanInstance>(m_enable_validation_layers);
         m_vulkan_instance->connect(m_initialize_info.window_system->getWindow());
         m_vulkan_instance->initialize();
+
+        VulkanDebugUtils::setup(m_vulkan_instance->m_instance);
     }
 
     void VulkanRHI::createVulkanDevice()
@@ -951,23 +954,27 @@ namespace ArchViz
     // ---------------------------------------------------------------------------
     // ---------------------------------------------------------------------------
 
-    void VulkanRHI::recordComputeCommandBuffer(VkCommandBuffer commandBuffer)
+    void VulkanRHI::recordComputeCommandBuffer(VkCommandBuffer command_buffer)
     {
         VkCommandBufferBeginInfo beginInfo {};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
+        if (vkBeginCommandBuffer(command_buffer, &beginInfo) != VK_SUCCESS)
         {
             LOG_FATAL("failed to begin recording compute command buffer!");
         }
 
-        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline);
+        VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 0: compute pass", {1.0f, 0.78f, 0.05f, 1.0f});
 
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline_layout, 0, 1, &m_compute_descriptor_sets[m_current_frame], 0, nullptr);
+        vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline);
 
-        vkCmdDispatch(commandBuffer, k_particle_count / 256, 1, 1);
+        vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline_layout, 0, 1, &m_compute_descriptor_sets[m_current_frame], 0, nullptr);
 
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+        vkCmdDispatch(command_buffer, k_particle_count / 256, 1, 1);
+
+        VulkanDebugUtils::cmdEndLabel(command_buffer);
+
+        if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
         {
             LOG_FATAL("failed to record compute command buffer!");
         }
@@ -1001,6 +1008,8 @@ namespace ArchViz
             vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
             {
+                VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 1: color pass", {0.0f, 0.5f, 1.0f, 1.0f});
+
                 vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline);
 
                 // https://www.saschawillems.de/blog/2019/03/29/flipping-the-vulkan-viewport/
@@ -1027,10 +1036,16 @@ namespace ArchViz
                 vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
 
                 vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+
+                VulkanDebugUtils::cmdEndLabel(command_buffer);
             }
 
             {
+                VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 2: ui pass", {0.5f, 0.76f, 0.34f, 1.0f});
+
                 m_vulkan_ui->recordCommandBuffer(command_buffer, m_swap_chain_framebuffers[image_index]);
+
+                VulkanDebugUtils::cmdEndLabel(command_buffer);
             }
 
             vkCmdEndRenderPass(command_buffer);

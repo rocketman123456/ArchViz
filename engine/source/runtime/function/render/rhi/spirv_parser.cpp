@@ -373,6 +373,9 @@ namespace ArchViz
                 word_index += word_count;
             }
 
+            LOG_DEBUG("");
+            LOG_DEBUG("SPRIV parse result: ");
+
             for (uint32_t id_index = 0; id_index < ids.size(); ++id_index)
             {
                 Id& id = ids[id_index];
@@ -418,6 +421,8 @@ namespace ArchViz
 
                             parse_result.set_count = std::max(parse_result.set_count, (id.set + 1));
 
+                            LOG_DEBUG("\t binding: name: {}, start: {}, count: {}", binding.name, binding.start, binding.count);
+
                             break;
                         }
                     }
@@ -425,6 +430,9 @@ namespace ArchViz
                 id.members.clear();
             }
             ids.clear();
+
+            LOG_DEBUG("SPRIV parse finish");
         }
+
     } // namespace SPIRV
 } // namespace ArchViz
