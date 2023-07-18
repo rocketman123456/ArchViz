@@ -89,8 +89,8 @@ namespace ArchViz
         m_vertex_buffer = std::make_shared<VulkanBuffer>();
         m_index_buffer  = std::make_shared<VulkanBuffer>();
 
-        m_vertex_buffer->device = m_device->m_device;
-        m_index_buffer->device  = m_device->m_device;
+        m_vertex_buffer->device = m_device;
+        m_index_buffer->device  = m_device;
 
         // createRenderPass();
         createDescriptorSetLayout();
@@ -610,8 +610,8 @@ namespace ArchViz
             vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
             VkViewport viewport {};
-            viewport.width    = ImGui::GetIO().DisplaySize.x;
-            viewport.height   = ImGui::GetIO().DisplaySize.y;
+            viewport.width    = io.DisplaySize.x;
+            viewport.height   = io.DisplaySize.y;
             viewport.minDepth = 0.0f;
             viewport.maxDepth = 1.0f;
             vkCmdSetViewport(command_buffer, 0, 1, &viewport);

@@ -1,21 +1,22 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_buffer.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
 
 #include "runtime/core/base/macro.h"
 
 namespace ArchViz
 {
-    VkResult VulkanBuffer::map(VkDeviceSize size, VkDeviceSize offset) { return vkMapMemory(device, memory, offset, size, 0, &mapped); }
+    VkResult VulkanBuffer::map(VkDeviceSize size, VkDeviceSize offset) { return vkMapMemory(device->m_device, memory, offset, size, 0, &mapped); }
 
     void VulkanBuffer::unmap()
     {
         if (mapped)
         {
-            vkUnmapMemory(device, memory);
+            vkUnmapMemory(device->m_device, memory);
             mapped = nullptr;
         }
     }
 
-    VkResult VulkanBuffer::bind(VkDeviceSize offset) { return vkBindBufferMemory(device, buffer, memory, offset); }
+    VkResult VulkanBuffer::bind(VkDeviceSize offset) { return vkBindBufferMemory(device->m_device, buffer, memory, offset); }
 
     void VulkanBuffer::setupDescriptor(VkDeviceSize size, VkDeviceSize offset)
     {
@@ -37,7 +38,7 @@ namespace ArchViz
         mapped_range.memory              = memory;
         mapped_range.offset              = offset;
         mapped_range.size                = size;
-        return vkFlushMappedMemoryRanges(device, 1, &mapped_range);
+        return vkFlushMappedMemoryRanges(device->m_device, 1, &mapped_range);
     }
 
     VkResult VulkanBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
@@ -47,7 +48,7 @@ namespace ArchViz
         mapped_range.memory              = memory;
         mapped_range.offset              = offset;
         mapped_range.size                = size;
-        return vkInvalidateMappedMemoryRanges(device, 1, &mapped_range);
+        return vkInvalidateMappedMemoryRanges(device->m_device, 1, &mapped_range);
     }
 
     void VulkanBuffer::destroy()
@@ -58,11 +59,11 @@ namespace ArchViz
         }
         if (buffer)
         {
-            vkDestroyBuffer(device, buffer, nullptr);
+            vkDestroyBuffer(device->m_device, buffer, nullptr);
         }
         if (memory)
         {
-            vkFreeMemory(device, memory, nullptr);
+            vkFreeMemory(device->m_device, memory, nullptr);
         }
     }
 } // namespace ArchViz

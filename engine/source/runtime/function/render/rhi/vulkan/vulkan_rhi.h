@@ -27,6 +27,7 @@ namespace ArchViz
     class VulkanInstance;
     class VulkanUI;
     class VulkanTexture;
+    class VulkanBuffer;
     class Vertex;
 
     struct UniformBufferObject
@@ -199,10 +200,13 @@ namespace ArchViz
         std::vector<VkDeviceMemory> m_uniform_buffers_memory;
         std::vector<void*>          m_uniform_buffers_mapped;
 
-        VkBuffer       m_vertex_buffer;
-        VkDeviceMemory m_vertex_buffer_memory;
-        VkBuffer       m_index_buffer;
-        VkDeviceMemory m_index_buffer_memory;
+        std::shared_ptr<VulkanBuffer> m_vulkan_vertex_buffer;
+        std::shared_ptr<VulkanBuffer> m_vulkan_index_buffer;
+
+        //VkBuffer       m_vertex_buffer;
+        //VkDeviceMemory m_vertex_buffer_memory;
+        //VkBuffer       m_index_buffer;
+        //VkDeviceMemory m_index_buffer_memory;
 
         // The main purpose of a command pool is to be a (mostly) single-threaded allocator for the storage used by a set of command buffers which are filled by that thread.
         VkCommandPool                m_command_pool;

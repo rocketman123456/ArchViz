@@ -3,6 +3,7 @@
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_debug_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_buffer.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_device.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_pipeline.h"
@@ -443,53 +444,78 @@ namespace ArchViz
     {
         VkDeviceSize buffer_size = sizeof(m_vertices[0]) * m_vertices.size();
 
-        VkBuffer              staging_buffer;
-        VkDeviceMemory        staging_buffer_memory;
-        VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
+        // VkBuffer              staging_buffer;
+        // VkDeviceMemory        staging_buffer_memory;
+        // VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        // VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
 
-        void* data;
-        vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
-        {
-            memcpy(data, m_vertices.data(), (size_t)buffer_size);
-        }
-        vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
+        // void* data;
+        // vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+        // {
+        //     memcpy(data, m_vertices.data(), (size_t)buffer_size);
+        // }
+        // vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
 
-        usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_vertex_buffer, m_vertex_buffer_memory);
+        // usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        // properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_vertex_buffer, m_vertex_buffer_memory);
+        // VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_vertex_buffer, buffer_size);
+        // VulkanBufferUtils::destroyBuffer(m_vulkan_device, staging_buffer, staging_buffer_memory);
 
-        VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_vertex_buffer, buffer_size);
+        m_vulkan_vertex_buffer           = std::make_shared<VulkanBuffer>();
+        m_vulkan_vertex_buffer->size     = buffer_size;
+        m_vulkan_vertex_buffer->usage    = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        m_vulkan_vertex_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        m_vulkan_vertex_buffer->device   = m_vulkan_device;
 
-        VulkanBufferUtils::destroyBuffer(m_vulkan_device, staging_buffer, staging_buffer_memory);
+        VulkanBufferUtils::createBuffer(
+            m_vulkan_device, m_vulkan_vertex_buffer->size, m_vulkan_vertex_buffer->usage, m_vulkan_vertex_buffer->property, m_vulkan_vertex_buffer->buffer, m_vulkan_vertex_buffer->memory);
+
+        m_vulkan_vertex_buffer->setupDescriptor();
+        m_vulkan_vertex_buffer->map();
+        memcpy(m_vulkan_vertex_buffer->mapped, m_vertices.data(), (size_t)buffer_size);
+        m_vulkan_vertex_buffer->unmap();
+        m_vulkan_vertex_buffer->flush();
     }
 
     void VulkanRHI::createIndexBuffer()
     {
         VkDeviceSize buffer_size = sizeof(m_indices[0]) * m_indices.size();
 
-        VkBuffer              staging_buffer;
-        VkDeviceMemory        staging_buffer_memory;
-        VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
+        // VkBuffer              staging_buffer;
+        // VkDeviceMemory        staging_buffer_memory;
+        // VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        // VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
 
-        void* data;
-        vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
-        {
-            memcpy(data, m_indices.data(), (size_t)buffer_size);
-        }
-        vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
+        // void* data;
+        // vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+        //{
+        //     memcpy(data, m_indices.data(), (size_t)buffer_size);
+        // }
+        // vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
 
-        usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-        properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-        VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_index_buffer, m_index_buffer_memory);
+        // usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        // properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_index_buffer, m_index_buffer_memory);
+        // VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_index_buffer, buffer_size);
+        // VulkanBufferUtils::destroyBuffer(m_vulkan_device, staging_buffer, staging_buffer_memory);
 
-        VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_index_buffer, buffer_size);
+        m_vulkan_index_buffer           = std::make_shared<VulkanBuffer>();
+        m_vulkan_index_buffer->size     = buffer_size;
+        m_vulkan_index_buffer->usage    = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        m_vulkan_index_buffer->property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        m_vulkan_index_buffer->device   = m_vulkan_device;
 
-        vkDestroyBuffer(m_vulkan_device->m_device, staging_buffer, nullptr);
-        vkFreeMemory(m_vulkan_device->m_device, staging_buffer_memory, nullptr);
+        VulkanBufferUtils::createBuffer(
+            m_vulkan_device, m_vulkan_index_buffer->size, m_vulkan_index_buffer->usage, m_vulkan_index_buffer->property, m_vulkan_index_buffer->buffer, m_vulkan_index_buffer->memory);
+
+        m_vulkan_index_buffer->setupDescriptor();
+        m_vulkan_index_buffer->map();
+        memcpy(m_vulkan_index_buffer->mapped, m_indices.data(), (size_t)buffer_size);
+        m_vulkan_index_buffer->unmap();
+        m_vulkan_index_buffer->flush();
     }
 
     void VulkanRHI::createUniformBuffers()
@@ -1027,15 +1053,28 @@ namespace ArchViz
                 scissor.extent = m_vulkan_swap_chain->m_swap_chain_extent;
                 vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
-                VkBuffer     vertex_buffers[] = {m_vertex_buffer};
+                VkBuffer     vertex_buffers[] = {m_vulkan_vertex_buffer->buffer};
                 VkDeviceSize offsets[]        = {0};
                 vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
 
-                vkCmdBindIndexBuffer(command_buffer, m_index_buffer, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdBindIndexBuffer(command_buffer, m_vulkan_index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
 
                 vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
 
                 vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+
+                VulkanDebugUtils::cmdEndLabel(command_buffer);
+            }
+
+            {
+                VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 1.1: color pass", {0.0f, 0.5f, 1.0f, 1.0f});
+
+                //VkBuffer     vertex_buffers[] = {m_vulkan_vertex_buffer->buffer};
+                //VkDeviceSize offsets[]        = {0};
+                //vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
+                //vkCmdBindIndexBuffer(command_buffer, m_vulkan_index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
+                //vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
+                //vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
 
                 VulkanDebugUtils::cmdEndLabel(command_buffer);
             }
@@ -1198,6 +1237,9 @@ namespace ArchViz
         m_vulkan_render_pass->clear();
         m_vulkan_render_pass.reset();
 
+        m_vulkan_vertex_buffer->destroy();
+        m_vulkan_index_buffer->destroy();
+
         for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             vkDestroySemaphore(m_vulkan_device->m_device, m_compute_finished_semaphores[i], nullptr);
@@ -1228,8 +1270,8 @@ namespace ArchViz
 
         vkDestroyCommandPool(m_vulkan_device->m_device, m_command_pool, nullptr);
 
-        VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_index_buffer, m_index_buffer_memory);
-        VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_vertex_buffer, m_vertex_buffer_memory);
+        // VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_index_buffer, m_index_buffer_memory);
+        // VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_vertex_buffer, m_vertex_buffer_memory);
 
         vkDestroyImageView(m_vulkan_device->m_device, m_depth_image_view, nullptr);
         vkDestroyImage(m_vulkan_device->m_device, m_depth_image, nullptr);
