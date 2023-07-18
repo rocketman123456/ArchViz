@@ -133,6 +133,10 @@ namespace ArchViz
         m_rhi->m_ubo.proj  = Math::perspective(45.0f, (float)width / (float)height, 0.01f, 100.0f); // m_render_camera->m_projction;
         m_rhi->m_ubo.model = model;
         // m_rhi->m_ubo.proj(1, 1) = m_rhi->m_ubo.proj(1, 1) * -1.0f; // vulkan's screen coordinate y axis is inerted
+
+        m_rhi->m_light_ubo.color = {1.0f, 1.0f, 1.0f};
+        // sin(time * 0.5f) * 0.5f + 0.5f};
+        m_rhi->m_light_ubo.position = {-1.2f, -1.0f, 1.0f + sin(time)};
     }
 
     void RenderSystem::clear()

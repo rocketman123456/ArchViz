@@ -72,7 +72,7 @@ namespace ArchViz
         void createDescriptorPool();
         void createBindlessDescriptorPool();
 
-        void createDescriptorSetLayout();
+        //void createDescriptorSetLayout();
         void createBindlessDescriptorSetLayout();
 
         void createRenderPass();
@@ -192,8 +192,8 @@ namespace ArchViz
         VkDescriptorSetLayout m_bindless_set_layout;
         VkDescriptorSet       m_bindless_set;
 
-        VkDescriptorPool             m_descriptor_pool;
-        VkDescriptorSetLayout        m_descriptor_set_layout;
+        VkDescriptorPool m_descriptor_pool;
+
         std::vector<VkDescriptorSet> m_descriptor_sets;
 
         std::vector<VkBuffer>       m_uniform_buffers;

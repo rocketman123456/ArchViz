@@ -187,42 +187,6 @@ namespace ArchViz
         }
     }
 
-    void VulkanRHI::createDescriptorSetLayout()
-    {
-        VkDescriptorSetLayoutBinding ubo_layout_binding {};
-        ubo_layout_binding.binding            = 0;
-        ubo_layout_binding.descriptorCount    = 1;
-        ubo_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        ubo_layout_binding.pImmutableSamplers = nullptr;
-        ubo_layout_binding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
-
-        VkDescriptorSetLayoutBinding sampler_layout_binding {};
-        sampler_layout_binding.binding            = 1;
-        sampler_layout_binding.descriptorCount    = 1;
-        sampler_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        sampler_layout_binding.pImmutableSamplers = nullptr;
-        sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        VkDescriptorSetLayoutBinding light_layout_binding {};
-        light_layout_binding.binding            = 2;
-        light_layout_binding.descriptorCount    = 1;
-        light_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        light_layout_binding.pImmutableSamplers = nullptr;
-        light_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        std::array<VkDescriptorSetLayoutBinding, 3> bindings = {ubo_layout_binding, sampler_layout_binding, light_layout_binding};
-
-        VkDescriptorSetLayoutCreateInfo layout_info {};
-        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
-        layout_info.pBindings    = bindings.data();
-
-        if (vkCreateDescriptorSetLayout(m_vulkan_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
-        {
-            LOG_FATAL("failed to create descriptor set layout!");
-        }
-    }
-
     void VulkanRHI::createBindlessDescriptorSetLayout()
     {
         if (!m_bindless_supported)
@@ -295,11 +259,10 @@ namespace ArchViz
 
         m_vulkan_pipeline = std::make_shared<VulkanPipeline>();
 
-        m_vulkan_pipeline->m_device                = m_vulkan_device;
-        m_vulkan_pipeline->m_shader                = shader;
-        m_vulkan_pipeline->m_render_pass           = m_vulkan_render_pass->m_render_pass;
-        m_vulkan_pipeline->m_pipeline_cache        = m_pipeline_cache;
-        m_vulkan_pipeline->m_descriptor_set_layout = m_descriptor_set_layout;
+        m_vulkan_pipeline->m_device         = m_vulkan_device;
+        m_vulkan_pipeline->m_shader         = shader;
+        m_vulkan_pipeline->m_render_pass    = m_vulkan_render_pass->m_render_pass;
+        m_vulkan_pipeline->m_pipeline_cache = m_pipeline_cache;
 
         m_vulkan_pipeline->initialize();
     }
@@ -404,6 +367,12 @@ namespace ArchViz
         m_vulkan_texture_ui->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
     }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     // TODO : move this to scene management
     void VulkanRHI::loadModel()
@@ -517,7 +486,7 @@ namespace ArchViz
 
     void VulkanRHI::createDescriptorSets()
     {
-        std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_descriptor_set_layout);
+        std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_vulkan_pipeline->m_descriptor_set_layout);
 
         VkDescriptorSetAllocateInfo alloc_info {};
         alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -928,8 +897,6 @@ namespace ArchViz
         createDescriptorPool();
         createBindlessDescriptorPool();
 
-        createDescriptorSetLayout();
-
         createBindlessDescriptorSetLayout();
 
         createRenderPass();
@@ -1092,9 +1059,8 @@ namespace ArchViz
 
     void VulkanRHI::updateUniformBuffer(uint32_t current_image)
     {
-        m_dt_ubo             = 1.0f;
-        m_light_ubo.color    = {1.0f, 1.0f, 1.0f};
-        m_light_ubo.position = {-1.2f, -1.0f, 2.0f};
+        m_dt_ubo = 1.0f;
+
         // update particle ubo
         memcpy(m_particle_uniform_buffers_mapped[current_image], &m_dt_ubo, sizeof(float));
         // update required data
@@ -1286,7 +1252,7 @@ namespace ArchViz
         }
 
         vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_compute_descriptor_set_layout, nullptr);
-        vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_descriptor_set_layout, nullptr);
+        // vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_descriptor_set_layout, nullptr);
 
         vkDestroyDescriptorPool(m_vulkan_device->m_device, m_descriptor_pool, nullptr);
 

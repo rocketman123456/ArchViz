@@ -17,6 +17,10 @@ namespace ArchViz
         void initialize();
         void clear();
 
+    private:
+        void createDescriptorSetLayout();
+        void createPipeline();
+
     public:
         std::shared_ptr<VulkanDevice> m_device;
         std::shared_ptr<VulkanShader> m_shader;
@@ -26,6 +30,7 @@ namespace ArchViz
 
         VkPipelineLayout      m_pipeline_layout;
         VkPipeline            m_pipeline;
+
         VkDescriptorSetLayout m_descriptor_set_layout;
     };
 } // namespace ArchViz

@@ -16,6 +16,50 @@ namespace ArchViz
     {
         m_shader->initialize();
 
+        createDescriptorSetLayout();
+        createPipeline();
+
+        m_shader->clear();
+    }
+
+    void VulkanPipeline::createDescriptorSetLayout()
+    {
+        VkDescriptorSetLayoutBinding ubo_layout_binding {};
+        ubo_layout_binding.binding            = 0;
+        ubo_layout_binding.descriptorCount    = 1;
+        ubo_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        ubo_layout_binding.pImmutableSamplers = nullptr;
+        ubo_layout_binding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+
+        VkDescriptorSetLayoutBinding sampler_layout_binding {};
+        sampler_layout_binding.binding            = 1;
+        sampler_layout_binding.descriptorCount    = 1;
+        sampler_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding light_layout_binding {};
+        light_layout_binding.binding            = 2;
+        light_layout_binding.descriptorCount    = 1;
+        light_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        light_layout_binding.pImmutableSamplers = nullptr;
+        light_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 3> bindings = {ubo_layout_binding, sampler_layout_binding, light_layout_binding};
+
+        VkDescriptorSetLayoutCreateInfo layout_info {};
+        layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings    = bindings.data();
+
+        if (vkCreateDescriptorSetLayout(m_device->m_device, &layout_info, nullptr, &m_descriptor_set_layout) != VK_SUCCESS)
+        {
+            LOG_FATAL("failed to create descriptor set layout!");
+        }
+    }
+
+    void VulkanPipeline::createPipeline()
+    {
         // TODO : add custom bindings
         auto binding_description    = Vertex::getBindingDescription();
         auto attribute_descriptions = Vertex::getAttributeDescriptions();
@@ -117,13 +161,12 @@ namespace ArchViz
         {
             LOG_FATAL("failed to create graphics pipeline!");
         }
-
-        m_shader->clear();
     }
 
     void VulkanPipeline::clear()
     {
         vkDestroyPipeline(m_device->m_device, m_pipeline, nullptr);
         vkDestroyPipelineLayout(m_device->m_device, m_pipeline_layout, nullptr);
+        vkDestroyDescriptorSetLayout(m_device->m_device, m_descriptor_set_layout, nullptr);
     }
 } // namespace ArchViz
