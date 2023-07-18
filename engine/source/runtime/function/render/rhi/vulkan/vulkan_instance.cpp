@@ -124,18 +124,18 @@ namespace ArchViz
             LOG_FATAL("failed to set up debug messenger!");
         }
 
-        auto FUNC_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
+        //auto FUNC_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
 
-        VkDebugReportCallbackCreateInfoEXT debug_report_ci;
-        debug_report_ci.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-        debug_report_ci.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-        debug_report_ci.pfnCallback = debug_report;
-        debug_report_ci.pUserData   = nullptr;
-        debug_report_ci.pNext       = nullptr;
-        if (FUNC_vkCreateDebugReportCallbackEXT(m_instance, &debug_report_ci, nullptr, &m_report_callback))
-        {
-            LOG_FATAL("failed to set up debug report!");
-        }
+        //VkDebugReportCallbackCreateInfoEXT debug_report_ci;
+        //debug_report_ci.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+        //debug_report_ci.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+        //debug_report_ci.pfnCallback = debug_report;
+        //debug_report_ci.pUserData   = nullptr;
+        //debug_report_ci.pNext       = nullptr;
+        //if (FUNC_vkCreateDebugReportCallbackEXT(m_instance, &debug_report_ci, nullptr, &m_report_callback))
+        //{
+        //    LOG_FATAL("failed to set up debug report!");
+        //}
     }
 
     void VulkanInstance::initSurface()
@@ -166,7 +166,7 @@ namespace ArchViz
         if (m_validation)
         {
             destroy_debug_utils_messenger_ext(m_instance, m_debug_messenger, nullptr);
-            vkDestroyDebugReportCallbackEXT(m_instance, m_report_callback, nullptr);
+            //vkDestroyDebugReportCallbackEXT(m_instance, m_report_callback, nullptr);
         }
 
         vkDestroyInstance(m_instance, nullptr);

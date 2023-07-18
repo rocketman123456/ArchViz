@@ -1043,6 +1043,8 @@ namespace ArchViz
             {
                 VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 2: ui pass", {0.5f, 0.76f, 0.34f, 1.0f});
 
+                vkCmdNextSubpass(command_buffer, VK_SUBPASS_CONTENTS_INLINE);
+
                 m_vulkan_ui->recordCommandBuffer(command_buffer, m_swap_chain_framebuffers[image_index]);
 
                 VulkanDebugUtils::cmdEndLabel(command_buffer);
@@ -1071,16 +1073,15 @@ namespace ArchViz
         // wait compute fence (first render pass)
         // Compute submission
         vkWaitForFences(m_vulkan_device->m_device, 1, &m_compute_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
+        vkResetFences(m_vulkan_device->m_device, 1, &m_compute_in_flight_fences[m_current_frame]);
+
+        updateUniformBuffer(m_current_frame);
     }
 
     void VulkanRHI::drawFrame()
     {
         VkSubmitInfo submitInfo {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        updateUniformBuffer(m_current_frame);
-
-        vkResetFences(m_vulkan_device->m_device, 1, &m_compute_in_flight_fences[m_current_frame]);
 
         vkResetCommandBuffer(m_compute_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
         recordComputeCommandBuffer(m_compute_command_buffers[m_current_frame]);

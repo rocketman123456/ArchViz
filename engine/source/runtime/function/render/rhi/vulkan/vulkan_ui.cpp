@@ -285,8 +285,6 @@ namespace ArchViz
         dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_state_enables.size());
         dynamic_state.flags             = 0;
 
-        // std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages {};
-
         VkVertexInputBindingDescription binding_description {};
         binding_description.binding   = 0;
         binding_description.stride    = sizeof(ImDrawVert);
@@ -338,6 +336,7 @@ namespace ArchViz
         pipeline_create_info.stageCount          = static_cast<uint32_t>(m_shader->m_stage_info.size());
         pipeline_create_info.pStages             = m_shader->m_stage_info.data();
         pipeline_create_info.pVertexInputState   = &vertex_input_state;
+        pipeline_create_info.subpass             = 1;
 
         if (vkCreateGraphicsPipelines(m_device->m_device, m_pipeline_cache, 1, &pipeline_create_info, nullptr, &m_pipeline) != VK_SUCCESS)
         {

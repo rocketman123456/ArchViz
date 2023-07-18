@@ -110,8 +110,8 @@ namespace ArchViz
         pipeline_info.pDynamicState       = &dynamic_state;
         pipeline_info.layout              = m_pipeline_layout;
         pipeline_info.renderPass          = m_render_pass;
-        pipeline_info.subpass             = 0;
         pipeline_info.basePipelineHandle  = VK_NULL_HANDLE;
+        pipeline_info.subpass             = 0;
 
         if (vkCreateGraphicsPipelines(m_device->m_device, m_pipeline_cache, 1, &pipeline_info, nullptr, &m_pipeline) != VK_SUCCESS)
         {
