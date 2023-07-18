@@ -203,7 +203,14 @@ namespace ArchViz
         sampler_layout_binding.pImmutableSamplers = nullptr;
         sampler_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        std::array<VkDescriptorSetLayoutBinding, 2> bindings = {ubo_layout_binding, sampler_layout_binding};
+        VkDescriptorSetLayoutBinding light_layout_binding {};
+        light_layout_binding.binding            = 2;
+        light_layout_binding.descriptorCount    = 1;
+        light_layout_binding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        light_layout_binding.pImmutableSamplers = nullptr;
+        light_layout_binding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 3> bindings = {ubo_layout_binding, sampler_layout_binding, light_layout_binding};
 
         VkDescriptorSetLayoutCreateInfo layout_info {};
         layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -414,7 +421,7 @@ namespace ArchViz
             throw std::runtime_error(warn + err);
         }
 
-        std::unordered_map<Vertex, uint32_t> uniqueVertices {};
+        std::unordered_map<Vertex, uint32_t> unique_vertices {};
 
         for (const auto& shape : shapes)
         {
@@ -424,18 +431,21 @@ namespace ArchViz
 
                 vertex.pos = {attrib.vertices[3 * index.vertex_index + 0], attrib.vertices[3 * index.vertex_index + 1], attrib.vertices[3 * index.vertex_index + 2]};
 
+                // vertex.color = {attrib.colors[3 * index.vertex_index + 0], attrib.colors[3 * index.vertex_index + 1], attrib.colors[3 * index.vertex_index + 2]};
+                vertex.color = {1.0f, 1.0f, 1.0f};
+
+                vertex.normal = {attrib.normals[3 * index.normal_index + 0], attrib.normals[3 * index.normal_index + 1], attrib.normals[3 * index.normal_index + 2]};
+
                 vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], 1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
                 // vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], attrib.texcoords[2 * index.texcoord_index + 1]};
 
-                vertex.color = {1.0f, 1.0f, 1.0f};
-
-                if (uniqueVertices.count(vertex) == 0)
+                if (unique_vertices.count(vertex) == 0)
                 {
-                    uniqueVertices[vertex] = static_cast<uint32_t>(m_vertices.size());
+                    unique_vertices[vertex] = static_cast<uint32_t>(m_vertices.size());
                     m_vertices.push_back(vertex);
                 }
 
-                m_indices.push_back(uniqueVertices[vertex]);
+                m_indices.push_back(unique_vertices[vertex]);
             }
         }
     }
@@ -443,25 +453,6 @@ namespace ArchViz
     void VulkanRHI::createVertexBuffer()
     {
         VkDeviceSize buffer_size = sizeof(m_vertices[0]) * m_vertices.size();
-
-        // VkBuffer              staging_buffer;
-        // VkDeviceMemory        staging_buffer_memory;
-        // VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        // VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
-
-        // void* data;
-        // vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
-        // {
-        //     memcpy(data, m_vertices.data(), (size_t)buffer_size);
-        // }
-        // vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
-
-        // usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        // properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_vertex_buffer, m_vertex_buffer_memory);
-        // VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_vertex_buffer, buffer_size);
-        // VulkanBufferUtils::destroyBuffer(m_vulkan_device, staging_buffer, staging_buffer_memory);
 
         m_vulkan_vertex_buffer           = std::make_shared<VulkanBuffer>();
         m_vulkan_vertex_buffer->size     = buffer_size;
@@ -475,32 +466,13 @@ namespace ArchViz
         m_vulkan_vertex_buffer->setupDescriptor();
         m_vulkan_vertex_buffer->map();
         memcpy(m_vulkan_vertex_buffer->mapped, m_vertices.data(), (size_t)buffer_size);
-        m_vulkan_vertex_buffer->unmap();
         m_vulkan_vertex_buffer->flush();
+        m_vulkan_vertex_buffer->unmap();
     }
 
     void VulkanRHI::createIndexBuffer()
     {
         VkDeviceSize buffer_size = sizeof(m_indices[0]) * m_indices.size();
-
-        // VkBuffer              staging_buffer;
-        // VkDeviceMemory        staging_buffer_memory;
-        // VkBufferUsageFlags    usage      = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        // VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, staging_buffer, staging_buffer_memory);
-
-        // void* data;
-        // vkMapMemory(m_vulkan_device->m_device, staging_buffer_memory, 0, buffer_size, 0, &data);
-        //{
-        //     memcpy(data, m_indices.data(), (size_t)buffer_size);
-        // }
-        // vkUnmapMemory(m_vulkan_device->m_device, staging_buffer_memory);
-
-        // usage      = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-        // properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-        // VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, properties, m_index_buffer, m_index_buffer_memory);
-        // VulkanBufferUtils::copyBuffer(m_vulkan_device, m_command_pool, staging_buffer, m_index_buffer, buffer_size);
-        // VulkanBufferUtils::destroyBuffer(m_vulkan_device, staging_buffer, staging_buffer_memory);
 
         m_vulkan_index_buffer           = std::make_shared<VulkanBuffer>();
         m_vulkan_index_buffer->size     = buffer_size;
@@ -514,25 +486,32 @@ namespace ArchViz
         m_vulkan_index_buffer->setupDescriptor();
         m_vulkan_index_buffer->map();
         memcpy(m_vulkan_index_buffer->mapped, m_indices.data(), (size_t)buffer_size);
-        m_vulkan_index_buffer->unmap();
         m_vulkan_index_buffer->flush();
+        m_vulkan_index_buffer->unmap();
     }
 
     void VulkanRHI::createUniformBuffers()
     {
-        VkDeviceSize buffer_size = sizeof(UniformBufferObject);
+        VkDeviceSize buffer_size = sizeof(UBO);
 
         m_uniform_buffers.resize(k_max_frames_in_flight);
         m_uniform_buffers_memory.resize(k_max_frames_in_flight);
         m_uniform_buffers_mapped.resize(k_max_frames_in_flight);
 
+        m_uniform_light_buffers.resize(k_max_frames_in_flight);
+        m_uniform_light_buffers_memory.resize(k_max_frames_in_flight);
+        m_uniform_light_buffers_mapped.resize(k_max_frames_in_flight);
+
         for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
             auto usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
             auto flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-            VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, flag, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
 
+            VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, flag, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
             vkMapMemory(m_vulkan_device->m_device, m_uniform_buffers_memory[i], 0, buffer_size, 0, &m_uniform_buffers_mapped[i]);
+
+            VulkanBufferUtils::createBuffer(m_vulkan_device, buffer_size, usage, flag, m_uniform_light_buffers[i], m_uniform_light_buffers_memory[i]);
+            vkMapMemory(m_vulkan_device->m_device, m_uniform_light_buffers_memory[i], 0, buffer_size, 0, &m_uniform_light_buffers_mapped[i]);
         }
     }
 
@@ -557,14 +536,19 @@ namespace ArchViz
             VkDescriptorBufferInfo buffer_info {};
             buffer_info.buffer = m_uniform_buffers[i];
             buffer_info.offset = 0;
-            buffer_info.range  = sizeof(UniformBufferObject);
+            buffer_info.range  = sizeof(UBO);
 
             VkDescriptorImageInfo image_info {};
             image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             image_info.imageView   = m_vulkan_texture->m_view;
             image_info.sampler     = m_vulkan_texture->m_sampler;
 
-            std::array<VkWriteDescriptorSet, 2> descriptor_writes {};
+            VkDescriptorBufferInfo light_info {};
+            light_info.buffer = m_uniform_light_buffers[i];
+            light_info.offset = 0;
+            light_info.range  = sizeof(Light);
+
+            std::array<VkWriteDescriptorSet, 3> descriptor_writes {};
 
             descriptor_writes[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptor_writes[0].dstSet          = m_descriptor_sets[i];
@@ -581,6 +565,14 @@ namespace ArchViz
             descriptor_writes[1].descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             descriptor_writes[1].descriptorCount = 1;
             descriptor_writes[1].pImageInfo      = &image_info;
+
+            descriptor_writes[2].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptor_writes[2].dstSet          = m_descriptor_sets[i];
+            descriptor_writes[2].dstBinding      = 2;
+            descriptor_writes[2].dstArrayElement = 0;
+            descriptor_writes[2].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptor_writes[2].descriptorCount = 1;
+            descriptor_writes[2].pBufferInfo     = &light_info;
 
             vkUpdateDescriptorSets(m_vulkan_device->m_device, static_cast<uint32_t>(descriptor_writes.size()), descriptor_writes.data(), 0, nullptr);
         }
@@ -1067,16 +1059,16 @@ namespace ArchViz
             }
 
             {
-                VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 1.1: color pass", {0.0f, 0.5f, 1.0f, 1.0f});
+                // VulkanDebugUtils::cmdBeginLabel(command_buffer, "subpass 1.1: color pass", {0.0f, 0.5f, 1.0f, 1.0f});
 
-                //VkBuffer     vertex_buffers[] = {m_vulkan_vertex_buffer->buffer};
-                //VkDeviceSize offsets[]        = {0};
-                //vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
-                //vkCmdBindIndexBuffer(command_buffer, m_vulkan_index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
-                //vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
-                //vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+                // VkBuffer     vertex_buffers[] = {m_vulkan_vertex_buffer->buffer};
+                // VkDeviceSize offsets[]        = {0};
+                // vkCmdBindVertexBuffers(command_buffer, 0, 1, vertex_buffers, offsets);
+                // vkCmdBindIndexBuffer(command_buffer, m_vulkan_index_buffer->buffer, 0, VK_INDEX_TYPE_UINT32);
+                // vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_vulkan_pipeline->m_pipeline_layout, 0, 1, &m_descriptor_sets[m_current_frame], 0, nullptr);
+                // vkCmdDrawIndexed(command_buffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
 
-                VulkanDebugUtils::cmdEndLabel(command_buffer);
+                // VulkanDebugUtils::cmdEndLabel(command_buffer);
             }
 
             {
@@ -1100,11 +1092,15 @@ namespace ArchViz
 
     void VulkanRHI::updateUniformBuffer(uint32_t current_image)
     {
-        m_dt = 1.0f;
+        m_dt_ubo             = 1.0f;
+        m_light_ubo.color    = {1.0f, 1.0f, 1.0f};
+        m_light_ubo.position = {-1.2f, -1.0f, 2.0f};
         // update particle ubo
-        memcpy(m_particle_uniform_buffers_mapped[current_image], &m_dt, sizeof(float));
+        memcpy(m_particle_uniform_buffers_mapped[current_image], &m_dt_ubo, sizeof(float));
         // update required data
         memcpy(m_uniform_buffers_mapped[current_image], &m_ubo, sizeof(m_ubo));
+        // update light info
+        memcpy(m_uniform_light_buffers_mapped[current_image], &m_light_ubo, sizeof(m_light_ubo));
     }
 
     void VulkanRHI::prepareContext()
@@ -1260,11 +1256,9 @@ namespace ArchViz
 
         for (size_t i = 0; i < k_max_frames_in_flight; i++)
         {
+            VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_particle_uniform_buffers[i], m_particle_uniform_buffers_memory[i]);
+            VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_uniform_light_buffers[i], m_uniform_light_buffers_memory[i]);
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_uniform_buffers[i], m_uniform_buffers_memory[i]);
-        }
-
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
-        {
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_shader_storage_buffers[i], m_shader_storage_buffers_memory[i]);
         }
 

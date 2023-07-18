@@ -7,24 +7,25 @@ layout(binding = 2) uniform LightObject {
     vec3 color;
 } light;
 
-layout(location = 0) in vec3 fragColor;
-layout(location = 1) in vec2 fragTexCoord;
+layout(location = 0) in vec3 fragPos;
+layout(location = 1) in vec3 fragColor;
+layout(location = 2) in vec3 fragNormal;
+layout(location = 3) in vec2 fragTexCoord;
 
 layout(location = 0) out vec4 outColor;
 
 void main() {
     // ambient
-    // float ambientStrength = 0.1;
-    // vec3 ambient = ambientStrength * light.color;
+    float ambientStrength = 0.1;
+    vec3 ambient = ambientStrength * light.color;
 
     // diffuse 
-    // vec3 norm = normalize(Normal);
-    // vec3 lightDir = normalize(lightPos - FragPos);
-    // float diff = max(dot(norm, lightDir), 0.0);
-    // vec3 diffuse = diff * light.color;
+    vec3 norm = normalize(fragNormal);
+    vec3 lightDir = normalize(light.position - fragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * light.color;
 
-    // vec3 result = (ambient + diffuse) * fragColor;
-    // outColor = vec4(result, 1.0);
+    vec3 result = (ambient + diffuse) * fragColor;
 
-    outColor = vec4(fragColor, 1.0) * texture(texSampler, fragTexCoord);
+    outColor = vec4(result, 1.0) * texture(texSampler, fragTexCoord);
 }

@@ -17,15 +17,15 @@ namespace ArchViz
         m_shader->initialize();
 
         // TODO : add custom bindings
-        auto bindingDescription    = Vertex::getBindingDescription();
-        auto attributeDescriptions = Vertex::getAttributeDescriptions();
+        auto binding_description    = Vertex::getBindingDescription();
+        auto attribute_descriptions = Vertex::getAttributeDescriptions();
 
         VkPipelineVertexInputStateCreateInfo vertex_input_info {};
         vertex_input_info.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertex_input_info.vertexBindingDescriptionCount   = 1;
-        vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-        vertex_input_info.pVertexBindingDescriptions      = &bindingDescription;
-        vertex_input_info.pVertexAttributeDescriptions    = attributeDescriptions.data();
+        vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
+        vertex_input_info.pVertexBindingDescriptions      = &binding_description;
+        vertex_input_info.pVertexAttributeDescriptions    = attribute_descriptions.data();
 
         VkPipelineInputAssemblyStateCreateInfo input_assembly {};
         input_assembly.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

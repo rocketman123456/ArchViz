@@ -30,7 +30,7 @@ namespace ArchViz
     class VulkanBuffer;
     class Vertex;
 
-    struct UniformBufferObject
+    struct UBO
     {
         alignas(16) FMatrix4 model;
         alignas(16) FMatrix4 view;
@@ -200,13 +200,17 @@ namespace ArchViz
         std::vector<VkDeviceMemory> m_uniform_buffers_memory;
         std::vector<void*>          m_uniform_buffers_mapped;
 
+        std::vector<VkBuffer>       m_uniform_light_buffers;
+        std::vector<VkDeviceMemory> m_uniform_light_buffers_memory;
+        std::vector<void*>          m_uniform_light_buffers_mapped;
+
         std::shared_ptr<VulkanBuffer> m_vulkan_vertex_buffer;
         std::shared_ptr<VulkanBuffer> m_vulkan_index_buffer;
 
-        //VkBuffer       m_vertex_buffer;
-        //VkDeviceMemory m_vertex_buffer_memory;
-        //VkBuffer       m_index_buffer;
-        //VkDeviceMemory m_index_buffer_memory;
+        // VkBuffer       m_vertex_buffer;
+        // VkDeviceMemory m_vertex_buffer_memory;
+        // VkBuffer       m_index_buffer;
+        // VkDeviceMemory m_index_buffer_memory;
 
         // The main purpose of a command pool is to be a (mostly) single-threaded allocator for the storage used by a set of command buffers which are filled by that thread.
         VkCommandPool                m_command_pool;
@@ -250,8 +254,8 @@ namespace ArchViz
         std::vector<uint32_t> m_indices;
 
     public:
-        UniformBufferObject m_ubo;
-
-        float m_dt;
+        UBO   m_ubo;
+        Light m_light_ubo;
+        float m_dt_ubo;
     };
 } // namespace ArchViz
