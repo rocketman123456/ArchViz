@@ -4,7 +4,7 @@
 
 #include <volk.h>
 
-#include <spirv/1.2/spirv.h>
+#include <spirv/unified1/spirv.h>
 
 #include <cstdint>
 #include <string>

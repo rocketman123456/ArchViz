@@ -22,9 +22,6 @@
 [submodule "engine/3rd_party/x9"]
 	path = engine/3rd_party/x9
 	url = https://github.com/df308/x9.git
-[submodule "engine/3rd_party/imgui-node-editor"]
-	path = engine/3rd_party/imgui-node-editor
-	url = https://github.com/thedmd/imgui-node-editor.git
 [submodule "engine/3rd_party/imgui"]
 	path = engine/3rd_party/imgui
 	url = https://github.com/ocornut/imgui.git
