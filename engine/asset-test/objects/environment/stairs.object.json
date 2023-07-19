@@ -28,8 +28,8 @@
         "mesh_res": {
           "sub_meshes": [
             {
-              "material": "asset/objects/environment/_material/gold.material.json",
-              "obj_file_ref": "asset/objects/environment/stairs/components/mesh/stairs.obj",
+              "material": "asset/objects/material/gold.material.json",
+              "obj_file_ref": "asset/data/model/environment/stairs.obj",
               "transform": {
                 "position": {
                   "x": 0,

@@ -54,7 +54,7 @@ namespace ArchViz
         // reflection
         auto                       meta = TypeMetaDef(Test2, &test2_out);
         Reflection::FieldAccessor* fields;
-        int                        fields_count = meta.m_meta.getFieldsList(fields);
+        size_t                     fields_count = meta.m_meta.getFieldsList(fields);
         for (int i = 0; i < fields_count; ++i)
         {
             auto filed_accesser = fields[i];

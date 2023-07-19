@@ -51,11 +51,11 @@ namespace std
         size_t operator()(ArchViz::Particle const& particle) const
         {
             size_t pos_hash = 0;
-            hash_combine(pos_hash, particle.position[0], particle.position[1], particle.position[2]);
+            ArchViz::hash_combine(pos_hash, particle.position[0], particle.position[1], particle.position[2]);
             size_t vel_hash = 0;
-            hash_combine(vel_hash, particle.velocity[0], particle.velocity[1], particle.velocity[2]);
+            ArchViz::hash_combine(vel_hash, particle.velocity[0], particle.velocity[1], particle.velocity[2]);
             size_t color_hash = 0;
-            hash_combine(color_hash, particle.color[0], particle.color[1], particle.color[2], particle.color[3]);
+            ArchViz::hash_combine(color_hash, particle.color[0], particle.color[1], particle.color[2], particle.color[3]);
             return pos_hash ^ ((vel_hash << 1) >> 1) ^ (color_hash << 1);
         }
     };

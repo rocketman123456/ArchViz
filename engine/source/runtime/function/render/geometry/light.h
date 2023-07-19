@@ -51,9 +51,9 @@ namespace std
         size_t operator()(ArchViz::Light const& light) const
         {
             size_t pos_hash = 0;
-            hash_combine(pos_hash, light.position[0], light.position[1], light.position[2]);
+            ArchViz::hash_combine(pos_hash, light.position[0], light.position[1], light.position[2]);
             size_t color_hash = 0;
-            hash_combine(color_hash, light.color[0], light.color[1], light.color[2]);
+            ArchViz::hash_combine(color_hash, light.color[0], light.color[1], light.color[2]);
             return pos_hash ^ ((color_hash << 1) >> 1);
         }
     };

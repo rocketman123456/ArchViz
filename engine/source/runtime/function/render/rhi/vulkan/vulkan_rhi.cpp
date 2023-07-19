@@ -239,46 +239,48 @@ namespace ArchViz
         m_vulkan_render_pass->initialize();
     }
 
-    void VulkanRHI::createGraphicsPipeline()
+    void VulkanRHI::createGraphicsPipelineCache()
     {
         VkPipelineCacheCreateInfo create_info {};
         create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 
         // read pipeline cache
+
+        auto cache_path = m_config_manager->getRootFolder() / "pipeline.cache";
+
+        // TODO : use vfs instead
+        FILE* file = fopen(cache_path.generic_string().c_str(), "rb");
+
+        if (file != nullptr)
         {
-            auto cache_path = m_config_manager->getRootFolder() / "pipeline.cache";
+            size_t               cache_size = 0;
+            std::vector<uint8_t> cache;
 
-            // TODO : use vfs instead
-            FILE* file = fopen(cache_path.generic_string().c_str(), "rb");
+            fseek(file, 0, SEEK_END);
+            cache_size = ftell(file);
+            cache.resize(cache_size);
+            rewind(file);
+            fread(cache.data(), cache.size(), 1, file);
 
-            if (file != nullptr)
+            VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
+            if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
+                memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
             {
-                size_t               cache_size = 0;
-                std::vector<uint8_t> cache;
-
-                fseek(file, 0, SEEK_END);
-                cache_size = ftell(file);
-                cache.resize(cache_size);
-                rewind(file);
-                fread(cache.data(), cache.size(), 1, file);
-
-                VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
-                if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
-                    memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
-                {
-                    create_info.initialDataSize = cache.size();
-                    create_info.pInitialData    = cache.data();
-                }
-
-                fclose(file);
+                create_info.initialDataSize = cache.size();
+                create_info.pInitialData    = cache.data();
             }
+
+            fclose(file);
         }
 
         if (vkCreatePipelineCache(m_vulkan_device->m_device, &create_info, nullptr, &m_pipeline_cache) != VK_SUCCESS)
         {
             LOG_FATAL("failed to create pipeline cache");
         }
+    }
 
+    void VulkanRHI::createGraphicsPipeline()
+    {
         ShaderModuleConfig config;
         config.m_vert_shader = "shader/glsl/shader_phong.vert";
         config.m_frag_shader = "shader/glsl/shader_phong.frag";
@@ -941,6 +943,7 @@ namespace ArchViz
         createBindlessDescriptorSetLayout();
 
         createRenderPass();
+        createGraphicsPipelineCache();
         createGraphicsPipeline();
 
         createCommandPool();

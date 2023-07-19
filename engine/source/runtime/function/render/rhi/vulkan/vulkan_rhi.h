@@ -76,6 +76,7 @@ namespace ArchViz
         void createBindlessDescriptorSetLayout();
 
         void createRenderPass();
+        void createGraphicsPipelineCache();
         void createGraphicsPipeline();
 
         void createCommandPool();

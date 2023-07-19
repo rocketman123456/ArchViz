@@ -65,11 +65,11 @@ namespace std
         size_t operator()(ArchViz::Vertex const& vertex) const
         {
             size_t pos_hash = 0;
-            hash_combine(pos_hash, vertex.pos[0], vertex.pos[1], vertex.pos[2]);
+            ArchViz::hash_combine(pos_hash, vertex.pos[0], vertex.pos[1], vertex.pos[2]);
             size_t color_hash = 0;
-            hash_combine(color_hash, vertex.color[0], vertex.color[1], vertex.color[2]);
+            ArchViz::hash_combine(color_hash, vertex.color[0], vertex.color[1], vertex.color[2]);
             size_t tex_hash = 0;
-            hash_combine(tex_hash, vertex.tex_coord[0], vertex.tex_coord[1]);
+            ArchViz::hash_combine(tex_hash, vertex.tex_coord[0], vertex.tex_coord[1]);
             return pos_hash ^ ((color_hash << 1) >> 1) ^ (tex_hash << 1);
         }
     };

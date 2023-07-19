@@ -28,8 +28,8 @@
                 "mesh_res": {
                     "sub_meshes": [
                         {
-                            "material": "asset/objects/environment/_material/silver.material.json",
-                            "obj_file_ref": "asset/objects/environment/fence/components/mesh/fence.obj",
+                            "material": "asset/objects/material/silver.material.json",
+                            "obj_file_ref": "asset/data/model/environment/fence.obj",
                             "transform": {
                                 "position": {
                                     "x": 0,
