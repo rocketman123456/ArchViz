@@ -28,6 +28,7 @@
 #include <tiny_obj_loader.h>
 
 #include <random>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unordered_map>
 
@@ -242,14 +243,45 @@ namespace ArchViz
     {
         VkPipelineCacheCreateInfo create_info {};
         create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+
+        // read pipeline cache
+        {
+            auto cache_path = m_config_manager->getRootFolder() / "pipeline.cache";
+
+            // TODO : use vfs instead
+            FILE* file = fopen(cache_path.generic_string().c_str(), "rb");
+
+            if (file != nullptr)
+            {
+                size_t               cache_size = 0;
+                std::vector<uint8_t> cache;
+
+                fseek(file, 0, SEEK_END);
+                cache_size = ftell(file);
+                cache.resize(cache_size);
+                rewind(file);
+                fread(cache.data(), cache.size(), 1, file);
+
+                VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
+                if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
+                    memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
+                {
+                    create_info.initialDataSize = cache.size();
+                    create_info.pInitialData    = cache.data();
+                }
+
+                fclose(file);
+            }
+        }
+
         if (vkCreatePipelineCache(m_vulkan_device->m_device, &create_info, nullptr, &m_pipeline_cache) != VK_SUCCESS)
         {
             LOG_FATAL("failed to create pipeline cache");
         }
 
         ShaderModuleConfig config;
-        config.m_vert_shader = "shader/glsl/shader_textures.vert";
-        config.m_frag_shader = "shader/glsl/shader_textures.frag";
+        config.m_vert_shader = "shader/glsl/shader_phong.vert";
+        config.m_frag_shader = "shader/glsl/shader_phong.frag";
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
 
@@ -358,6 +390,7 @@ namespace ArchViz
         m_vulkan_texture->m_command_pool   = m_command_pool;
         m_vulkan_texture->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         m_vulkan_texture->initizlize("asset-test/data/model/viking_room/viking_room.png");
+        // m_vulkan_texture->initizlize("asset-test/data/texture/object/white.tga");
 
         m_vulkan_texture_ui                   = std::make_shared<VulkanTexture>();
         m_vulkan_texture_ui->m_asset_manager  = m_asset_manager;
@@ -378,16 +411,24 @@ namespace ArchViz
     void VulkanRHI::loadModel()
     {
         std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
-        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/cube.obj";
-        //  TODO : make this with world load
+        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
+        std::filesystem::path mtl_path = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room";
+        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/capsule.obj";
+        // TODO : make this with world load
         tinyobj::attrib_t                attrib;
         std::vector<tinyobj::shape_t>    shapes;
         std::vector<tinyobj::material_t> materials;
         std::string                      warn, err;
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str()))
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str(), mtl_path.generic_string().c_str()))
         {
-            throw std::runtime_error(warn + err);
+            LOG_WARN(warn);
+            LOG_FATAL(err);
+        }
+
+        if (!warn.empty())
+        {
+            LOG_WARN(warn);
         }
 
         std::unordered_map<Vertex, uint32_t> unique_vertices {};
@@ -667,7 +708,7 @@ namespace ArchViz
         pipelineInfo.layout = m_compute_pipeline_layout;
         pipelineInfo.stage  = compute_shader_stage_info;
 
-        if (vkCreateComputePipelines(m_vulkan_device->m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_compute_pipeline) != VK_SUCCESS)
+        if (vkCreateComputePipelines(m_vulkan_device->m_device, m_pipeline_cache, 1, &pipelineInfo, nullptr, &m_compute_pipeline) != VK_SUCCESS)
         {
             LOG_FATAL("failed to create compute pipeline!");
         }
@@ -1255,6 +1296,21 @@ namespace ArchViz
         // vkDestroyDescriptorSetLayout(m_vulkan_device->m_device, m_descriptor_set_layout, nullptr);
 
         vkDestroyDescriptorPool(m_vulkan_device->m_device, m_descriptor_pool, nullptr);
+
+        // store pipeline cache
+        {
+            size_t cache_size = 0;
+            vkGetPipelineCacheData(m_vulkan_device->m_device, m_pipeline_cache, &cache_size, nullptr);
+            std::vector<uint8_t> cache;
+            cache.resize(cache_size);
+            vkGetPipelineCacheData(m_vulkan_device->m_device, m_pipeline_cache, &cache_size, cache.data());
+
+            auto cache_path = m_config_manager->getRootFolder() / "pipeline.cache";
+
+            FILE* file = fopen(cache_path.generic_string().c_str(), "wb");
+            fwrite(cache.data(), cache.size(), 1, file);
+            fclose(file);
+        }
 
         vkDestroyPipelineCache(m_vulkan_device->m_device, m_pipeline_cache, nullptr);
 

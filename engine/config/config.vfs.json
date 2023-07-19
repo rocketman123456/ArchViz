@@ -8,12 +8,6 @@
         },
         {
             "vpath": "shader",
-            "rpath": "shader-example",
-            "type": "native",
-            "ignores": []
-        },
-        {
-            "vpath": "shader",
             "rpath": "shader",
             "type": "native",
             "ignores": []

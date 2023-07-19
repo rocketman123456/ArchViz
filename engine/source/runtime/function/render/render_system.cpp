@@ -127,7 +127,7 @@ namespace ArchViz
         m_render_camera->update();
 
         FMatrix4 model {FMatrix4::Identity()};
-        model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
+        //model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
 
         m_rhi->m_ubo.view  = Math::lookAt({2, 2, 2}, {0, 0, 0}, {0, 0, 1});                         // m_render_camera->m_view;
         m_rhi->m_ubo.proj  = Math::perspective(45.0f, (float)width / (float)height, 0.01f, 100.0f); // m_render_camera->m_projction;
@@ -136,7 +136,7 @@ namespace ArchViz
 
         m_rhi->m_light_ubo.color = {1.0f, 1.0f, 1.0f};
         // sin(time * 0.5f) * 0.5f + 0.5f};
-        m_rhi->m_light_ubo.position = {-1.2f, -1.0f, 1.0f + sin(time)};
+        m_rhi->m_light_ubo.position = {1.0f, 1.0f, 1.0f + sin(time)};
     }
 
     void RenderSystem::clear()
