@@ -1,3 +1,97 @@
 {
-    
+    "name": "test_fg",
+    "nodes": [
+        {
+            "enabled": true,
+            "name": "A",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "colorA"
+                },
+                {
+                    "name": "depthA"
+                }
+            ]
+        },
+        {
+            "enabled": true,
+            "name": "B",
+            "inputs": [
+                {
+                    "name": "colorA"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "colorB1"
+                },
+                {
+                    "name": "colorB2"
+                }
+            ]
+        },
+        {
+            "enabled": true,
+            "name": "C",
+            "inputs": [
+                {
+                    "name": "colorB1"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "colorC1"
+                }
+            ]
+        },
+        {
+            "enabled": true,
+            "name": "D",
+            "inputs": [
+                {
+                    "name": "colorB2"
+                },
+                {
+                    "name": "depthF"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "colorD1"
+                }
+            ]
+        },
+        {
+            "enabled": true,
+            "name": "E",
+            "inputs": [
+                {
+                    "name": "colorC1"
+                },
+                {
+                    "name": "colorD1"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "colorE"
+                }
+            ]
+        },
+        {
+            "enabled": true,
+            "name": "F",
+            "inputs": [
+                {
+                    "name": "depthA"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "depthF"
+                }
+            ]
+        }
+    ]
 }

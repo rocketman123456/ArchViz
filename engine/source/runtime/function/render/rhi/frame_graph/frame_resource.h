@@ -13,24 +13,21 @@
 
 namespace ArchViz
 {
-    // class VulkanBuffer;
-    // class VulkanTexture;
-
     using FrameGraphHandle = uint32_t;
 
     struct FrameGraphResourceHandle
     {
-        FrameGraphHandle index;
+        FrameGraphHandle index {k_invalid_index};
     };
 
     struct FrameGraphNodeHandle
     {
-        FrameGraphHandle index;
+        FrameGraphHandle index {k_invalid_index};
     };
 
     struct FrameGraphRenderPassHandle
     {
-        FrameGraphHandle index;
+        FrameGraphHandle index {k_invalid_index};
     };
 
     enum class FrameGraphResourceType : int32_t
@@ -82,7 +79,7 @@ namespace ArchViz
         FrameGraphResourceInfo resource_info;
 
         FrameGraphNodeHandle     producer;
-        FrameGraphResourceHandle output_andle;
+        FrameGraphResourceHandle output_handle;
 
         int32_t ref_count {0};
 
@@ -99,6 +96,9 @@ namespace ArchViz
 
         META(Enable)
         std::string name {};
+
+        META(Enable)
+        std::string type_name {};
     };
 
     REFLECTION_TYPE(FrameGraphResourceOutputCreation)
@@ -111,6 +111,9 @@ namespace ArchViz
 
         META(Enable)
         std::string name {};
+
+        META(Enable)
+        std::string type_name {};
     };
 
     REFLECTION_TYPE(FrameGraphNodeCreation)
@@ -127,31 +130,22 @@ namespace ArchViz
         std::string name {};
     };
 
+    REFLECTION_TYPE(FrameGraphCreation)
+    CLASS(FrameGraphCreation, Fields)
+    {
+        REFLECTION_BODY(FrameGraphCreation)
+
+    public:
+        std::vector<FrameGraphNodeCreation> nodes;
+
+        std::string name {};
+    };
+
     // Interact with vulkan render pass
     struct FrameGraphRenderPass
     {
         void preRender() {}
         void render() {}
-    };
-
-    struct FrameGraphNode
-    {
-        int32_t ref_count {0};
-
-        // TODO: render pass handle
-        uint32_t render_pass;
-        // TODO: framebuffer handle
-        uint32_t framebuffer;
-
-        std::vector<FrameGraphResourceHandle> inputs;
-        std::vector<FrameGraphResourceHandle> outputs;
-
-        std::vector<FrameGraphNodeHandle> edges_forward;
-        std::vector<FrameGraphNodeHandle> edges_backward;
-
-        bool enabled {true};
-
-        std::string name;
     };
 
 } // namespace ArchViz

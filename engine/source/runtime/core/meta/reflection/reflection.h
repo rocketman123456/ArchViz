@@ -19,6 +19,7 @@ namespace ArchViz
 #define META(...)
 #define CLASS(class_name, ...) class class_name
 #define STRUCT(struct_name, ...) struct struct_name
+#define ENUM(enum_name, ...) enum class enum_name
 // #define CLASS(class_name,...) class class_name:public Reflection::object
 #endif // __REFLECTION_PARSER__
 
@@ -71,6 +72,7 @@ namespace ArchViz
         class ArrayAccessor;
         class ReflectionInstance;
     } // namespace Reflection
+
     typedef std::function<void(void*, void*)>      SetFuncion;
     typedef std::function<void*(void*)>            GetFuncion;
     typedef std::function<const char*()>           GetNameFuncion;
@@ -88,6 +90,7 @@ namespace ArchViz
     typedef std::tuple<GetNameFuncion, InvokeFunction>                                                      MethodFunctionTuple;
     typedef std::tuple<GetBaseClassReflectionInstanceListFunc, ConstructorWithJson, WriteJsonByName>        ClassFunctionTuple;
     typedef std::tuple<SetArrayFunc, GetArrayFunc, GetSizeFunc, GetNameFuncion, GetNameFuncion>             ArrayFunctionTuple;
+    //typedef std::tuple<> EnumFunctionTuple;
 
     namespace Reflection
     {
@@ -203,6 +206,7 @@ namespace ArchViz
             MethodFunctionTuple* m_functions;
             const char*          m_method_name;
         };
+
         /**
          *  Function reflection is not implemented, so use this as an std::vector accessor
          */
