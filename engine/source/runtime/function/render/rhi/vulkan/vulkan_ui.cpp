@@ -473,7 +473,7 @@ namespace ArchViz
         }
         ImGui::End();
 
-        ImGui::Begin(u8"ArchViz ²âÊÔ");
+        ImGui::Begin(u8"ArchViz æµ‹è¯•");
         {
             ImGui::Text("Hello, world %d", 123);
         }

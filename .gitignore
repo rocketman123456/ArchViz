@@ -47,6 +47,8 @@ build/
 .vscode/setting.json
 .vscode/c_cpp_properties.json
 
+.xmake/
+
 # Assets that are part of the asset pack and should not be stored in the repo
 engine/asset/data/models/**
 engine/asset/data/textures/**
