@@ -1,8 +1,11 @@
 #pragma once
+#include "runtime/core/meta/reflection/reflection.h"
+#include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
 
 #include <volk.h>
 
 #include <memory>
+#include <string>
 
 namespace ArchViz
 {
@@ -10,6 +13,21 @@ namespace ArchViz
     class ConfigManager;
     class VulkanDevice;
     class VulkanShader;
+
+    class DescriptorSetLayoutCreateInfo
+    {
+    public:
+    };
+
+    REFLECTION_TYPE(VulkanPipelineCreateInfo)
+    CLASS(VulkanPipelineCreateInfo, Fields)
+    {
+        REFLECTION_BODY(VulkanPipelineCreateInfo)
+    public:
+        ShaderModuleCreateInfo m_shader_info;
+
+        std::string m_name;
+    };
 
     class VulkanPipeline
     {
@@ -28,8 +46,8 @@ namespace ArchViz
         VkPipelineCache m_pipeline_cache;
         VkRenderPass    m_render_pass;
 
-        VkPipelineLayout      m_pipeline_layout;
-        VkPipeline            m_pipeline;
+        VkPipelineLayout m_pipeline_layout;
+        VkPipeline       m_pipeline;
 
         VkDescriptorSetLayout m_descriptor_set_layout;
     };

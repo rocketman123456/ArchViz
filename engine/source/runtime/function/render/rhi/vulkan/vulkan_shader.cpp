@@ -7,7 +7,7 @@
 
 namespace ArchViz
 {
-    VulkanShader::VulkanShader(const ShaderModuleConfig& config) : m_config(config) {}
+    VulkanShader::VulkanShader(const ShaderModuleCreateInfo& config) : m_config(config) {}
 
     void VulkanShader::initialize()
     {

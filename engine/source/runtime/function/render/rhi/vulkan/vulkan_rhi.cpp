@@ -281,7 +281,7 @@ namespace ArchViz
 
     void VulkanRHI::createGraphicsPipeline()
     {
-        ShaderModuleConfig config;
+        ShaderModuleCreateInfo config;
         config.m_vert_shader = "shader/glsl/shader_phong.vert";
         config.m_frag_shader = "shader/glsl/shader_phong.frag";
 
@@ -679,7 +679,7 @@ namespace ArchViz
 
     void VulkanRHI::createComputePipeline()
     {
-        ShaderModuleConfig config;
+        ShaderModuleCreateInfo config;
         config.m_comp_shader = "shader/glsl/shader_compute.comp";
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);

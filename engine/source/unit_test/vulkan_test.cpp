@@ -55,6 +55,7 @@ int main(int argc, char** argv)
     float    fps_alpha        = 1.f / 1000;
     uint64_t frame_count      = 0;
     float    average_duration = 0;
+    uint64_t update_interval  = 30;
 
     while (!window_system->shouldClose())
     {
@@ -73,10 +74,15 @@ int main(int argc, char** argv)
             average_duration = average_duration * (1 - fps_alpha) + delta_time * fps_alpha;
         }
         uint32_t fps = static_cast<uint32_t>(1.f / average_duration);
+        frame_count++;
 
         window_system->pollEvents();
 
-        render_system->setFPS(fps);
+        if (frame_count % update_interval == 0)
+        {
+            render_system->setFPS(fps);
+        }
+
         render_system->tick(delta_time);
     }
 

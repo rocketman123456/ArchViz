@@ -197,7 +197,7 @@ namespace ArchViz
 
     void VulkanUI::createPipelineLayout()
     {
-        ShaderModuleConfig config;
+        ShaderModuleCreateInfo config;
         config.m_vert_shader = "shader/glsl/imgui.vert";
         config.m_frag_shader = "shader/glsl/imgui.frag";
 

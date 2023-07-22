@@ -1,5 +1,4 @@
 #pragma once
-
 #include "runtime/core/meta/reflection/reflection.h"
 
 #include <volk.h>
@@ -14,9 +13,10 @@ namespace ArchViz
     class ConfigManager;
     class VulkanDevice;
 
-    REFLECTION_TYPE(ShaderModuleConfig)
-    CLASS(ShaderModuleConfig, Fields)
+    REFLECTION_TYPE(ShaderModuleCreateInfo)
+    CLASS(ShaderModuleCreateInfo, Fields)
     {
+        REFLECTION_BODY(ShaderModuleCreateInfo)
     public:
         std::string m_vert_shader;
         std::string m_frag_shader;
@@ -29,7 +29,7 @@ namespace ArchViz
     class VulkanShader
     {
     public:
-        VulkanShader(const ShaderModuleConfig& config);
+        VulkanShader(const ShaderModuleCreateInfo& config);
         ~VulkanShader() = default;
 
         void initialize();
@@ -49,7 +49,7 @@ namespace ArchViz
 
         std::shared_ptr<VulkanDevice> m_device;
 
-        ShaderModuleConfig m_config;
+        ShaderModuleCreateInfo m_config;
 
         VkShaderModule m_vert_shader = VK_NULL_HANDLE;
         VkShaderModule m_frag_shader = VK_NULL_HANDLE;
