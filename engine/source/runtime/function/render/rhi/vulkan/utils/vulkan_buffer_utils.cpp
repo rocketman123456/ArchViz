@@ -1,6 +1,6 @@
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_device.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
 
 #include "runtime/core/base/macro.h"
 
@@ -16,10 +16,10 @@ namespace ArchViz
         VmaAllocationCreateInfo alloc_info {};
         alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
 
-        vmaCreateBuffer(device->m_assets_allocator, &buffer_info, &alloc_info, &buffer, &allocation, nullptr);
+        vmaCreateBuffer(device->m_vma_allocator, &buffer_info, &alloc_info, &buffer, &allocation, nullptr);
     }
 
-    void VulkanBufferUtils::destroyBufferVMA(std::shared_ptr<VulkanDevice> device, VkBuffer& buffer, VmaAllocation& allocation) { vmaDestroyBuffer(device->m_assets_allocator, buffer, allocation); }
+    void VulkanBufferUtils::destroyBufferVMA(std::shared_ptr<VulkanDevice> device, VkBuffer& buffer, VmaAllocation& allocation) { vmaDestroyBuffer(device->m_vma_allocator, buffer, allocation); }
 
     void VulkanBufferUtils::createBuffer(std::shared_ptr<VulkanDevice> device,
                                          VkDeviceSize                  size,

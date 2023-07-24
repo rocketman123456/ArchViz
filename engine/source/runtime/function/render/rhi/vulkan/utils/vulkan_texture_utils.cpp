@@ -1,8 +1,7 @@
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_device.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-
 
 #include "runtime/core/base/macro.h"
 
@@ -171,8 +170,13 @@ namespace ArchViz
         VulkanBufferUtils::endSingleTimeCommands(device, command_pool, command_buffer);
     }
 
-    void
-    VulkanTextureUtils::generateMipmaps(std::shared_ptr<VulkanDevice> device, VkCommandPool command_pool, VkImage image, VkFormat image_format, int32_t tex_width, int32_t tex_height, uint32_t mip_levels)
+    void VulkanTextureUtils::generateMipmaps(std::shared_ptr<VulkanDevice> device,
+                                             VkCommandPool                 command_pool,
+                                             VkImage                       image,
+                                             VkFormat                      image_format,
+                                             int32_t                       tex_width,
+                                             int32_t                       tex_height,
+                                             uint32_t                      mip_levels)
     {
         // Check if image format supports linear blitting
         VkFormatProperties formatProperties;

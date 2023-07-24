@@ -1,16 +1,16 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_rhi.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_buffer.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_device.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_instance.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_pipeline.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_render_pass.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_shader.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_swap_chain.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_texture.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_debug_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_buffer.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_pipeline.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_render_pass.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_swap_chain.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
 
 #include "runtime/function/render/geometry/particle.h"
@@ -60,8 +60,10 @@ namespace ArchViz
 
     void VulkanRHI::createInstance()
     {
-        m_vulkan_instance = std::make_shared<VulkanInstance>(m_enable_validation_layers);
-        m_vulkan_instance->connect(m_initialize_info.window_system->getWindow());
+        m_vulkan_instance = std::make_shared<VulkanInstance>();
+
+        m_vulkan_instance->m_validation = m_enable_validation_layers;
+        m_vulkan_instance->m_window     = m_initialize_info.window_system->getWindow();
         m_vulkan_instance->initialize();
 
         VulkanDebugUtils::setup(m_vulkan_instance->m_instance);
@@ -69,8 +71,10 @@ namespace ArchViz
 
     void VulkanRHI::createVulkanDevice()
     {
-        m_vulkan_device = std::make_shared<VulkanDevice>(m_enable_validation_layers);
-        m_vulkan_device->connect(m_vulkan_instance);
+        m_vulkan_device = std::make_shared<VulkanDevice>();
+
+        m_vulkan_device->m_validation = m_enable_validation_layers;
+        m_vulkan_device->m_instance   = m_vulkan_instance;
         m_vulkan_device->initialize();
     }
 
@@ -78,10 +82,11 @@ namespace ArchViz
     {
         m_vulkan_swap_chain = std::make_shared<VulkanSwapChain>();
 
+        m_vulkan_swap_chain->m_instance = m_vulkan_instance;
+        m_vulkan_swap_chain->m_device   = m_vulkan_device;
+
         uint32_t width  = m_initialize_info.window_system->getWindowWidth();
         uint32_t height = m_initialize_info.window_system->getWindowHeight();
-
-        m_vulkan_swap_chain->connect(m_vulkan_instance, m_vulkan_device);
         m_vulkan_swap_chain->initialize(width, height, false, false);
     }
 
@@ -92,6 +97,7 @@ namespace ArchViz
         // for minimize
         while (width == 0 || height == 0)
         {
+            // TODO : add variable to judge this
             glfwGetFramebufferSize(m_initialize_info.window_system->getWindow(), &width, &height);
             glfwWaitEvents();
         }
@@ -183,9 +189,8 @@ namespace ArchViz
         {
             LOG_FATAL("failed to create bindless discriptor pool");
         }
-        {
-            m_bindless_pool_size = pool_sizes_bindless.size();
-        }
+
+        m_bindless_pool_size = pool_sizes_bindless.size();
     }
 
     void VulkanRHI::createBindlessDescriptorSetLayout()
@@ -235,7 +240,7 @@ namespace ArchViz
     {
         m_vulkan_render_pass                 = std::make_shared<VulkanRenderPass>();
         m_vulkan_render_pass->m_device       = m_vulkan_device;
-        m_vulkan_render_pass->m_color_format = m_vulkan_swap_chain->m_swap_chain_image_format;
+        m_vulkan_render_pass->m_color_format = m_vulkan_swap_chain->m_surface_format.format;
         m_vulkan_render_pass->initialize();
     }
 
@@ -902,7 +907,7 @@ namespace ArchViz
         m_vulkan_ui->m_instance        = m_vulkan_instance;
         m_vulkan_ui->m_device          = m_vulkan_device;
         m_vulkan_ui->m_image_count     = static_cast<uint32_t>(m_vulkan_swap_chain->m_images.size());
-        m_vulkan_ui->m_image_format    = m_vulkan_swap_chain->m_swap_chain_image_format;
+        m_vulkan_ui->m_image_format    = m_vulkan_swap_chain->m_surface_format.format;
         m_vulkan_ui->m_command_pool    = m_command_pool;
         m_vulkan_ui->m_descriptor_pool = m_descriptor_pool;
         m_vulkan_ui->m_asset_manager   = m_asset_manager;
@@ -1149,8 +1154,8 @@ namespace ArchViz
 
         // handle swap chain recreation
         uint32_t image_index;
-        VkResult result = vkAcquireNextImageKHR(m_vulkan_device->m_device, m_vulkan_swap_chain->m_swap_chain, UINT64_MAX, m_image_available_semaphores[m_current_frame], VK_NULL_HANDLE, &image_index);
 
+        VkResult result = m_vulkan_swap_chain->acquireNextImage(m_image_available_semaphores[m_current_frame], &image_index);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
             recreateSwapChain();
@@ -1185,16 +1190,7 @@ namespace ArchViz
             LOG_FATAL("failed to submit draw command buffer!");
         }
 
-        VkPresentInfoKHR present_info {};
-        VkSwapchainKHR   swap_chains[]  = {m_vulkan_swap_chain->m_swap_chain};
-        present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        present_info.waitSemaphoreCount = 1;
-        present_info.pWaitSemaphores    = signal_semaphores;
-        present_info.swapchainCount     = 1;
-        present_info.pSwapchains        = swap_chains;
-        present_info.pImageIndices      = &image_index;
-
-        result = vkQueuePresentKHR(m_vulkan_device->m_present_queue, &present_info);
+        result = m_vulkan_swap_chain->queuePresent(m_vulkan_device->m_present_queue, image_index, m_render_finished_semaphores[m_current_frame]);
         if (VK_ERROR_OUT_OF_DATE_KHR == result || VK_SUBOPTIMAL_KHR == result)
         {
             recreateSwapChain();

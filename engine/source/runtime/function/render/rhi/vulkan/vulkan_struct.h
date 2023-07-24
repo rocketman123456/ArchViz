@@ -30,9 +30,4 @@ namespace ArchViz
         std::vector<VkPresentModeKHR>   presentModes;
     };
 
-    struct VulkanSwapChainBuffer
-    {
-        VkImage     image;
-        VkImageView view;
-    };
 } // namespace ArchViz

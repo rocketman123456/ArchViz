@@ -72,7 +72,7 @@ namespace ArchViz
         void createDescriptorPool();
         void createBindlessDescriptorPool();
 
-        //void createDescriptorSetLayout();
+        // void createDescriptorSetLayout();
         void createBindlessDescriptorSetLayout();
 
         void createRenderPass();
@@ -128,7 +128,7 @@ namespace ArchViz
         void updateUniformBuffer(uint32_t current_image);
         void drawFrame();
 
-    private:
+    public:
         const bool m_enable_validation_layers = true;
 
         const uint32_t k_max_frames_in_flight = 2;
@@ -258,5 +258,7 @@ namespace ArchViz
         UBO   m_ubo;
         Light m_light_ubo;
         float m_dt_ubo;
+
+        bool m_minimize {false};
     };
 } // namespace ArchViz

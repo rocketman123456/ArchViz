@@ -1,13 +1,13 @@
 #include "runtime/function/render/rhi/vulkan/vulkan_ui.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_buffer.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_device.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_instance.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_shader.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_texture.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_buffer_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_shader_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_buffer.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_instance.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_shader.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_texture.h"
 
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
@@ -40,7 +40,7 @@ namespace ArchViz
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoTaskBarIcon = true;
 
-        // TODO : add multi viewport support
+        // TODO : add multi viewport support (register a series callback function for viewport creation)
 
         io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 

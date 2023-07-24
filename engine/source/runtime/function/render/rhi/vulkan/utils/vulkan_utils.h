@@ -1,4 +1,6 @@
 #pragma once
+#include "runtime/function/render/rhi/vulkan/common/vulkan_instance.h"
+
 
 #include <volk.h>
 #define GLFW_INCLUDE_NONE
