@@ -11,6 +11,14 @@ namespace ArchViz
     {
         static const std::vector<const char*> validation_layers;
         static const std::vector<const char*> device_extensions;
+
+        static constexpr uint32_t k_max_frames_in_flight = 2;
+
+        static constexpr uint32_t k_particle_count = 8192;
+
+        static constexpr uint32_t k_global_pool_elements     = 128;
+        static constexpr uint32_t k_bindless_texture_binding = 10;
+        static constexpr uint32_t k_max_bindless_resources   = 1024;
     };
 
     struct QueueFamilyIndices

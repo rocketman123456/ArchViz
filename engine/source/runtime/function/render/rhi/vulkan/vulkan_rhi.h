@@ -131,14 +131,6 @@ namespace ArchViz
     public:
         const bool m_enable_validation_layers = true;
 
-        const uint32_t k_max_frames_in_flight = 2;
-
-        const uint32_t k_particle_count = 8192;
-
-        const uint32_t k_global_pool_elements     = 128;
-        const uint32_t k_bindless_texture_binding = 10;
-        const uint32_t k_max_bindless_resources   = 1024;
-
         bool m_framebuffer_resized = false;
         bool m_bindless_supported  = true;
 

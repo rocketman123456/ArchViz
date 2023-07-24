@@ -17,17 +17,28 @@ namespace ArchViz
         if (!std::filesystem::exists(rpath))
         {
             LOG_ERROR("Native File System {} Not Exist", rpath);
-            throw std::invalid_argument("Native File System Not Exist");
+            //throw std::invalid_argument("Native File System Not Exist");
         }
         if (!std::filesystem::is_directory(rpath))
         {
             LOG_ERROR("Native File System {} Not a Dir Path", rpath);
-            throw std::invalid_argument("Native File System Not A Path");
+            //throw std::invalid_argument("Native File System Not A Path");
         }
     }
 
     void NativeFileSystem::buildFSCache()
     {
+        if (!std::filesystem::exists(m_rpath))
+        {
+            LOG_ERROR("Native File System {} Not Exist", m_rpath);
+            return;
+        }
+        if (!std::filesystem::is_directory(m_rpath))
+        {
+            LOG_ERROR("Native File System {} Not a Dir Path", m_rpath);
+            return;
+        }
+
         // iterate all file in current path
         for (auto const& directory_entry : std::filesystem::recursive_directory_iterator {m_rpath})
         {

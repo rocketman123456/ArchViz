@@ -127,34 +127,34 @@ namespace ArchViz
         // DescriptorPool merely as we sub-allocate Buffer/Image from DeviceMemory.
         std::array<VkDescriptorPoolSize, 11> pool_sizes {};
         pool_sizes[0].type             = VK_DESCRIPTOR_TYPE_SAMPLER;
-        pool_sizes[0].descriptorCount  = k_global_pool_elements;
+        pool_sizes[0].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[1].type             = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        pool_sizes[1].descriptorCount  = k_global_pool_elements;
+        pool_sizes[1].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[2].type             = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        pool_sizes[2].descriptorCount  = k_global_pool_elements;
+        pool_sizes[2].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[3].type             = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        pool_sizes[3].descriptorCount  = k_global_pool_elements;
+        pool_sizes[3].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[4].type             = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-        pool_sizes[4].descriptorCount  = k_global_pool_elements;
+        pool_sizes[4].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[5].type             = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-        pool_sizes[5].descriptorCount  = k_global_pool_elements;
+        pool_sizes[5].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[6].type             = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        pool_sizes[6].descriptorCount  = k_global_pool_elements;
+        pool_sizes[6].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[7].type             = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        pool_sizes[7].descriptorCount  = k_global_pool_elements;
+        pool_sizes[7].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[8].type             = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-        pool_sizes[8].descriptorCount  = k_global_pool_elements;
+        pool_sizes[8].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[9].type             = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
-        pool_sizes[9].descriptorCount  = k_global_pool_elements;
+        pool_sizes[9].descriptorCount  = VulkanConstants::k_global_pool_elements;
         pool_sizes[10].type            = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
-        pool_sizes[10].descriptorCount = k_global_pool_elements;
+        pool_sizes[10].descriptorCount = VulkanConstants::k_global_pool_elements;
 
         VkDescriptorPoolCreateInfo pool_info {};
         pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
         pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
         pool_info.pPoolSizes    = pool_sizes.data();
-        pool_info.maxSets       = static_cast<uint32_t>(pool_sizes.size() * k_global_pool_elements);
+        pool_info.maxSets       = static_cast<uint32_t>(pool_sizes.size() * VulkanConstants::k_global_pool_elements);
 
         if (vkCreateDescriptorPool(m_vulkan_device->m_device, &pool_info, nullptr, &m_descriptor_pool) != VK_SUCCESS)
         {
@@ -172,16 +172,16 @@ namespace ArchViz
         // DescriptorPool merely as we sub-allocate Buffer/Image from DeviceMemory.
         std::array<VkDescriptorPoolSize, 2> pool_sizes_bindless {};
         pool_sizes_bindless[0].type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        pool_sizes_bindless[0].descriptorCount = k_max_bindless_resources;
+        pool_sizes_bindless[0].descriptorCount = VulkanConstants::k_max_bindless_resources;
         pool_sizes_bindless[1].type            = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        pool_sizes_bindless[1].descriptorCount = k_max_bindless_resources;
+        pool_sizes_bindless[1].descriptorCount = VulkanConstants::k_max_bindless_resources;
 
         VkDescriptorPoolCreateInfo bindless_pool_info {};
         bindless_pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         bindless_pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
         bindless_pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes_bindless.size());
         bindless_pool_info.pPoolSizes    = pool_sizes_bindless.data();
-        bindless_pool_info.maxSets       = static_cast<uint32_t>(pool_sizes_bindless.size() * k_max_bindless_resources);
+        bindless_pool_info.maxSets       = static_cast<uint32_t>(pool_sizes_bindless.size() * VulkanConstants::k_max_bindless_resources);
 
         m_bindless_pool_size = pool_sizes_bindless.size();
 
@@ -202,15 +202,15 @@ namespace ArchViz
 
         VkDescriptorSetLayoutBinding& image_sampler_binding {vk_binding[0]};
         image_sampler_binding.descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        image_sampler_binding.descriptorCount    = k_max_bindless_resources;
-        image_sampler_binding.binding            = k_bindless_texture_binding;
+        image_sampler_binding.descriptorCount    = VulkanConstants::k_max_bindless_resources;
+        image_sampler_binding.binding            = VulkanConstants::k_bindless_texture_binding;
         image_sampler_binding.stageFlags         = VK_SHADER_STAGE_ALL;
         image_sampler_binding.pImmutableSamplers = nullptr;
 
         VkDescriptorSetLayoutBinding& storage_image_binding {vk_binding[1]};
         storage_image_binding.descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-        storage_image_binding.descriptorCount    = k_max_bindless_resources;
-        storage_image_binding.binding            = k_bindless_texture_binding + 1;
+        storage_image_binding.descriptorCount    = VulkanConstants::k_max_bindless_resources;
+        storage_image_binding.binding            = VulkanConstants::k_bindless_texture_binding + 1;
         storage_image_binding.stageFlags         = VK_SHADER_STAGE_ALL;
         storage_image_binding.pImmutableSamplers = nullptr;
 
@@ -364,13 +364,13 @@ namespace ArchViz
 
     void VulkanRHI::createCommandBuffer()
     {
-        m_command_buffers.resize(k_max_frames_in_flight);
+        m_command_buffers.resize(VulkanConstants::k_max_frames_in_flight);
 
         VkCommandBufferAllocateInfo alloc_info {};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         alloc_info.commandPool        = m_command_pool;
         alloc_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        alloc_info.commandBufferCount = k_max_frames_in_flight;
+        alloc_info.commandBufferCount = VulkanConstants::k_max_frames_in_flight;
 
         if (vkAllocateCommandBuffers(m_vulkan_device->m_device, &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
         {
@@ -511,15 +511,15 @@ namespace ArchViz
     {
         VkDeviceSize buffer_size = sizeof(UBO);
 
-        m_uniform_buffers.resize(k_max_frames_in_flight);
-        m_uniform_buffers_memory.resize(k_max_frames_in_flight);
-        m_uniform_buffers_mapped.resize(k_max_frames_in_flight);
+        m_uniform_buffers.resize(VulkanConstants::k_max_frames_in_flight);
+        m_uniform_buffers_memory.resize(VulkanConstants::k_max_frames_in_flight);
+        m_uniform_buffers_mapped.resize(VulkanConstants::k_max_frames_in_flight);
 
-        m_uniform_light_buffers.resize(k_max_frames_in_flight);
-        m_uniform_light_buffers_memory.resize(k_max_frames_in_flight);
-        m_uniform_light_buffers_mapped.resize(k_max_frames_in_flight);
+        m_uniform_light_buffers.resize(VulkanConstants::k_max_frames_in_flight);
+        m_uniform_light_buffers_memory.resize(VulkanConstants::k_max_frames_in_flight);
+        m_uniform_light_buffers_mapped.resize(VulkanConstants::k_max_frames_in_flight);
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (size_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             auto usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
             auto flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -534,21 +534,21 @@ namespace ArchViz
 
     void VulkanRHI::createDescriptorSets()
     {
-        std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_vulkan_pipeline->m_descriptor_set_layout);
+        std::vector<VkDescriptorSetLayout> layouts(VulkanConstants::k_max_frames_in_flight, m_vulkan_pipeline->m_descriptor_set_layout);
 
         VkDescriptorSetAllocateInfo alloc_info {};
         alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         alloc_info.descriptorPool     = m_descriptor_pool;
-        alloc_info.descriptorSetCount = static_cast<uint32_t>(k_max_frames_in_flight);
+        alloc_info.descriptorSetCount = VulkanConstants::k_max_frames_in_flight;
         alloc_info.pSetLayouts        = layouts.data();
 
-        m_descriptor_sets.resize(k_max_frames_in_flight);
+        m_descriptor_sets.resize(VulkanConstants::k_max_frames_in_flight);
         if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &alloc_info, m_descriptor_sets.data()) != VK_SUCCESS)
         {
             LOG_FATAL("failed to allocate descriptor sets!");
         }
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             VkDescriptorBufferInfo buffer_info {};
             buffer_info.buffer = m_uniform_buffers[i];
@@ -600,7 +600,7 @@ namespace ArchViz
         if (!m_bindless_supported)
             return;
 
-        uint32_t max_binding = k_max_bindless_resources - 1;
+        uint32_t max_binding = VulkanConstants::k_max_bindless_resources - 1;
 
         VkDescriptorSetVariableDescriptorCountAllocateInfoEXT count_info {};
         count_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
@@ -622,9 +622,9 @@ namespace ArchViz
 
     void VulkanRHI::createSyncObjects()
     {
-        m_image_available_semaphores.resize(k_max_frames_in_flight);
-        m_render_finished_semaphores.resize(k_max_frames_in_flight);
-        m_in_flight_fences.resize(k_max_frames_in_flight);
+        m_image_available_semaphores.resize(VulkanConstants::k_max_frames_in_flight);
+        m_render_finished_semaphores.resize(VulkanConstants::k_max_frames_in_flight);
+        m_in_flight_fences.resize(VulkanConstants::k_max_frames_in_flight);
 
         VkSemaphoreCreateInfo semaphore_info {};
         semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -633,7 +633,7 @@ namespace ArchViz
         fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(m_vulkan_device->m_device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
@@ -730,7 +730,7 @@ namespace ArchViz
         std::uniform_real_distribution<float> rnd_dist(0.0f, 1.0f);
 
         // Initial particle positions on a circle
-        std::vector<Particle> particles(k_particle_count);
+        std::vector<Particle> particles(VulkanConstants::k_particle_count);
         for (auto& particle : particles)
         {
             float r           = 0.25f * sqrt(rnd_dist(rnd_engine));
@@ -742,7 +742,7 @@ namespace ArchViz
             particle.color    = {rnd_dist(rnd_engine), rnd_dist(rnd_engine), rnd_dist(rnd_engine), 1.0f};
         }
 
-        VkDeviceSize buffer_size = sizeof(Particle) * k_particle_count;
+        VkDeviceSize buffer_size = sizeof(Particle) * VulkanConstants::k_particle_count;
 
         // Create a staging buffer used to upload data to the gpu
         VkBuffer       stagingBuffer;
@@ -755,11 +755,11 @@ namespace ArchViz
         memcpy(data, particles.data(), (size_t)buffer_size);
         vkUnmapMemory(m_vulkan_device->m_device, stagingBufferMemory);
 
-        m_shader_storage_buffers.resize(k_max_frames_in_flight);
-        m_shader_storage_buffers_memory.resize(k_max_frames_in_flight);
+        m_shader_storage_buffers.resize(VulkanConstants::k_max_frames_in_flight);
+        m_shader_storage_buffers_memory.resize(VulkanConstants::k_max_frames_in_flight);
 
         // Copy initial particle data to all storage buffers
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             VulkanBufferUtils::createBuffer(m_vulkan_device,
                                             buffer_size,
@@ -778,11 +778,11 @@ namespace ArchViz
     {
         VkDeviceSize buffer_size = sizeof(float);
 
-        m_particle_uniform_buffers.resize(k_max_frames_in_flight);
-        m_particle_uniform_buffers_memory.resize(k_max_frames_in_flight);
-        m_particle_uniform_buffers_mapped.resize(k_max_frames_in_flight);
+        m_particle_uniform_buffers.resize(VulkanConstants::k_max_frames_in_flight);
+        m_particle_uniform_buffers_memory.resize(VulkanConstants::k_max_frames_in_flight);
+        m_particle_uniform_buffers_mapped.resize(VulkanConstants::k_max_frames_in_flight);
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             auto usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
             auto flag  = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -794,21 +794,21 @@ namespace ArchViz
 
     void VulkanRHI::createComputeDescriptorSets()
     {
-        std::vector<VkDescriptorSetLayout> layouts(k_max_frames_in_flight, m_compute_descriptor_set_layout);
+        std::vector<VkDescriptorSetLayout> layouts(VulkanConstants::k_max_frames_in_flight, m_compute_descriptor_set_layout);
 
         VkDescriptorSetAllocateInfo allocInfo {};
         allocInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool     = m_descriptor_pool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(k_max_frames_in_flight);
+        allocInfo.descriptorSetCount = VulkanConstants::k_max_frames_in_flight;
         allocInfo.pSetLayouts        = layouts.data();
 
-        m_compute_descriptor_sets.resize(k_max_frames_in_flight);
+        m_compute_descriptor_sets.resize(VulkanConstants::k_max_frames_in_flight);
         if (vkAllocateDescriptorSets(m_vulkan_device->m_device, &allocInfo, m_compute_descriptor_sets.data()) != VK_SUCCESS)
         {
             LOG_ERROR("failed to allocate compute descriptor sets!");
         }
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             VkDescriptorBufferInfo uniformBufferInfo {};
             uniformBufferInfo.buffer = m_particle_uniform_buffers[i];
@@ -825,9 +825,9 @@ namespace ArchViz
             descriptorWrites[0].pBufferInfo     = &uniformBufferInfo;
 
             VkDescriptorBufferInfo storageBufferInfoLastFrame {};
-            storageBufferInfoLastFrame.buffer = m_shader_storage_buffers[(i - 1) % k_max_frames_in_flight];
+            storageBufferInfoLastFrame.buffer = m_shader_storage_buffers[(i - 1) % VulkanConstants::k_max_frames_in_flight];
             storageBufferInfoLastFrame.offset = 0;
-            storageBufferInfoLastFrame.range  = sizeof(Particle) * k_particle_count;
+            storageBufferInfoLastFrame.range  = sizeof(Particle) * VulkanConstants::k_particle_count;
 
             descriptorWrites[1].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[1].dstSet          = m_compute_descriptor_sets[i];
@@ -840,7 +840,7 @@ namespace ArchViz
             VkDescriptorBufferInfo storageBufferInfoCurrentFrame {};
             storageBufferInfoCurrentFrame.buffer = m_shader_storage_buffers[i];
             storageBufferInfoCurrentFrame.offset = 0;
-            storageBufferInfoCurrentFrame.range  = sizeof(Particle) * k_particle_count;
+            storageBufferInfoCurrentFrame.range  = sizeof(Particle) * VulkanConstants::k_particle_count;
 
             descriptorWrites[2].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[2].dstSet          = m_compute_descriptor_sets[i];
@@ -856,7 +856,7 @@ namespace ArchViz
 
     void VulkanRHI::createComputeCommandBuffers()
     {
-        m_compute_command_buffers.resize(k_max_frames_in_flight);
+        m_compute_command_buffers.resize(VulkanConstants::k_max_frames_in_flight);
 
         VkCommandBufferAllocateInfo allocInfo {};
         allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -872,8 +872,8 @@ namespace ArchViz
 
     void VulkanRHI::createComputeSyncObjects()
     {
-        m_compute_finished_semaphores.resize(k_max_frames_in_flight);
-        m_compute_in_flight_fences.resize(k_max_frames_in_flight);
+        m_compute_finished_semaphores.resize(VulkanConstants::k_max_frames_in_flight);
+        m_compute_in_flight_fences.resize(VulkanConstants::k_max_frames_in_flight);
 
         VkSemaphoreCreateInfo semaphoreInfo {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -882,7 +882,7 @@ namespace ArchViz
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             if (vkCreateSemaphore(m_vulkan_device->m_device, &semaphoreInfo, nullptr, &m_compute_finished_semaphores[i]) != VK_SUCCESS ||
                 vkCreateFence(m_vulkan_device->m_device, &fenceInfo, nullptr, &m_compute_in_flight_fences[i]) != VK_SUCCESS)
@@ -1004,7 +1004,7 @@ namespace ArchViz
 
         vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_compute_pipeline_layout, 0, 1, &m_compute_descriptor_sets[m_current_frame], 0, nullptr);
 
-        vkCmdDispatch(command_buffer, k_particle_count / 256, 1, 1);
+        vkCmdDispatch(command_buffer, VulkanConstants::k_particle_count / 256, 1, 1);
 
         VulkanDebugUtils::cmdEndLabel(command_buffer);
 
@@ -1171,19 +1171,19 @@ namespace ArchViz
         vkResetCommandBuffer(m_command_buffers[m_current_frame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(m_command_buffers[m_current_frame], image_index);
 
-        VkSemaphore          wait_semaphores[]   = {m_compute_finished_semaphores[m_current_frame], m_image_available_semaphores[m_current_frame]};
-        VkPipelineStageFlags wait_stages[]       = {VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        VkSemaphore          signal_semaphores[] = {m_render_finished_semaphores[m_current_frame]};
+        std::array<VkSemaphore, 2>          wait_semaphores   = {m_compute_finished_semaphores[m_current_frame], m_image_available_semaphores[m_current_frame]};
+        std::array<VkPipelineStageFlags, 2> wait_stages       = {VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        std::array<VkSemaphore, 1>          signal_semaphores = {m_render_finished_semaphores[m_current_frame]};
 
         VkSubmitInfo submit_info {};
         submit_info.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.waitSemaphoreCount   = 2;
-        submit_info.pWaitSemaphores      = wait_semaphores;
-        submit_info.pWaitDstStageMask    = wait_stages;
+        submit_info.waitSemaphoreCount   = static_cast<uint32_t>(wait_semaphores.size());
+        submit_info.pWaitSemaphores      = wait_semaphores.data();
+        submit_info.pWaitDstStageMask    = wait_stages.data();
         submit_info.commandBufferCount   = 1;
         submit_info.pCommandBuffers      = &m_command_buffers[m_current_frame];
-        submit_info.signalSemaphoreCount = 1;
-        submit_info.pSignalSemaphores    = signal_semaphores;
+        submit_info.signalSemaphoreCount = static_cast<uint32_t>(signal_semaphores.size());
+        submit_info.pSignalSemaphores    = signal_semaphores.data();
 
         if (vkQueueSubmit(m_vulkan_device->m_graphics_queue, 1, &submit_info, m_in_flight_fences[m_current_frame]) != VK_SUCCESS)
         {
@@ -1200,7 +1200,7 @@ namespace ArchViz
             LOG_FATAL("failed to present swap chain image!");
         }
 
-        m_current_frame = (m_current_frame + 1) % k_max_frames_in_flight;
+        m_current_frame = (m_current_frame + 1) % VulkanConstants::k_max_frames_in_flight;
     }
 
     void VulkanRHI::render()
@@ -1242,25 +1242,25 @@ namespace ArchViz
         m_vulkan_vertex_buffer->destroy();
         m_vulkan_index_buffer->destroy();
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             vkDestroySemaphore(m_vulkan_device->m_device, m_compute_finished_semaphores[i], nullptr);
             vkDestroyFence(m_vulkan_device->m_device, m_compute_in_flight_fences[i], nullptr);
         }
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             vkDestroySemaphore(m_vulkan_device->m_device, m_image_available_semaphores[i], nullptr);
             vkDestroySemaphore(m_vulkan_device->m_device, m_render_finished_semaphores[i], nullptr);
             vkDestroyFence(m_vulkan_device->m_device, m_in_flight_fences[i], nullptr);
         }
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_particle_uniform_buffers[i], m_particle_uniform_buffers_memory[i]);
         }
 
-        for (size_t i = 0; i < k_max_frames_in_flight; i++)
+        for (uint32_t i = 0; i < VulkanConstants::k_max_frames_in_flight; i++)
         {
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_particle_uniform_buffers[i], m_particle_uniform_buffers_memory[i]);
             VulkanBufferUtils::destroyBuffer(m_vulkan_device, m_uniform_light_buffers[i], m_uniform_light_buffers_memory[i]);

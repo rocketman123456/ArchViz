@@ -97,6 +97,8 @@ namespace ArchViz
 
         void readTextFile(const std::filesystem::path& file_path, std::string& content) const;
         void readBinaryFile(const std::filesystem::path& file_path, std::vector<std::byte>& content) const;
+        void writeTextFile(const std::filesystem::path& file_path, const std::string& content) const;
+        void writeBinaryFile(const std::filesystem::path& file_path, const std::vector<std::byte>& content) const;
 
         void readVFSTextFile(const std::filesystem::path& file_path, std::string& content) const;
         void readVFSBinaryFile(const std::filesystem::path& file_path, std::vector<std::byte>& content) const;

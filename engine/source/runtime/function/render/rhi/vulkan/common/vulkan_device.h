@@ -1,5 +1,5 @@
 #pragma once
-
+#include "runtime/core/meta/reflection/reflection.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 
 #include <volk.h>
@@ -15,10 +15,14 @@ namespace ArchViz
 {
     class VulkanInstance;
 
-    struct VulkanDeviceCreateInfo
+    REFLECTION_TYPE(VulkanDeviceCreateInfo)
+    CLASS(VulkanDeviceCreateInfo, Fields)
     {
+        REFLECTION_BODY(VulkanDeviceCreateInfo)
+    public:
         bool validation;
 
+        META(Disable)
         std::shared_ptr<VulkanInstance> m_instance;
     };
 

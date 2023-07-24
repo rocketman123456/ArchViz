@@ -56,8 +56,8 @@ namespace ArchViz
     void VFS::unmountAll()
     {
         m_fs.clear();
-        m_fileCache.clear();
-        m_dirCache.clear();
+        m_file_cache.clear();
+        m_dir_cache.clear();
     }
 
     void VFS::buildVFSCache()
@@ -68,19 +68,19 @@ namespace ArchViz
 
             for (auto file : fs->m_vfiles)
             {
-                m_fileCache[file] = fs;
+                m_file_cache[file] = fs;
             }
             for (auto dir : fs->m_vdirs)
             {
-                m_dirCache[dir] = fs;
+                m_dir_cache[dir] = fs;
             }
         }
     }
 
     FilePtr VFS::open(const std::string& vpath, uint32_t mode)
     {
-        auto fs = m_fileCache.find(vpath);
-        if (fs == m_fileCache.end())
+        auto fs = m_file_cache.find(vpath);
+        if (fs == m_file_cache.end())
         {
             return nullptr;
         }

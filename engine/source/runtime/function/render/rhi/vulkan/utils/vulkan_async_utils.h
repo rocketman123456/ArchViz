@@ -4,8 +4,14 @@
 
 namespace ArchViz
 {
-	class VulkanAsyncUtils
-	{
+    struct FileLoadRequest
+    {};
 
-	};
-}
+    struct GpuUploadRequest
+    {};
+
+    class VulkanAsyncUtils
+    {
+    public:
+    };
+} // namespace ArchViz

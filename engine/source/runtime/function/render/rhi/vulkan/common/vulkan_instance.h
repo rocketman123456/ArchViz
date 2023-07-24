@@ -1,4 +1,5 @@
 #pragma once
+#include "runtime/core/meta/reflection/reflection.h"
 
 #include <volk.h>
 #define GLFW_INCLUDE_NONE
@@ -6,9 +7,14 @@
 
 namespace ArchViz
 {
-    struct VulkanInstanceCreateInfo
+    REFLECTION_TYPE(VulkanInstanceCreateInfo)
+    CLASS(VulkanInstanceCreateInfo, Fields)
     {
-        bool        validation;
+        REFLECTION_BODY(VulkanInstanceCreateInfo)
+    public:
+        bool validation;
+
+        META(Disable)
         GLFWwindow* window;
     };
 

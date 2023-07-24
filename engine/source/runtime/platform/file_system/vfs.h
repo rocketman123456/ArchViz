@@ -30,7 +30,7 @@ namespace ArchViz
 
     private:
         std::vector<FileSystemPtr>                     m_fs;
-        std::unordered_map<std::string, FileSystemPtr> m_fileCache;
-        std::unordered_map<std::string, FileSystemPtr> m_dirCache;
+        std::unordered_map<std::string, FileSystemPtr> m_file_cache;
+        std::unordered_map<std::string, FileSystemPtr> m_dir_cache;
     };
 } // namespace ArchViz
