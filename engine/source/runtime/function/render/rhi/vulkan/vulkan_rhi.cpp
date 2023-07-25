@@ -426,6 +426,12 @@ namespace ArchViz
         }
     }
 
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
     void VulkanRHI::createTextureImage()
     {
         m_vulkan_texture                   = std::make_shared<VulkanTexture>();
@@ -434,8 +440,8 @@ namespace ArchViz
         m_vulkan_texture->m_device         = m_vulkan_device;
         m_vulkan_texture->m_command_pool   = m_command_pool;
         m_vulkan_texture->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        m_vulkan_texture->initizlize("asset-test/data/model/viking_room/viking_room.png");
-        // m_vulkan_texture->initizlize("asset-test/data/texture/object/white.tga");
+        // m_vulkan_texture->initizlize("asset-test/data/model/viking_room/viking_room.png");
+        m_vulkan_texture->initizlize("asset-test/data/texture/object/container/container2.png");
 
         m_vulkan_texture_ui                   = std::make_shared<VulkanTexture>();
         m_vulkan_texture_ui->m_asset_manager  = m_asset_manager;
@@ -446,26 +452,20 @@ namespace ArchViz
         m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
     }
 
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-
     // TODO : move this to scene management
     void VulkanRHI::loadModel()
     {
-        std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
-        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
-        std::filesystem::path mtl_path = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room";
-        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/capsule.obj";
+        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
+        //  std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
+        // std::filesystem::path mtl_path = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room";
+        std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/cube_1.obj";
         // TODO : make this with world load
         tinyobj::attrib_t                attrib;
         std::vector<tinyobj::shape_t>    shapes;
         std::vector<tinyobj::material_t> materials;
         std::string                      warn, err;
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str(), mtl_path.generic_string().c_str()))
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str()))
         {
             LOG_WARN(warn);
             LOG_FATAL(err);

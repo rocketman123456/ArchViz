@@ -4,5 +4,8 @@
 
 namespace ArchViz
 {
-
+    class ResourceManager
+    {
+    public:
+    };
 }

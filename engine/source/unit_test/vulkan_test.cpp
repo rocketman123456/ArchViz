@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
     asset_manager->setVFS(vfs);
 
-    
+    std::shared_ptr<WorldManager> world_manager = std::make_shared<WorldManager>();
 
     std::shared_ptr<WindowSystem> window_system = std::make_shared<WindowSystem>();
     WindowCreateInfo window_create_info;
