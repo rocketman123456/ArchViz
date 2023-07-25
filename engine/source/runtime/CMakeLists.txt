@@ -41,7 +41,6 @@ target_compile_options(${TARGET_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:
 target_link_libraries(${TARGET_NAME} PUBLIC json11)
 target_link_libraries(${TARGET_NAME} PUBLIC mustache)
 target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog_header_only)
-
 # target_link_libraries(${TARGET_NAME} PUBLIC fmt::fmt-header-only)
 target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC volk::volk_headers)
@@ -49,10 +48,10 @@ target_link_libraries(${TARGET_NAME} PUBLIC volk::volk)
 target_link_libraries(${TARGET_NAME} PUBLIC libzip::zip)
 target_link_libraries(${TARGET_NAME} PUBLIC SPIRV-Headers)
 target_link_libraries(${TARGET_NAME} PUBLIC Vulkan-Headers)
-# target_link_libraries(${TARGET_NAME} PUBLIC VulkanMemoryAllocator)
 target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
-
+target_link_libraries(${TARGET_NAME} PUBLIC sol2::sol2)
+target_link_libraries(${TARGET_NAME} PUBLIC lua_static)
 # target_link_libraries(${TARGET_NAME} PUBLIC zip)
 target_link_libraries(${TARGET_NAME} PUBLIC
   glslang
@@ -83,9 +82,10 @@ target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/ti
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/SPIRV-Headers/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vulkan-Headers/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/VulkanMemoryAllocator/include)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/sol2/include)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/lua)
 
 # target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/libzip/lib)
-
 # target_include_directories(${TARGET_NAME} PUBLIC ${STB_INCLUDE_DIRS})
 # target_include_directories(${TARGET_NAME} PUBLIC ${TINYGLTF_INCLUDE_DIRS})
 # target_include_directories(${TARGET_NAME} PUBLIC ${LUA_INCLUDE_DIR})

@@ -14,10 +14,6 @@ if(NOT TARGET imgui)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/imgui.cmake)
 endif()
 
-# if(NOT TARGET zlib)
-#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/zlib.cmake)
-# endif()
-
 if(NOT TARGET libzip)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/libzip.cmake)
 endif()
@@ -25,14 +21,6 @@ endif()
 if(NOT TARGET glfw)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glfw.cmake)
 endif()
-
-if(NOT TARGET tlsf)
-    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tlsf.cmake)
-endif()
-
-# if(NOT TARGET VulkanMemoryAllocator)
-#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/vma.cmake)
-# endif()
 
 if(NOT TARGET glslang)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/glslang.cmake)
@@ -65,6 +53,26 @@ endif()
 if(NOT TARGET tinygltf)
     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tinygltf.cmake)
 endif()
+
+if(NOT TARGET sol2)
+    add_subdirectory(sol2)
+endif()
+
+if(NOT TARGET lua)
+    include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/lua.cmake)
+endif()
+
+# if(NOT TARGET zlib)
+#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/zlib.cmake)
+# endif()
+
+# if(NOT TARGET tlsf)
+#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/tlsf.cmake)
+# endif()
+
+# if(NOT TARGET VulkanMemoryAllocator)
+#     include(${ARCHVIZ_ROOT_DIR}/cmake/3rd_party/vma.cmake)
+# endif()
 
 # if(NOT TARGET tinyobjloader)
 #     add_subdirectory(tinyobjloader)
