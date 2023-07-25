@@ -23,22 +23,47 @@ static void destroy_debug_utils_messenger_ext(VkInstance instance, VkDebugUtilsM
     }
 }
 
-// static VKAPI_ATTR VkBool32 VKAPI_CALL
-// debug_report(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void*
-// pUserData)
-// {
-//     (void)flags;
-//     (void)object;
-//     (void)location;
-//     (void)messageCode;
-//     (void)pUserData;
-//     (void)pLayerPrefix; // Unused arguments
-//     fprintf(stderr, "[vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n", objectType, pMessage);
-//     return VK_FALSE;
-// }
-
 namespace ArchViz
 {
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT      flags,
+                                                       VkDebugReportObjectTypeEXT objectType,
+                                                       uint64_t                   object,
+                                                       size_t                     location,
+                                                       int32_t                    messageCode,
+                                                       const char*                pLayerPrefix,
+                                                       const char*                pMessage,
+                                                       void*                      pUserData)
+    {
+        (void)object;
+        (void)location;
+        (void)messageCode;
+        (void)pUserData;
+        (void)pLayerPrefix; // Unused arguments
+
+        if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
+        {
+            LOG_DEBUG("[vulkan] Debug report from ObjectType: {} : Message: {}", objectType, pMessage);
+        }
+        else if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
+        {
+            LOG_INFO("[vulkan] Debug report from ObjectType: {} : Message: {}", objectType, pMessage);
+        }
+        else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+        {
+            LOG_WARN("[vulkan] Debug report from ObjectType: {} : Message: {}", objectType, pMessage);
+        }
+        else if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
+        {
+            LOG_WARN("[vulkan] Debug report from ObjectType: {} : Message: {}", objectType, pMessage);
+        }
+        else if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+        {
+            LOG_ERROR("[vulkan] Debug report from ObjectType: {} : Message: {}", objectType, pMessage);
+        }
+
+        // fprintf(stderr, "[vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n", objectType, pMessage);
+        return VK_FALSE;
+    }
 
     void VulkanInstance::createInstance()
     {
@@ -63,16 +88,16 @@ namespace ArchViz
             LOG_FATAL("failed to initialize volk!");
         }
 
-        if (m_validation && !VulkanUtils::checkValidationLayerSupport(VulkanConstants::validation_layers))
+        if (m_validation && !VulkanUtils::checkValidationLayerSupport(m_validation_layers_cstring))
         {
             LOG_FATAL("validation layers requested, but not available!");
         }
 
         VkApplicationInfo app_info {};
         app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        app_info.pApplicationName   = "ArchViz";
+        app_info.pApplicationName   = m_name.c_str();
         app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        app_info.pEngineName        = "ArchViz Engine";
+        app_info.pEngineName        = m_engine_name.c_str();
         app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
         app_info.apiVersion         = m_vulkan_api_version;
 
@@ -91,8 +116,8 @@ namespace ArchViz
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo {};
         if (m_validation)
         {
-            create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
-            create_info.ppEnabledLayerNames = VulkanConstants::validation_layers.data();
+            create_info.enabledLayerCount   = static_cast<uint32_t>(m_validation_layers_cstring.size());
+            create_info.ppEnabledLayerNames = m_validation_layers_cstring.data();
 
             VulkanUtils::populateDebugMessengerCreateInfo(debugCreateInfo);
             create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
@@ -116,26 +141,32 @@ namespace ArchViz
         if (!m_validation)
             return;
 
-        VkDebugUtilsMessengerCreateInfoEXT create_info;
-        VulkanUtils::populateDebugMessengerCreateInfo(create_info);
-
-        if (create_debug_utils_messenger_ext(m_instance, &create_info, nullptr, &m_debug_messenger) != VK_SUCCESS)
+        if (m_debug_utils_callback)
         {
-            LOG_FATAL("failed to set up debug messenger!");
+            VkDebugUtilsMessengerCreateInfoEXT create_info;
+            VulkanUtils::populateDebugMessengerCreateInfo(create_info);
+
+            if (create_debug_utils_messenger_ext(m_instance, &create_info, nullptr, &m_debug_messenger) != VK_SUCCESS)
+            {
+                LOG_FATAL("failed to set up debug messenger!");
+            }
         }
 
-        // auto FUNC_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
+        if (m_debug_report_callback)
+        {
+            auto FUNC_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
 
-        // VkDebugReportCallbackCreateInfoEXT debug_report_ci;
-        // debug_report_ci.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-        // debug_report_ci.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-        // debug_report_ci.pfnCallback = debug_report;
-        // debug_report_ci.pUserData   = nullptr;
-        // debug_report_ci.pNext       = nullptr;
-        // if (FUNC_vkCreateDebugReportCallbackEXT(m_instance, &debug_report_ci, nullptr, &m_report_callback))
-        //{
-        //    LOG_FATAL("failed to set up debug report!");
-        //}
+            VkDebugReportCallbackCreateInfoEXT debug_report_ci;
+            debug_report_ci.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+            debug_report_ci.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+            debug_report_ci.pfnCallback = debug_report;
+            debug_report_ci.pUserData   = nullptr;
+            debug_report_ci.pNext       = nullptr;
+            if (FUNC_vkCreateDebugReportCallbackEXT(m_instance, &debug_report_ci, nullptr, &m_report_callback))
+            {
+                LOG_FATAL("failed to set up debug report!");
+            }
+        }
     }
 
     void VulkanInstance::initSurface()
@@ -159,8 +190,14 @@ namespace ArchViz
 
         if (m_validation)
         {
-            destroy_debug_utils_messenger_ext(m_instance, m_debug_messenger, nullptr);
-            // vkDestroyDebugReportCallbackEXT(m_instance, m_report_callback, nullptr);
+            if (m_debug_utils_callback)
+            {
+                destroy_debug_utils_messenger_ext(m_instance, m_debug_messenger, nullptr);
+            }
+            if (m_debug_report_callback)
+            {
+                vkDestroyDebugReportCallbackEXT(m_instance, m_report_callback, nullptr);
+            }
         }
 
         vkDestroyInstance(m_instance, nullptr);

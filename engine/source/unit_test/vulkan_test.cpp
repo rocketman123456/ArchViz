@@ -3,6 +3,8 @@
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
+#include "runtime/function/framework/world/world_manager.h"
+
 #include "runtime/function/window/window_system.h"
 
 #include "runtime/function/render/render_system.h"
@@ -33,14 +35,14 @@ int main(int argc, char** argv)
 
     asset_manager->setVFS(vfs);
 
-    std::shared_ptr<WindowSystem> window_system = std::make_shared<WindowSystem>();
+    
 
+    std::shared_ptr<WindowSystem> window_system = std::make_shared<WindowSystem>();
     WindowCreateInfo window_create_info;
     asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
     window_system->initialize(window_create_info);
 
     std::shared_ptr<RenderSystem> render_system = std::make_shared<RenderSystem>();
-
     RenderSystemInitInfo render_init_info;
     render_init_info.window_system = window_system;
     render_system->setConfigManager(config_manager);

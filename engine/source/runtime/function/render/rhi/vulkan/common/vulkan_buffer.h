@@ -1,5 +1,5 @@
 #pragma once
-#include "runtime/function/render/rhi/gpu_handle.h"
+#include "runtime/function/render/rhi/gpu_resources.h"
 
 #include <volk.h>
 #include <vk_mem_alloc.h>

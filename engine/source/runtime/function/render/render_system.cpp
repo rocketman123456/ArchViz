@@ -101,10 +101,6 @@ namespace ArchViz
         int width = 0, height = 0;
         glfwGetFramebufferSize(m_rhi->m_initialize_info.window_system->getWindow(), &width, &height);
         // for minimize
-        if (width == 0 || height == 0)
-        {
-            return;
-        }
 
         static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -125,15 +121,22 @@ namespace ArchViz
                 m_render_camera->move(CameraMovement::Right, delta_time);
         }
 
-        m_render_camera->m_width  = width;
-        m_render_camera->m_height = height;
-        m_render_camera->setPerspective(45.0f, (float)width / (float)height, 0.1, 100.0f);
-        m_render_camera->setViewPort((float)width, (float)height);
+        if (width == 0 || height == 0)
+        {
+            //return;
+        }
+        else
+        {
+            m_render_camera->m_width  = width;
+            m_render_camera->m_height = height;
+            m_render_camera->setPerspective(45.0f, (float)width / (float)height, 0.1, 100.0f);
+            m_render_camera->setViewPort((float)width, (float)height);
 
-        m_render_camera->update();
+            m_render_camera->update();
+        }
 
         FMatrix4 model {FMatrix4::Identity()};
-        // model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
+        model.block<3, 3>(0, 0) = Eigen::AngleAxisf(time * 0.1f, FVector3::UnitZ()).toRotationMatrix();
 
         m_rhi->m_ubo.view  = Math::lookAt({2, 2, 2}, {0, 0, 0}, {0, 0, 1});                         // m_render_camera->m_view;
         m_rhi->m_ubo.proj  = Math::perspective(45.0f, (float)width / (float)height, 0.01f, 100.0f); // m_render_camera->m_projction;

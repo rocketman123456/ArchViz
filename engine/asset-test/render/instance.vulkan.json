@@ -1,3 +1,11 @@
 {
-    "validation": true
+    "validation": true,
+    "standlone_table": false,
+    "debug_utils_callback": true,
+    "debug_report_callback": false,
+    "name": "ArchViz",
+    "engine_name": "ArchViz Engine",
+    "validation_layers": [
+        "VK_LAYER_KHRONOS_validation"
+    ]
 }

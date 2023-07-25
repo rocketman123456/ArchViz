@@ -60,10 +60,24 @@ namespace ArchViz
 
     void VulkanRHI::createInstance()
     {
-        m_vulkan_instance = std::make_shared<VulkanInstance>();
+        VulkanInstanceCreateInfo info;
+        m_asset_manager->loadVFSAsset("asset/render/instance.vulkan.json", info);
 
-        m_vulkan_instance->m_validation = m_enable_validation_layers;
-        m_vulkan_instance->m_window     = m_initialize_info.window_system->getWindow();
+        m_vulkan_instance                          = std::make_shared<VulkanInstance>();
+        m_vulkan_instance->m_validation            = info.validation;
+        m_vulkan_instance->m_standlone_table       = info.standlone_table;
+        m_vulkan_instance->m_debug_utils_callback  = info.debug_utils_callback;
+        m_vulkan_instance->m_debug_report_callback = info.debug_report_callback;
+        m_vulkan_instance->m_name                  = info.name;
+        m_vulkan_instance->m_engine_name           = info.engine_name;
+        m_vulkan_instance->m_window                = m_initialize_info.window_system->getWindow();
+
+        m_vulkan_instance->m_validation_layers.insert(m_vulkan_instance->m_validation_layers.begin(), info.validation_layers.begin(), info.validation_layers.end());
+        for (auto& layer : m_vulkan_instance->m_validation_layers)
+        {
+            m_vulkan_instance->m_validation_layers_cstring.push_back(layer.c_str());
+        }
+
         m_vulkan_instance->initialize();
 
         VulkanDebugUtils::setup(m_vulkan_instance->m_instance);
@@ -71,17 +85,41 @@ namespace ArchViz
 
     void VulkanRHI::createVulkanDevice()
     {
-        m_vulkan_device = std::make_shared<VulkanDevice>();
+        VulkanDeviceCreateInfo info;
+        m_asset_manager->loadVFSAsset("asset/render/device.vulkan.json", info);
 
-        m_vulkan_device->m_validation = m_enable_validation_layers;
-        m_vulkan_device->m_instance   = m_vulkan_instance;
+        m_vulkan_device                    = std::make_shared<VulkanDevice>();
+        m_vulkan_device->m_validation      = info.validation;
+        m_vulkan_device->m_standlone_table = info.standlone_table;
+        m_vulkan_device->m_instance        = m_vulkan_instance;
+
+        m_vulkan_device->m_validation_layers.insert(m_vulkan_device->m_validation_layers.begin(), info.validation_layers.begin(), info.validation_layers.end());
+        for (auto& layer : m_vulkan_device->m_validation_layers)
+        {
+            m_vulkan_device->m_validation_layers_cstring.push_back(layer.c_str());
+        }
+
+        m_vulkan_device->m_device_extensions.insert(m_vulkan_device->m_device_extensions.begin(), info.device_extensions.begin(), info.device_extensions.end());
+        for (auto& layer : m_vulkan_device->m_device_extensions)
+        {
+            m_vulkan_device->m_device_extensions_cstring.push_back(layer.c_str());
+        }
+#if defined(__MACH__)
+        m_vulkan_device->m_device_extensions_cstring.push_back("VK_KHR_portability_subset");
+#endif
+
         m_vulkan_device->initialize();
     }
 
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
     void VulkanRHI::createSwapChain()
     {
-        m_vulkan_swap_chain = std::make_shared<VulkanSwapChain>();
-
+        m_vulkan_swap_chain             = std::make_shared<VulkanSwapChain>();
         m_vulkan_swap_chain->m_instance = m_vulkan_instance;
         m_vulkan_swap_chain->m_device   = m_vulkan_device;
 

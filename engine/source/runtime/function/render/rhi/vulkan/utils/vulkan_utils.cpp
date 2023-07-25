@@ -14,19 +14,22 @@ namespace ArchViz
                                                          const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
                                                          void*                                       pUserData)
     {
-        if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+        (void)messageType;
+        (void)pUserData; // unused data
+
+        if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
         {
             LOG_DEBUG("[Vulkan] validation layer: {}", pCallbackData->pMessage);
         }
-        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+        else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
         {
             LOG_INFO("[Vulkan] validation layer: {}", pCallbackData->pMessage);
         }
-        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
         {
             LOG_WARN("[Vulkan] validation layer: {}", pCallbackData->pMessage);
         }
-        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
         {
             LOG_ERROR("[Vulkan] validation layer: {}", pCallbackData->pMessage);
         }
@@ -42,7 +45,7 @@ namespace ArchViz
         createInfo.pfnUserCallback = debug_callback;
     }
 
-    std::vector<const char*> VulkanUtils::getRequiredExtensions(bool enableValidationLayers)
+    std::vector<const char*> VulkanUtils::getRequiredExtensions(bool enable_validation_layers)
     {
         uint32_t     glfwExtensionCount = 0;
         const char** glfwExtensions;
@@ -50,7 +53,7 @@ namespace ArchViz
 
         std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
-        if (enableValidationLayers)
+        if (enable_validation_layers)
         {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
@@ -112,6 +115,7 @@ namespace ArchViz
 
     bool VulkanUtils::checkBindlessSupport(VkPhysicalDevice device)
     {
+        // Query bindless extension, called Descriptor Indexing (https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VK_EXT_descriptor_indexing.html)
         VkPhysicalDeviceDescriptorIndexingFeatures indexing_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr};
         VkPhysicalDeviceFeatures2                  device_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_features};
 

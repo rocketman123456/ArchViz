@@ -2,8 +2,5 @@
 
 namespace ArchViz
 {
-	class WorldManager
-	{
-	public:
-	};
+
 }

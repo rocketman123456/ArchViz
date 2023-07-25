@@ -2,9 +2,8 @@
 #include "runtime/core/meta/reflection/reflection.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 
-#include <volk.h>
-
 #include <vk_mem_alloc.h>
+#include <volk.h>
 
 #include <cstdint>
 #include <memory>
@@ -21,12 +20,13 @@ namespace ArchViz
         REFLECTION_BODY(VulkanDeviceCreateInfo)
     public:
         bool validation;
+        bool standlone_table;
 
-        META(Disable)
-        std::shared_ptr<VulkanInstance> m_instance;
+        std::vector<std::string> validation_layers;
+        std::vector<std::string> device_extensions;
     };
 
-    class VulkanDevice : public std::enable_shared_from_this<VulkanDevice>
+    class VulkanDevice //: public std::enable_shared_from_this<VulkanDevice>
     {
     public:
         VulkanDevice()  = default;
@@ -45,6 +45,14 @@ namespace ArchViz
 
     public:
         bool m_validation {true};
+        bool m_standlone_table {false};
+
+        std::vector<std::string> m_validation_layers;
+        std::vector<const char*> m_validation_layers_cstring;
+
+        std::vector<std::string> m_device_extensions;
+        std::vector<const char*> m_device_extensions_cstring;
+
         bool m_bindless_support {false};
 
         std::shared_ptr<VulkanInstance> m_instance {nullptr};

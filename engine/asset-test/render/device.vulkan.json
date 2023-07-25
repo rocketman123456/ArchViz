@@ -1,3 +1,13 @@
 {
-    "validation": true
+    "validation": true,
+    "standlone_table": false,
+    "validation_layers": [
+        "VK_LAYER_KHRONOS_validation"
+    ],
+    "device_extensions": [
+        "VK_KHR_swapchain",
+        "VK_KHR_timeline_semaphore",
+        "VK_KHR_shader_draw_parameters",
+        "VK_KHR_dynamic_rendering"
+    ]
 }

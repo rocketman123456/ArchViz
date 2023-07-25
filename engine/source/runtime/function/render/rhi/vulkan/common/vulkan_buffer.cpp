@@ -1,5 +1,5 @@
 #include "runtime/function/render/rhi/vulkan/common/vulkan_buffer.h"
-#include "runtime/function/render/rhi/vulkan/vulkan_device.h"
+#include "runtime/function/render/rhi/vulkan/common/vulkan_device.h"
 
 #include "runtime/core/base/macro.h"
 

@@ -5,6 +5,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <string>
+#include <vector>
+
 namespace ArchViz
 {
     REFLECTION_TYPE(VulkanInstanceCreateInfo)
@@ -13,9 +16,14 @@ namespace ArchViz
         REFLECTION_BODY(VulkanInstanceCreateInfo)
     public:
         bool validation;
+        bool standlone_table;
+        bool debug_utils_callback;
+        bool debug_report_callback;
 
-        META(Disable)
-        GLFWwindow* window;
+        std::string name;
+        std::string engine_name;
+
+        std::vector<std::string> validation_layers;
     };
 
     class VulkanInstance
@@ -31,6 +39,15 @@ namespace ArchViz
 
     public:
         bool m_validation {true};
+        bool m_standlone_table {false};
+        bool m_debug_utils_callback {true};
+        bool m_debug_report_callback {false};
+
+        std::vector<std::string> m_validation_layers;
+        std::vector<const char*> m_validation_layers_cstring;
+
+        std::string m_name;
+        std::string m_engine_name;
 
         GLFWwindow* m_window {nullptr};
 

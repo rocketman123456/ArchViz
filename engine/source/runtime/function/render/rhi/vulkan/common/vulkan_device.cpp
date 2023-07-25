@@ -55,13 +55,13 @@ namespace ArchViz
             vkGetPhysicalDeviceFeatures(device, &supported_features);
 
             bool suitable  = VulkanUtils::isDeviceSuitable(device, m_instance->m_surface);
-            bool extension = VulkanUtils::checkDeviceExtensionSupport(device, VulkanConstants::device_extensions);
+            bool extension = VulkanUtils::checkDeviceExtensionSupport(device, m_device_extensions_cstring);
             bool adequate  = VulkanUtils::isSwapChainAdequate(device, m_instance->m_surface, extension);
             bool bindless  = VulkanUtils::checkBindlessSupport(device);
             if (suitable && extension && adequate && bindless && supported_features.samplerAnisotropy)
             {
-                m_bindless_support = bindless;
-                m_physical_device  = device;
+                // m_bindless_support = bindless;
+                m_physical_device = device;
                 break;
             }
         }
@@ -94,7 +94,7 @@ namespace ArchViz
             std::vector<VkExtensionProperties> extensions(extension_count);
             if (vkEnumerateDeviceExtensionProperties(m_physical_device, nullptr, &extension_count, &extensions.front()) == VK_SUCCESS)
             {
-                for (auto ext : extensions)
+                for (const auto& ext : extensions)
                 {
                     // LOG_DEBUG("    supported vulkan extensions: {}", ext.extensionName);
                     m_supported_extensions.push_back(ext.extensionName);
@@ -110,14 +110,14 @@ namespace ArchViz
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
         std::set<uint32_t>                   unique_queue_families = {m_indices.m_graphics_family.value(), m_indices.m_compute_family.value(), m_indices.m_present_family.value()};
 
-        float queuePriority = 1.0f;
-        for (uint32_t queueFamily : unique_queue_families)
+        float queue_priority = 1.0f;
+        for (uint32_t queue_family : unique_queue_families)
         {
             VkDeviceQueueCreateInfo queue_create_info {};
             queue_create_info.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-            queue_create_info.queueFamilyIndex = queueFamily;
+            queue_create_info.queueFamilyIndex = queue_family;
             queue_create_info.queueCount       = 1;
-            queue_create_info.pQueuePriorities = &queuePriority;
+            queue_create_info.pQueuePriorities = &queue_priority;
             queue_create_infos.push_back(queue_create_info);
         }
 
@@ -131,16 +131,16 @@ namespace ArchViz
         create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.pQueueCreateInfos       = queue_create_infos.data();
         create_info.queueCreateInfoCount    = static_cast<uint32_t>(queue_create_infos.size());
-        create_info.enabledExtensionCount   = static_cast<uint32_t>(VulkanConstants::device_extensions.size());
-        create_info.ppEnabledExtensionNames = VulkanConstants::device_extensions.data();
+        create_info.enabledExtensionCount   = static_cast<uint32_t>(m_device_extensions_cstring.size());
+        create_info.ppEnabledExtensionNames = m_device_extensions_cstring.data();
         create_info.pEnabledFeatures        = nullptr;
         // create_info.pEnabledFeatures        = &device_features;
         create_info.pNext = &physical_features2;
 
         if (m_validation)
         {
-            create_info.enabledLayerCount   = static_cast<uint32_t>(VulkanConstants::validation_layers.size());
-            create_info.ppEnabledLayerNames = VulkanConstants::validation_layers.data();
+            create_info.enabledLayerCount   = static_cast<uint32_t>(m_validation_layers_cstring.size());
+            create_info.ppEnabledLayerNames = m_validation_layers_cstring.data();
         }
         else
         {
@@ -148,7 +148,6 @@ namespace ArchViz
         }
 
         // Query bindless extension, called Descriptor Indexing (https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VK_EXT_descriptor_indexing.html)
-
         VkPhysicalDeviceDescriptorIndexingFeatures indexing_features {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES, nullptr};
         VkPhysicalDeviceFeatures2                  device_features_2 {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &indexing_features};
 
@@ -192,16 +191,16 @@ namespace ArchViz
 
     void VulkanDevice::createAssetAllocator()
     {
-        VmaVulkanFunctions vulkanFunctions    = {};
-        vulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
-        vulkanFunctions.vkGetDeviceProcAddr   = vkGetDeviceProcAddr;
+        VmaVulkanFunctions vulkan_functions    = {};
+        vulkan_functions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+        vulkan_functions.vkGetDeviceProcAddr   = vkGetDeviceProcAddr;
 
         VmaAllocatorCreateInfo allocator_create_info = {};
         allocator_create_info.vulkanApiVersion       = m_instance->m_vulkan_api_version;
         allocator_create_info.instance               = m_instance->m_instance;
         allocator_create_info.physicalDevice         = m_physical_device;
         allocator_create_info.device                 = m_device;
-        allocator_create_info.pVulkanFunctions       = &vulkanFunctions;
+        allocator_create_info.pVulkanFunctions       = &vulkan_functions;
 
         vmaCreateAllocator(&allocator_create_info, &m_vma_allocator);
     }

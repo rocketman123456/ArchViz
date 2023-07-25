@@ -129,10 +129,7 @@ namespace ArchViz
         void drawFrame();
 
     public:
-        const bool m_enable_validation_layers = true;
-
-        bool m_framebuffer_resized = false;
-        bool m_bindless_supported  = true;
+        bool m_bindless_supported = true;
 
         uint32_t m_fps;
 
@@ -148,7 +145,6 @@ namespace ArchViz
         std::shared_ptr<VulkanRenderPass> m_vulkan_render_pass;
 
         std::shared_ptr<VulkanTexture> m_vulkan_texture;
-
         std::shared_ptr<VulkanTexture> m_vulkan_texture_ui;
 
         std::shared_ptr<VulkanUI> m_vulkan_ui;
@@ -159,7 +155,7 @@ namespace ArchViz
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------
 
-        // TODO add pipeline cache storage to increase creation speed
+        // add pipeline cache storage to increase creation speed
         VkPipelineCache m_pipeline_cache;
 
         VkFormat       m_depth_format;
@@ -172,7 +168,7 @@ namespace ArchViz
         std::vector<VkSemaphore> m_image_available_semaphores;
         std::vector<VkSemaphore> m_render_finished_semaphores;
         std::vector<VkFence>     m_in_flight_fences;
-        uint32_t                 m_current_frame = 0;
+        uint32_t                 m_current_frame {0};
 
         // ---------------------------------------------------------------------------
         // ---------------------------------------------------------------------------

@@ -82,3 +82,9 @@
 [submodule "engine/3rd_party/SPIRV-Reflect"]
 	path = engine/3rd_party/SPIRV-Reflect
 	url = https://github.com/KhronosGroup/SPIRV-Reflect.git
+[submodule "engine/3rd_party/meshoptimizer"]
+	path = engine/3rd_party/meshoptimizer
+	url = https://github.com/zeux/meshoptimizer.git
+[submodule "engine/3rd_party/llvm-project"]
+	path = engine/3rd_party/llvm-project
+	url = https://github.com/llvm/llvm-project.git
