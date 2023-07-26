@@ -1,5 +1,5 @@
 #pragma once
-
+#include "runtime/core/base/macro.h"
 #include "runtime/function/framework/ecs/types.h"
 
 #include <array>
@@ -8,10 +8,14 @@
 
 namespace Piccolo
 {
+    // The virtual inheritance of IComponentArray is unfortunate but, as far as I can tell, unavoidable. As seen later, we'll have a list of every ComponentArray (one per component type), and we need
+    // to notify all of them when an entity is destroyed so that it can remove the entity's data if it exists. The only way to keep a list of multiple templated types is to keep a list of their common
+    // interface so that we can call EntityDestroyed() on all of them.
     class IComponentArray
     {
     public:
-        virtual ~IComponentArray()                  = default;
+        virtual ~IComponentArray() = default;
+
         virtual void entityDestroyed(Entity entity) = 0;
     };
 
@@ -21,8 +25,7 @@ namespace Piccolo
     public:
         void insertData(Entity entity, T component)
         {
-            assert(m_entity_to_index.find(entity) == m_entity_to_index.end() && "Component added to same entity more than once.");
-
+            ASSERT(m_entity_to_index.find(entity) == m_entity_to_index.end() && "Component added to same entity more than once.");
             // Put new entry at end
             size_t newIndex             = m_size;
             m_entity_to_index[entity]   = newIndex;
@@ -33,8 +36,7 @@ namespace Piccolo
 
         T& getData(Entity entity)
         {
-            assert(m_entity_to_index.find(entity) != m_entity_to_index.end() && "Retrieving non-existent component.");
-
+            ASSERT(m_entity_to_index.find(entity) != m_entity_to_index.end() && "Retrieving non-existent component.");
             return m_components[m_entity_to_index[entity]];
         }
 

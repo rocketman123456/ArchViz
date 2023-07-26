@@ -2,10 +2,20 @@
 // https://giordi91.github.io/post/resourcesystem/
 #pragma once
 
+#include <string>
+#include <unordered_map>
+
 namespace ArchViz
 {
     class ResourceManager
     {
     public:
+        void createMesh();
+        void createTexture();
+
+        void getMesh();
+        void getTexture();
+
+    private:
     };
-}
+} // namespace ArchViz

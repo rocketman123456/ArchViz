@@ -1,4 +1,5 @@
 #include "runtime/function/framework/ecs/entity_manager.h"
+#include "runtime/core/base/macro.h"
 
 namespace Piccolo
 {
@@ -12,7 +13,7 @@ namespace Piccolo
 
     Entity EntityManager::createEntity()
     {
-        assert(m_living_entity_count < MAX_ENTITIES && "Too many entities in existence.");
+        ASSERT(m_living_entity_count < MAX_ENTITIES && "Too many entities in existence.");
 
         Entity id = m_available_entities.front();
         m_available_entities.pop();
@@ -23,7 +24,7 @@ namespace Piccolo
 
     void EntityManager::destroyEntity(Entity entity)
     {
-        assert(entity < MAX_ENTITIES && "Entity out of range.");
+        ASSERT(entity < MAX_ENTITIES && "Entity out of range.");
 
         m_signatures[entity].reset();
         m_available_entities.push(entity);
@@ -32,15 +33,13 @@ namespace Piccolo
 
     void EntityManager::setSignature(Entity entity, Signature signature)
     {
-        assert(entity < MAX_ENTITIES && "Entity out of range.");
-
+        ASSERT(entity < MAX_ENTITIES && "Entity out of range.");
         m_signatures[entity] = signature;
     }
 
     Signature EntityManager::getSignature(Entity entity)
     {
-        assert(entity < MAX_ENTITIES && "Entity out of range.");
-
+        ASSERT(entity < MAX_ENTITIES && "Entity out of range.");
         return m_signatures[entity];
     }
 } // namespace Piccolo

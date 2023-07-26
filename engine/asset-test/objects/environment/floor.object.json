@@ -29,7 +29,7 @@
                 "mesh_res": {
                     "sub_meshes": [
                         {
-                            "material": "asset/objects/material/white.material.json",
+                            "material": "asset/material/white.material.json",
                             "obj_file_ref": "asset/data/model/environment/floor.obj",
                             "transform": {
                                 "position": {

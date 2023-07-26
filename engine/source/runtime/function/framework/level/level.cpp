@@ -47,7 +47,7 @@ namespace ArchViz
         m_level_res_url = level_res_url;
 
         LevelRes   level_res;
-        const bool is_load_success = m_asset_manager->loadVFSAsset(level_res_url, level_res);
+        const bool is_load_success = m_asset_manager->loadAsset(level_res_url, level_res);
         if (is_load_success == false)
         {
             return false;

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "runtime/function/framework/ecs/types.h"
 
 #include <array>

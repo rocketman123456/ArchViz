@@ -456,16 +456,16 @@ namespace ArchViz
     void VulkanRHI::loadModel()
     {
         // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
-        //  std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
-        // std::filesystem::path mtl_path = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room";
-        std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/cube_1.obj";
+        std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
+        // std::filesystem::path mtl_path  = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/";
+        // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/cube.obj";
         // TODO : make this with world load
         tinyobj::attrib_t                attrib;
         std::vector<tinyobj::shape_t>    shapes;
         std::vector<tinyobj::material_t> materials;
         std::string                      warn, err;
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str()))
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str(), model_uri.parent_path().generic_string().c_str()))
         {
             LOG_WARN(warn);
             LOG_FATAL(err);
@@ -491,7 +491,7 @@ namespace ArchViz
 
                 vertex.normal = {attrib.normals[3 * index.normal_index + 0], attrib.normals[3 * index.normal_index + 1], attrib.normals[3 * index.normal_index + 2]};
 
-                vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], 1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
+                vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], 1.0f - attrib.texcoords[2 * index.texcoord_index + 1]}; // invert tex y axis
                 // vertex.tex_coord = {attrib.texcoords[2 * index.texcoord_index + 0], attrib.texcoords[2 * index.texcoord_index + 1]};
 
                 if (unique_vertices.count(vertex) == 0)

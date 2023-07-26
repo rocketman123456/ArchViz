@@ -1,0 +1,168 @@
+{
+    "components": [
+        {
+            "$typeName": "TransformComponent",
+            "$context": {
+                "transform": {
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "rotation": {
+                        "w": 1,
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "scale": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    }
+                }
+            }
+        },
+        {
+            "$typeName": "MeshComponent",
+            "$context": {
+                "mesh_res": {
+                    "sub_meshes": [
+                        {
+                            "material": "asset-test/material/nanosuit/arm.material.json",
+                            "obj_file_ref": "asset-test/data/model/nanosuit/nanosuit_arm.obj",
+                            "transform": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "rotation": {
+                                    "w": 1,
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                }
+                            }
+                        },
+                        {
+                            "material": "asset-test/material/nanosuit/body.material.json",
+                            "obj_file_ref": "asset-test/data/model/nanosuit/nanosuit_body.obj",
+                            "transform": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "rotation": {
+                                    "w": 1,
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                }
+                            }
+                        },
+                        {
+                            "material": "asset-test/material/nanosuit/hands.material.json",
+                            "obj_file_ref": "asset-test/data/model/nanosuit/nanosuit_hands.obj",
+                            "transform": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "rotation": {
+                                    "w": 1,
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                }
+                            }
+                        },
+                        {
+                            "material": "asset-test/material/nanosuit/helmet.material.json",
+                            "obj_file_ref": "asset-test/data/model/nanosuit/nanosuit_helmet.obj",
+                            "transform": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "rotation": {
+                                    "w": 1,
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                }
+                            }
+                        },
+                        {
+                            "material": "asset-test/material/nanosuit/legs.material.json",
+                            "obj_file_ref": "asset-test/data/model/nanosuit/nanosuit_legs.obj",
+                            "transform": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "rotation": {
+                                    "w": 1,
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                }
+                            }
+                        },
+                        {
+                            "material": "asset-test/material/nanosuit/visor.material.json",
+                            "obj_file_ref": "asset-test/data/model/nanosuit/nanosuit_visor.obj",
+                            "transform": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "rotation": {
+                                    "w": 1,
+                                    "x": 0,
+                                    "y": 0,
+                                    "z": 0
+                                },
+                                "scale": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

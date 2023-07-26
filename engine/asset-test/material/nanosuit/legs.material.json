@@ -1,0 +1,7 @@
+{
+  "base_colour_texture_file": "asset-test/data/texture/object/nanosuit/leg_dif.png",
+  "metallic_roughness_texture_file": "asset-test/data/texture/object/nanosuit/leg_showroom_spec.png",
+  "normal_texture_file": "asset-test/data/texture/object/nanosuit/leg_showroom_ddn.png",
+  "occlusion_texture_file": "",
+  "emissive_texture_file": ""
+}

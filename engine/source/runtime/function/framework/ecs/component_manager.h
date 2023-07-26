@@ -1,5 +1,5 @@
 #pragma once
-
+#include "runtime/core/base/macro.h"
 #include "runtime/function/framework/ecs/component_array.h"
 
 #include <any>
@@ -16,7 +16,7 @@ namespace Piccolo
         {
             const char* type_name = typeid(T).name();
 
-            assert(m_component_types.find(type_name) == m_component_types.end() && "Registering component type more than once.");
+            ASSERT(m_component_types.find(type_name) == m_component_types.end() && "Registering component type more than once.");
 
             m_component_types.insert({type_name, m_next_component_type});
             m_component.insert({type_name, std::make_shared<ComponentArray<T>>()});
@@ -28,7 +28,7 @@ namespace Piccolo
         {
             const char* type_name = typeid(T).name();
 
-            assert(m_component_types.find(type_name) != m_component_types.end() && "Component not registered before use.");
+            ASSERT(m_component_types.find(type_name) != m_component_types.end() && "Component not registered before use.");
 
             return m_component_types[type_name];
         }
@@ -59,7 +59,7 @@ namespace Piccolo
         {
             const char* type_name = typeid(T).name();
 
-            assert(m_component_types.find(type_name) != m_component_types.end() && "Component not registered before use.");
+            ASSERT(m_component_types.find(type_name) != m_component_types.end() && "Component not registered before use.");
 
             return std::static_pointer_cast<ComponentArray<T>>(m_component[type_name]);
         }

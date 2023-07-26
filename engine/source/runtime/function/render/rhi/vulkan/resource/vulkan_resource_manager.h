@@ -5,7 +5,7 @@
 
 namespace ArchViz
 {
-    class VulkanResourcePool
+    class VulkanResourceManager
     {
     public:
         void accessBuffer();

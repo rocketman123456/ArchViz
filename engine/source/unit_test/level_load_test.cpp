@@ -2,6 +2,14 @@
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
+#include "runtime/core/meta/reflection/reflection_register.h"
+
+#include "runtime/resource/res_type/common/level_res.h"
+#include "runtime/resource/res_type/components/material_res.h"
+#include "runtime/resource/res_type/components/mesh_res.h"
+
+#include "runtime/function/framework/level/level.h"
+
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -27,6 +35,16 @@ int main(int argc, char** argv)
     vfs->mount(config);
 
     asset_manager->setVFS(vfs);
+
+    Reflection::TypeMetaRegister::metaRegister();
+
+    // LevelRes level_res;
+    // asset_manager->loadAsset("asset-test/level/0-1.level.json", level_res);
+
+    // std::vector<GObjectID> objects;
+    Level level;
+    level.m_asset_manager = asset_manager;
+    level.load("asset-test/level/0-1.level.json");
 
     return 0;
 }

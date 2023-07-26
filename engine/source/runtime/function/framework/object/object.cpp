@@ -79,7 +79,7 @@ namespace ArchViz
 
         ObjectDefinitionRes definition_res;
 
-        const bool is_loaded_success = m_asset_manager->loadVFSAsset(m_definition_url, definition_res);
+        const bool is_loaded_success = m_asset_manager->loadAsset(m_definition_url, definition_res);
         if (!is_loaded_success)
             return false;
 
