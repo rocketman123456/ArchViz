@@ -2,6 +2,6 @@
 
 namespace ArchViz
 {
-    class IEvent
+    class IListener
     {};
 } // namespace ArchViz

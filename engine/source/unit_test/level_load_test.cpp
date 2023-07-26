@@ -38,10 +38,6 @@ int main(int argc, char** argv)
 
     Reflection::TypeMetaRegister::metaRegister();
 
-    // LevelRes level_res;
-    // asset_manager->loadAsset("asset-test/level/0-1.level.json", level_res);
-
-    // std::vector<GObjectID> objects;
     Level level;
     level.m_asset_manager = asset_manager;
     level.load("asset-test/level/0-1.level.json");

@@ -12,9 +12,11 @@ namespace ArchViz
     class ObjectInstanceRes;
     class AssetManager;
     class ConfigManager;
+    class ComponentManager;
 
     using LevelObjectsMap = std::unordered_map<GObjectID, std::shared_ptr<GObject>>;
 
+    /// could use as ecs' entity manager
     /// The main class to manage all game objects
     class Level
     {

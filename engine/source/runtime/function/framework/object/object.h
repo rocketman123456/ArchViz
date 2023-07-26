@@ -67,8 +67,8 @@ namespace ArchViz
 
     protected:
         GObjectID   m_id {k_invalid_gobject_id};
-        std::string m_name;
-        std::string m_definition_url;
+        std::string m_name {};
+        std::string m_definition_url {};
 
         // we have to use the ReflectionPtr due to that the components need to be reflected
         // in editor, and it's polymorphism

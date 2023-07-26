@@ -1,4 +1,4 @@
-#include "runtime/core/memory/slab_allocator.h"
+#include "runtime/core/memory/allocators/slab_allocator.h"
 
 #include <cmath>
 #include <cstring>

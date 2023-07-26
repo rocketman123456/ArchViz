@@ -70,7 +70,6 @@ namespace ArchViz
                     for (int index = 0; index < count; ++index)
                     {
                         std::cout << ":L:" << index << ":R:" << (int*)array_accesser.get(index, field_instance) << std::endl;
-                        ;
                     }
                 }
             }

@@ -2,7 +2,7 @@
     "objects": [
         {
             "name": "Ground",
-            "definition": "asset/objects/environment/floor.object.json",
+            "definition": "asset-test/objects/environment/floor.object.json",
             "instanced_components": [
                 {
                     "$typeName": "TransformComponent",
@@ -31,7 +31,7 @@
         },
         {
             "name": "Nanosuit",
-            "definition": "asset/objects/environment/floor.object.json",
+            "definition": "asset-test/objects/nanosuit.object.json",
             "instanced_components": [
                 {
                     "$typeName": "TransformComponent",
