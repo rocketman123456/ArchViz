@@ -1,6 +1,6 @@
 #include "runtime/function/global/global_context.h"
 
-// #include "core/log/log_system.h"
+#include "runtime/core/meta/reflection/reflection_register.h"
 
 #include "runtime/platform/file_service/file_service.h"
 #include "runtime/platform/file_system/vfs.h"
@@ -8,7 +8,6 @@
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
-// #include "runtime/engine.h"
 #include "runtime/function/window/window_system.h"
 
 #include "runtime/function/render/render_system.h"
@@ -21,6 +20,8 @@ namespace ArchViz
     {
         // m_log_system = std::make_shared<LogSystem>();
 
+        Reflection::TypeMetaRegister::metaRegister();
+
         m_config_manager = std::make_shared<ConfigManager>();
         m_config_manager->initialize(config_file_path);
 
@@ -31,10 +32,10 @@ namespace ArchViz
 
         VFSConfig config;
         m_asset_manager->loadAsset<VFSConfig>("config/config.vfs.json", config);
-        m_vfs = std::make_shared<VFS>();
-        m_vfs->mount(config);
+        std::shared_ptr<VFS> vfs = std::make_shared<VFS>();
+        vfs->mount(config);
 
-        m_asset_manager->setVFS(m_vfs);
+        m_asset_manager->setVFS(vfs);
 
         // m_physics_manager = std::make_shared<PhysicsManager>();
         // m_physics_manager->initialize();
@@ -42,10 +43,10 @@ namespace ArchViz
         // m_world_manager = std::make_shared<WorldManager>();
         // m_world_manager->initialize();
 
-        m_window_system = std::make_shared<WindowSystem>();
-        WindowCreateInfo window_create_info;
-        m_asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
-        m_window_system->initialize(window_create_info);
+        // m_window_system = std::make_shared<WindowSystem>();
+        // WindowCreateInfo window_create_info;
+        // m_asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
+        // m_window_system->initialize(window_create_info);
 
         // m_input_system = std::make_shared<InputSystem>();
         // m_input_system->initialize();
@@ -53,12 +54,12 @@ namespace ArchViz
         // m_particle_manager = std::make_shared<ParticleManager>();
         // m_particle_manager->initialize();
 
-        m_render_system = std::make_shared<RenderSystem>();
-        RenderSystemInitInfo render_init_info;
-        render_init_info.window_system = m_window_system;
-        m_render_system->setConfigManager(m_config_manager);
-        m_render_system->setAssetManager(m_asset_manager);
-        m_render_system->initialize(render_init_info);
+        // m_render_system = std::make_shared<RenderSystem>();
+        // RenderSystemInitInfo render_init_info;
+        // render_init_info.window_system = m_window_system;
+        // m_render_system->setConfigManager(m_config_manager);
+        // m_render_system->setAssetManager(m_asset_manager);
+        // m_render_system->initialize(render_init_info);
 
         // m_debugdraw_manager = std::make_shared<DebugDrawManager>();
         // m_debugdraw_manager->initialize();
@@ -72,12 +73,12 @@ namespace ArchViz
 
         // m_debugdraw_manager.reset();
 
-        m_render_system->clear();
-        m_render_system.reset();
+        // m_render_system->clear();
+        // m_render_system.reset();
 
         // m_particle_manager.reset();
 
-        m_window_system.reset();
+        // m_window_system.reset();
 
         // m_world_manager->clear();
         // m_world_manager.reset();

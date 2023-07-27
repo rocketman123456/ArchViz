@@ -26,7 +26,6 @@ namespace ArchViz
         std::shared_ptr<AssetManager>  m_asset_manager;
         std::shared_ptr<WindowSystem>  m_window_system;
         std::shared_ptr<RenderSystem>  m_render_system;
-        std::shared_ptr<VFS>           m_vfs;
     };
 
     extern RuntimeGlobalContext g_runtime_global_context;

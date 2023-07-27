@@ -2,6 +2,7 @@
 
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/res_type/components/material_res.h"
+#include "runtime/resource/resource_manager/resource_manager.h"
 
 #include "runtime/function/framework/object/object.h"
 

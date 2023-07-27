@@ -1,5 +1,7 @@
 #include "runtime/function/framework/object/object.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/core/meta/reflection/reflection.h"
 #include "runtime/function/framework/component/component.h"
 #include "runtime/function/framework/component/transform/transform_component.h"
@@ -16,11 +18,11 @@ namespace ArchViz
     bool shouldComponentTick(std::string component_type_name)
     {
         // if (g_is_editor_mode)
-        //{
+        // {
         //     return g_editor_tick_component_types.find(component_type_name) != g_editor_tick_component_types.end();
         // }
         // else
-        //{
+        // {
         //     return true;
         // }
         return false;
@@ -79,7 +81,7 @@ namespace ArchViz
 
         ObjectDefinitionRes definition_res;
 
-        const bool is_loaded_success = m_asset_manager->loadAsset(m_definition_url, definition_res);
+        const bool is_loaded_success = g_runtime_global_context.m_asset_manager->loadAsset(m_definition_url, definition_res);
         if (!is_loaded_success)
             return false;
 

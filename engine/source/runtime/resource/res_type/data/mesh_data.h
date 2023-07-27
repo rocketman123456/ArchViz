@@ -1,6 +1,12 @@
 #pragma once
 #include "runtime/core/meta/reflection/reflection.h"
 
+#include "runtime/core/math/vector/vector2.h"
+#include "runtime/core/math/vector/vector3.h"
+#include "runtime/core/math/vector/vector4.h"
+
+#include "runtime/core/math/math_type.h"
+
 #include <string>
 #include <vector>
 
@@ -12,18 +18,13 @@ namespace ArchViz
         REFLECTION_BODY(MeshVertex);
 
     public:
-        float px;
-        float py;
-        float pz;
-        float nx;
-        float ny;
-        float nz;
-        float tx;
-        float ty;
-        float tz;
-        float u;
-        float v;
+        Vector3 postion {};
+        Vector3 normal {};
+        Vector3 tangent {};
+        Vector2 uv {};
     };
+
+    // TODO : add sub mesh
 
     REFLECTION_TYPE(SkeletonBinding)
     CLASS(SkeletonBinding, Fields)
@@ -31,14 +32,8 @@ namespace ArchViz
         REFLECTION_BODY(SkeletonBinding);
 
     public:
-        int32_t index0;
-        int32_t index1;
-        int32_t index2;
-        int32_t index3;
-        float   weight0;
-        float   weight1;
-        float   weight2;
-        float   weight3;
+        Vector4 index;
+        Vector4 weight;
     };
 
     REFLECTION_TYPE(MeshData)
@@ -51,5 +46,30 @@ namespace ArchViz
         std::vector<int>             index_buffer;
         std::vector<SkeletonBinding> bind;
     };
+
+    //struct RawMeshVertex
+    //{
+    //    FVector3 postion {};
+    //    FVector3 normal {};
+    //    FVector3 tangent {};
+    //    FVector2 uv {};
+    //};
+
+    //struct RawSubMeshData
+    //{
+    //    uint64_t first_vertex;
+    //    uint64_t vertex_count;
+    //    uint64_t first_index;
+    //    uint64_t index_count;
+    //};
+
+    //struct RawMeshData
+    //{
+    //    std::vector<RawMeshVertex> vertices;
+    //    std::vector<uint32_t>      indices;
+
+    //    // TODO : 
+    //    std::vector<RawSubMeshData> sub_meshes;
+    //};
 
 } // namespace ArchViz

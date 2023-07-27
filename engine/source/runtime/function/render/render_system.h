@@ -37,9 +37,6 @@ namespace ArchViz
         void tick(float delta_time);
         void clear();
 
-        void setConfigManager(std::shared_ptr<ConfigManager> config_manager);
-        void setAssetManager(std::shared_ptr<AssetManager> asset_manager);
-
     private:
         void processSwapData(float delta_time);
 
@@ -56,9 +53,8 @@ namespace ArchViz
         // std::shared_ptr<RenderScene>        m_render_scene;
         // std::shared_ptr<RenderResourceBase> m_render_resource;
         // std::shared_ptr<RenderPipelineBase> m_render_pipeline;
-
-        std::shared_ptr<ConfigManager> m_config_manager;
-        std::shared_ptr<AssetManager>  m_asset_manager;
+        
+        // TODO : move to global
         std::shared_ptr<WindowSystem>  m_window_system;
     };
 } // namespace ArchViz

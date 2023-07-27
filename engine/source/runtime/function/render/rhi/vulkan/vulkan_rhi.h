@@ -2,6 +2,8 @@
 #include "runtime/function/render/rhi/rhi.h"
 #include "runtime/function/render/rhi/vulkan/vulkan_struct.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/function/render/geometry/light.h"
 #include "runtime/function/render/geometry/particle.h"
 #include "runtime/function/render/geometry/vertex.h"
@@ -42,9 +44,6 @@ namespace ArchViz
     public:
         VulkanRHI()          = default;
         virtual ~VulkanRHI() = default;
-
-        void setConfigManager(std::shared_ptr<ConfigManager> config_manager) override;
-        void setAssetManager(std::shared_ptr<AssetManager> asset_manager) override;
 
         void initialize(RHIInitInfo initialize_info) override;
         void prepareContext() override;
@@ -132,9 +131,6 @@ namespace ArchViz
         bool m_bindless_supported = true;
 
         uint32_t m_fps;
-
-        std::shared_ptr<AssetManager>  m_asset_manager;  // for debug, or use global
-        std::shared_ptr<ConfigManager> m_config_manager; // for debug, or use global
 
         RHIInitInfo m_initialize_info;
 

@@ -34,18 +34,6 @@
 
 namespace ArchViz
 {
-    void VulkanRHI::setConfigManager(std::shared_ptr<ConfigManager> config_manager)
-    {
-        ASSERT(config_manager);
-        m_config_manager = config_manager;
-    }
-
-    void VulkanRHI::setAssetManager(std::shared_ptr<AssetManager> asset_manager)
-    {
-        ASSERT(asset_manager);
-        m_asset_manager = asset_manager;
-    }
-
     void VulkanRHI::setFPS(uint32_t fps)
     {
         m_fps = fps;
@@ -61,7 +49,7 @@ namespace ArchViz
     void VulkanRHI::createInstance()
     {
         VulkanInstanceCreateInfo info;
-        m_asset_manager->loadVFSAsset("asset/render/instance.vulkan.json", info);
+        g_runtime_global_context.m_asset_manager->loadVFSAsset("asset/render/instance.vulkan.json", info);
 
         m_vulkan_instance                          = std::make_shared<VulkanInstance>();
         m_vulkan_instance->m_validation            = info.validation;
@@ -86,7 +74,7 @@ namespace ArchViz
     void VulkanRHI::createVulkanDevice()
     {
         VulkanDeviceCreateInfo info;
-        m_asset_manager->loadVFSAsset("asset/render/device.vulkan.json", info);
+        g_runtime_global_context.m_asset_manager->loadVFSAsset("asset/render/device.vulkan.json", info);
 
         m_vulkan_device                    = std::make_shared<VulkanDevice>();
         m_vulkan_device->m_validation      = info.validation;
@@ -288,23 +276,12 @@ namespace ArchViz
         create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 
         // read pipeline cache
+        std::vector<std::byte> cache;
 
-        auto cache_path = m_config_manager->getRootFolder() / "pipeline.cache";
-
-        // TODO : use vfs instead
-        FILE* file = fopen(cache_path.generic_string().c_str(), "rb");
-
-        if (file != nullptr)
+        auto cache_path = g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
+        g_runtime_global_context.m_asset_manager->readBinaryFile(cache_path.generic_string(), cache);
+        if (cache.size() != 0)
         {
-            size_t               cache_size = 0;
-            std::vector<uint8_t> cache;
-
-            fseek(file, 0, SEEK_END);
-            cache_size = ftell(file);
-            cache.resize(cache_size);
-            rewind(file);
-            fread(cache.data(), cache.size(), 1, file);
-
             VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
             if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
                 memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
@@ -312,9 +289,34 @@ namespace ArchViz
                 create_info.initialDataSize = cache.size();
                 create_info.pInitialData    = cache.data();
             }
-
-            fclose(file);
         }
+
+        // auto cache_path =   g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
+
+        //// TODO : use vfs instead
+        // FILE* file = fopen(cache_path.generic_string().c_str(), "rb");
+
+        // if (file != nullptr)
+        //{
+        //     size_t               cache_size = 0;
+        //     std::vector<uint8_t> cache;
+
+        //    fseek(file, 0, SEEK_END);
+        //    cache_size = ftell(file);
+        //    cache.resize(cache_size);
+        //    rewind(file);
+        //    fread(cache.data(), cache.size(), 1, file);
+
+        //    VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
+        //    if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
+        //        memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
+        //    {
+        //        create_info.initialDataSize = cache.size();
+        //        create_info.pInitialData    = cache.data();
+        //    }
+
+        //    fclose(file);
+        //}
 
         if (vkCreatePipelineCache(m_vulkan_device->m_device, &create_info, nullptr, &m_pipeline_cache) != VK_SUCCESS)
         {
@@ -330,9 +332,7 @@ namespace ArchViz
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
 
-        shader->m_device         = m_vulkan_device;
-        shader->m_config_manager = m_config_manager;
-        shader->m_asset_manager  = m_asset_manager;
+        shader->m_device = m_vulkan_device;
 
         m_vulkan_pipeline = std::make_shared<VulkanPipeline>();
 
@@ -434,21 +434,17 @@ namespace ArchViz
 
     void VulkanRHI::createTextureImage()
     {
-        m_vulkan_texture                   = std::make_shared<VulkanTexture>();
-        m_vulkan_texture->m_asset_manager  = m_asset_manager;
-        m_vulkan_texture->m_config_manager = m_config_manager;
-        m_vulkan_texture->m_device         = m_vulkan_device;
-        m_vulkan_texture->m_command_pool   = m_command_pool;
-        m_vulkan_texture->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        m_vulkan_texture                 = std::make_shared<VulkanTexture>();
+        m_vulkan_texture->m_device       = m_vulkan_device;
+        m_vulkan_texture->m_command_pool = m_command_pool;
+        m_vulkan_texture->m_address_mode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         // m_vulkan_texture->initizlize("asset-test/data/model/viking_room/viking_room.png");
         m_vulkan_texture->initizlize("asset-test/data/texture/object/container/container2.png");
 
-        m_vulkan_texture_ui                   = std::make_shared<VulkanTexture>();
-        m_vulkan_texture_ui->m_asset_manager  = m_asset_manager;
-        m_vulkan_texture_ui->m_config_manager = m_config_manager;
-        m_vulkan_texture_ui->m_device         = m_vulkan_device;
-        m_vulkan_texture_ui->m_command_pool   = m_command_pool;
-        m_vulkan_texture_ui->m_address_mode   = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        m_vulkan_texture_ui                 = std::make_shared<VulkanTexture>();
+        m_vulkan_texture_ui->m_device       = m_vulkan_device;
+        m_vulkan_texture_ui->m_command_pool = m_command_pool;
+        m_vulkan_texture_ui->m_address_mode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         m_vulkan_texture_ui->initizlize("asset-test/data/texture/object/texture.jpg");
     }
 
@@ -456,7 +452,7 @@ namespace ArchViz
     void VulkanRHI::loadModel()
     {
         // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/viking_room/viking_room.obj";
-        std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
+        std::filesystem::path model_uri = g_runtime_global_context.m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/nanosuit.obj";
         // std::filesystem::path mtl_path  = m_config_manager->getRootFolder() / "asset-test/data/model/nanosuit/";
         // std::filesystem::path model_uri = m_config_manager->getRootFolder() / "asset-test/data/model/basic/cube.obj";
         // TODO : make this with world load
@@ -727,9 +723,7 @@ namespace ArchViz
 
         std::shared_ptr<VulkanShader> shader = std::make_shared<VulkanShader>(config);
 
-        shader->m_device         = m_vulkan_device;
-        shader->m_config_manager = m_config_manager;
-        shader->m_asset_manager  = m_asset_manager;
+        shader->m_device = m_vulkan_device;
         shader->initialize();
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
@@ -948,8 +942,6 @@ namespace ArchViz
         m_vulkan_ui->m_image_format    = m_vulkan_swap_chain->m_surface_format.format;
         m_vulkan_ui->m_command_pool    = m_command_pool;
         m_vulkan_ui->m_descriptor_pool = m_descriptor_pool;
-        m_vulkan_ui->m_asset_manager   = m_asset_manager;
-        m_vulkan_ui->m_config_manager  = m_config_manager;
         m_vulkan_ui->m_pipeline_cache  = m_pipeline_cache;
         m_vulkan_ui->m_ui_pass         = m_vulkan_render_pass->m_render_pass;
 
@@ -1338,15 +1330,17 @@ namespace ArchViz
         {
             size_t cache_size = 0;
             vkGetPipelineCacheData(m_vulkan_device->m_device, m_pipeline_cache, &cache_size, nullptr);
-            std::vector<uint8_t> cache;
+            std::vector<std::byte> cache;
             cache.resize(cache_size);
             vkGetPipelineCacheData(m_vulkan_device->m_device, m_pipeline_cache, &cache_size, cache.data());
 
-            auto cache_path = m_config_manager->getRootFolder() / "pipeline.cache";
+            g_runtime_global_context.m_asset_manager->writeBinaryFile("pipeline.cache", cache);
 
-            FILE* file = fopen(cache_path.generic_string().c_str(), "wb");
-            fwrite(cache.data(), cache.size(), 1, file);
-            fclose(file);
+            // auto cache_path = g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
+
+            // FILE* file = fopen(cache_path.generic_string().c_str(), "wb");
+            // fwrite(cache.data(), cache.size(), 1, file);
+            // fclose(file);
         }
 
         vkDestroyPipelineCache(m_vulkan_device->m_device, m_pipeline_cache, nullptr);

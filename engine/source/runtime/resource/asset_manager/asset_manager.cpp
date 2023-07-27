@@ -31,6 +31,7 @@ namespace ArchViz
             return;
         }
         content = {std::istreambuf_iterator<char>(fin), std::istreambuf_iterator<char>()};
+        fin.close();
     }
 
     void AssetManager::readBinaryFile(const std::filesystem::path& file_path, std::vector<std::byte>& content) const
@@ -42,10 +43,11 @@ namespace ArchViz
             return;
         }
 
+        fin.seekg(0, fin.end);
         size_t file_size = fin.tellg();
         content.resize(file_size);
+        fin.seekg(0, fin.beg);
 
-        fin.seekg(0);
         fin.read(reinterpret_cast<char*>(content.data()), sizeof(file_size));
         fin.close();
     }

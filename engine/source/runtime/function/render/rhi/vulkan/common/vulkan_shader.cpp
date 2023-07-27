@@ -2,6 +2,8 @@
 #include "runtime/function/render/rhi/vulkan/common/vulkan_device.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_shader_utils.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -76,7 +78,7 @@ namespace ArchViz
     {
         if (file.size() > 0)
         {
-            auto spv = VulkanShaderUtils::createShaderModuleFromVFS(file, m_config_manager, m_asset_manager);
+            auto spv = VulkanShaderUtils::createShaderModuleFromVFS(file);
             shader   = VulkanShaderUtils::createShaderModule(m_device->m_device, spv);
         }
     }

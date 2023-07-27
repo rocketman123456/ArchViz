@@ -1,5 +1,7 @@
 #include "runtime/platform/file_system/vfs.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -22,31 +24,18 @@ int main(int argc, char** argv)
     std::filesystem::path executable_path(argv[0]);
     std::filesystem::path config_file_path = executable_path.parent_path() / "../ArchVizEditor.ini";
 
-    std::shared_ptr<ConfigManager> config_manager = std::make_shared<ConfigManager>();
-    config_manager->initialize(config_file_path.generic_string());
-
-    std::shared_ptr<AssetManager> asset_manager = std::make_shared<AssetManager>();
-    asset_manager->setConfigManager(config_manager);
-
-    VFSConfig config;
-    asset_manager->loadAsset<VFSConfig>("config/config.vfs.json", config);
-    std::shared_ptr<VFS> vfs = std::make_shared<VFS>();
-    vfs->mount(config);
-
-    asset_manager->setVFS(vfs);
+    g_runtime_global_context.startSystems(config_file_path.generic_string());
 
     std::shared_ptr<WorldManager> world_manager = std::make_shared<WorldManager>();
 
     std::shared_ptr<WindowSystem> window_system = std::make_shared<WindowSystem>();
     WindowCreateInfo window_create_info;
-    asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
+    g_runtime_global_context.m_asset_manager->loadAsset<WindowCreateInfo>("config/config.window.json", window_create_info);
     window_system->initialize(window_create_info);
 
     std::shared_ptr<RenderSystem> render_system = std::make_shared<RenderSystem>();
     RenderSystemInitInfo render_init_info;
     render_init_info.window_system = window_system;
-    render_system->setConfigManager(config_manager);
-    render_system->setAssetManager(asset_manager);
     render_system->initialize(render_init_info);
 
     using namespace std::chrono;

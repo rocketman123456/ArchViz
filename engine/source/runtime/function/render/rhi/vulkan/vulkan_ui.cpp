@@ -9,6 +9,8 @@
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -68,7 +70,7 @@ namespace ArchViz
         // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
         // - Read 'docs/FONTS.md' for more instructions and details.
         // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-        auto font_path = m_config_manager->getRootFolder() / "asset-test/data/font/MiSans-Normal.ttf";
+        auto font_path = g_runtime_global_context.m_config_manager->getRootFolder() / "asset-test/data/font/MiSans-Normal.ttf";
         // io.Fonts->AddFontDefault();
         ImFont* font = io.Fonts->AddFontFromFileTTF(font_path.generic_string().c_str(), 40.0f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
         ASSERT(font);
@@ -201,12 +203,8 @@ namespace ArchViz
         config.m_vert_shader = "shader/glsl/imgui.vert";
         config.m_frag_shader = "shader/glsl/imgui.frag";
 
-        m_shader = std::make_shared<VulkanShader>(config);
-
-        m_shader->m_device         = m_device;
-        m_shader->m_config_manager = m_config_manager;
-        m_shader->m_asset_manager  = m_asset_manager;
-
+        m_shader           = std::make_shared<VulkanShader>(config);
+        m_shader->m_device = m_device;
         m_shader->initialize();
 
         VkPushConstantRange push_constant_range {};

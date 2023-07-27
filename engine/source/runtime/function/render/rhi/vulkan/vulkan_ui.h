@@ -52,9 +52,6 @@ namespace ArchViz
 
         uint32_t m_fps;
 
-        std::shared_ptr<AssetManager>  m_asset_manager;
-        std::shared_ptr<ConfigManager> m_config_manager;
-
         uint32_t m_image_count; // swap chain
         VkFormat m_image_format;
 

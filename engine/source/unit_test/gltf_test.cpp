@@ -97,12 +97,14 @@ int main(int argc, char** argv)
 
     asset_manager->setVFS(vfs);
 
+    std::string file_path = "asset/model-glTF/2.0/Cube/glTF/Cube.gltf";
+    //std::string file_path = "asset/model-glTF/2.0/Sponza/glTF/Sponza.gltf";
+    std::string base_path = (config_manager->getRootFolder() / file_path).parent_path().generic_string();
     std::string content;
-    asset_manager->readVFSTextFile("asset/data/buster_drone/busterDrone.gltf", content);
+    asset_manager->readTextFile(file_path, content);
 
-    std::filesystem::path base_path = config_manager->getRootFolder() / "asset/data/buster_drone";
     tinygltf::Model model;
-    loadModelFromString(model, content, base_path.generic_string());
+    loadModelFromString(model, content, base_path);
 
     return 0;
 }

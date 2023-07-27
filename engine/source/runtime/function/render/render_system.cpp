@@ -19,18 +19,6 @@ namespace ArchViz
 {
     RenderSystem::~RenderSystem() { clear(); }
 
-    void RenderSystem::setConfigManager(std::shared_ptr<ConfigManager> config_manager)
-    {
-        ASSERT(config_manager);
-        m_config_manager = config_manager;
-    }
-
-    void RenderSystem::setAssetManager(std::shared_ptr<AssetManager> asset_manager)
-    {
-        ASSERT(asset_manager);
-        m_asset_manager = asset_manager;
-    }
-
     void RenderSystem::onMouseCallback(double x, double y)
     {
         static bool  first_mouse;
@@ -75,8 +63,6 @@ namespace ArchViz
         m_render_camera->m_rotate_speed = 0.1;
 
         m_rhi = std::make_shared<VulkanRHI>();
-        m_rhi->setConfigManager(m_config_manager);
-        m_rhi->setAssetManager(m_asset_manager);
         m_rhi->initialize(rhi_init_info);
 
         rhi_init_info.window_system->registerOnCursorPosFunc(std::bind(&RenderSystem::onMouseCallback, this, std::placeholders::_1, std::placeholders::_2));

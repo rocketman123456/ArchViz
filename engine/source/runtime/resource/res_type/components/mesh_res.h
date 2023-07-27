@@ -22,5 +22,7 @@ namespace ArchViz
 
     public:
         std::vector<SubMeshRes> m_sub_meshes;
+
+        //std::vector<Reflection::ReflectionPtr<Component>> m_meshes;
     };
 } // namespace ArchViz

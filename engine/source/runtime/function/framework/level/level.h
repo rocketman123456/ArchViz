@@ -48,9 +48,5 @@ namespace ArchViz
         // all game objects in this level, key: object id, value: object instance
         // TODO : use ecs
         LevelObjectsMap m_gobjects;
-
-    public:
-        std::shared_ptr<AssetManager>  m_asset_manager;
-        std::shared_ptr<ConfigManager> m_config_manager;
     };
 } // namespace ArchViz

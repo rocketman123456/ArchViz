@@ -44,9 +44,6 @@ namespace ArchViz
         VkPipelineShaderStageCreateInfo getStageInfo(VkShaderModule module, VkShaderStageFlagBits stage);
 
     public:
-        std::shared_ptr<AssetManager>  m_asset_manager;
-        std::shared_ptr<ConfigManager> m_config_manager;
-
         std::shared_ptr<VulkanDevice> m_device;
 
         ShaderModuleCreateInfo m_config;

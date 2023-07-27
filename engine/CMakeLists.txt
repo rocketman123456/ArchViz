@@ -1,8 +1,7 @@
 set(ENGINE_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(THIRD_PARTY_DIR "${ENGINE_ROOT_DIR}/3rd_party")
-set(ENGINE_ASSET_DIR "/asset")
-set(ENGINE_ASSET_TEST_DIR "/asset-test")
-
+# set(ENGINE_ASSET_DIR "/asset")
+# set(ENGINE_ASSET_TEST_DIR "/asset-test")
 set(DEPLOY_CONFIG_DIR "config/deployment")
 set(DEVELOP_CONFIG_DIR "config/development")
 

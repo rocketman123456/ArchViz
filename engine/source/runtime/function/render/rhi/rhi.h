@@ -10,8 +10,6 @@
 
 namespace ArchViz
 {
-    class ConfigManager;
-    class AssetManager;
     class WindowSystem;
 
     struct RHIInitInfo
@@ -23,9 +21,6 @@ namespace ArchViz
     {
     public:
         virtual ~RHI() = 0;
-
-        virtual void setConfigManager(std::shared_ptr<ConfigManager> config_manager) = 0;
-        virtual void setAssetManager(std::shared_ptr<AssetManager> asset_manager)    = 0;
 
         virtual void initialize(RHIInitInfo initialize_info) = 0;
         virtual void prepareContext()                        = 0;

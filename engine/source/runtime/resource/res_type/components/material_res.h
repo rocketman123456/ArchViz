@@ -13,6 +13,16 @@ namespace ArchViz
     // std::string alpha_texture;              // map_d
     // std::string reflection_texture;         // refl
 
+    enum class AlphaMode
+    {
+        /// Alpha value is ignored
+        Opaque,
+        /// Either full opaque or fully transparent
+        Mask,
+        /// Output is combined with the background
+        Blend
+    };
+
     REFLECTION_TYPE(MaterialRes)
     CLASS(MaterialRes, Fields)
     {

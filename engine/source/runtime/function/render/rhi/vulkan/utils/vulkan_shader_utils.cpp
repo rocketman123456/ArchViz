@@ -4,6 +4,8 @@
 #include "runtime/core/base/macro.h"
 #include "runtime/core/string/string_utils.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -45,16 +47,16 @@ namespace ArchViz
         return EShLangVertex;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromVFS(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromVFS(const std::string& shader_file)
     {
-        std::filesystem::path root_path        = config_manager->getRootFolder();
+        std::filesystem::path root_path        = g_runtime_global_context.m_config_manager->getRootFolder();
         std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
         std::filesystem::path include_path     = root_path / "shader" / "include";
         LOG_DEBUG("open shader: " + shader_file_path.generic_string());
 
         std::string shader_code = "";
         // asset_manager->readTextFile(shader_file_path, shader_code);
-        asset_manager->readVFSTextFile(shader_file, shader_code);
+        g_runtime_global_context.m_asset_manager->readVFSTextFile(shader_file, shader_code);
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_file.c_str());
 
@@ -149,16 +151,16 @@ namespace ArchViz
         return spirv;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string& shader_file, std::shared_ptr<ConfigManager> config_manager, std::shared_ptr<AssetManager> asset_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromFile(const std::string& shader_file)
     {
-        std::filesystem::path root_path        = config_manager->getRootFolder();
+        std::filesystem::path root_path        = g_runtime_global_context.m_config_manager->getRootFolder();
         std::filesystem::path shader_file_path = root_path / "shader" / "glsl" / shader_file;
         std::filesystem::path include_path     = root_path / "shader" / "include";
         LOG_DEBUG("open shader: " + shader_file_path.generic_string());
 
         std::string shader_code = "";
         // asset_manager->readTextFile(shader_file_path, shader_code);
-        asset_manager->readTextFile(shader_file, shader_code);
+        g_runtime_global_context.m_asset_manager->readTextFile(shader_file, shader_code);
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_file.c_str());
 
@@ -253,9 +255,9 @@ namespace ArchViz
         return spirv;
     }
 
-    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type, std::shared_ptr<ConfigManager> config_manager)
+    std::vector<uint32_t> VulkanShaderUtils::createShaderModuleFromCode(const std::string& shader_code, const std::string& shader_type)
     {
-        std::filesystem::path root_path    = config_manager->getRootFolder();
+        std::filesystem::path root_path    = g_runtime_global_context.m_config_manager->getRootFolder();
         std::filesystem::path include_path = root_path / "shader" / "include";
 
         EShLanguage stage = shaderLanguageStageFromFileName(shader_type.c_str());

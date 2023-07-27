@@ -4,6 +4,8 @@
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_texture_utils.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_utils.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -17,9 +19,10 @@ namespace ArchViz
 {
     void VulkanTexture::createTextureImageFromFile(const std::string& image_uri)
     {
-        std::filesystem::path root       = m_config_manager->getRootFolder();
+        std::filesystem::path root       = g_runtime_global_context.m_config_manager->getRootFolder();
         std::filesystem::path image_path = root / image_uri;
 
+        // TODO : load from vfs
         int          tex_width, tex_height, tex_channels;
         stbi_uc*     pixels     = stbi_load(image_path.generic_string().c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
         VkDeviceSize image_size = tex_width * tex_height * 4;

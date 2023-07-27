@@ -18,6 +18,8 @@ namespace ArchViz
         void initialize(const uint8_t* image_data, const VkDeviceSize size);                                                     // no decode
         void initialize(const uint8_t* pixels, const VkDeviceSize image_size, VkFormat format, uint32_t width, uint32_t height); // after decode
 
+        // TODO : add initialize from TextureData
+
         void clear();
 
         void createDescriptorSet();
@@ -32,8 +34,6 @@ namespace ArchViz
 
     public:
         std::shared_ptr<VulkanDevice>  m_device;
-        std::shared_ptr<AssetManager>  m_asset_manager;
-        std::shared_ptr<ConfigManager> m_config_manager;
 
         VkCommandPool m_command_pool;
 

@@ -73,9 +73,5 @@ namespace ArchViz
         // we have to use the ReflectionPtr due to that the components need to be reflected
         // in editor, and it's polymorphism
         std::vector<Reflection::ReflectionPtr<Component>> m_components;
-
-    public:
-        std::shared_ptr<AssetManager>  m_asset_manager;
-        std::shared_ptr<ConfigManager> m_config_manager;
     };
 } // namespace ArchViz

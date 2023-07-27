@@ -1,5 +1,7 @@
 #include "runtime/function/framework/level/level.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include "runtime/core/base/macro.h"
 #include "runtime/function/framework/object/object.h"
 #include "runtime/resource/asset_manager/asset_manager.h"
@@ -47,7 +49,7 @@ namespace ArchViz
         m_level_res_url = level_res_url;
 
         LevelRes   level_res;
-        const bool is_load_success = m_asset_manager->loadAsset(level_res_url, level_res);
+        const bool is_load_success = g_runtime_global_context.m_asset_manager->loadAsset(level_res_url, level_res);
         if (is_load_success == false)
         {
             return false;
@@ -93,7 +95,7 @@ namespace ArchViz
         }
 
         // TODO : change save to vfs instead
-        const bool is_save_success = m_asset_manager->saveAsset(output_level_res, m_level_res_url);
+        const bool is_save_success = g_runtime_global_context.m_asset_manager->saveAsset(output_level_res, m_level_res_url);
 
         if (is_save_success == false)
         {
