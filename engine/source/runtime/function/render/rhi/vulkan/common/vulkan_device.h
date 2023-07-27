@@ -62,7 +62,6 @@ namespace ArchViz
 
         VkPhysicalDeviceProperties           m_properties {};
         VkPhysicalDeviceFeatures             m_features {};
-        VkPhysicalDeviceFeatures             m_enabled_features {};
         VkPhysicalDeviceMemoryProperties     m_memory_properties {};
         std::vector<VkQueueFamilyProperties> m_queue_family_properties {};
         std::vector<std::string>             m_supported_extensions {};

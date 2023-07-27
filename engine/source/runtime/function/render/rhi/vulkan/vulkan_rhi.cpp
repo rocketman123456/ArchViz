@@ -1334,7 +1334,8 @@ namespace ArchViz
             cache.resize(cache_size);
             vkGetPipelineCacheData(m_vulkan_device->m_device, m_pipeline_cache, &cache_size, cache.data());
 
-            g_runtime_global_context.m_asset_manager->writeBinaryFile("pipeline.cache", cache);
+            auto cache_path = g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
+            g_runtime_global_context.m_asset_manager->writeBinaryFile(cache_path.generic_string(), cache);
 
             // auto cache_path = g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
 
