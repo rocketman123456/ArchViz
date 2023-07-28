@@ -88,3 +88,15 @@
 [submodule "engine/3rd_party/llvm-project"]
 	path = engine/3rd_party/llvm-project
 	url = https://github.com/llvm/llvm-project.git
+[submodule "engine/3rd_party/SDL"]
+	path = engine/3rd_party/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "engine/3rd_party/skynet"]
+	path = engine/3rd_party/skynet
+	url = https://github.com/cloudwu/skynet.git
+[submodule "engine/3rd_party/RE-flex"]
+	path = engine/3rd_party/RE-flex
+	url = https://github.com/Genivia/RE-flex.git
+[submodule "engine/3rd_party/KTX-Software"]
+	path = engine/3rd_party/KTX-Software
+	url = https://github.com/KhronosGroup/KTX-Software.git
