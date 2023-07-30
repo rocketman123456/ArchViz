@@ -17,15 +17,8 @@ namespace ArchViz
 {
     bool shouldComponentTick(std::string component_type_name)
     {
-        // if (g_is_editor_mode)
-        // {
-        //     return g_editor_tick_component_types.find(component_type_name) != g_editor_tick_component_types.end();
-        // }
-        // else
-        // {
-        //     return true;
-        // }
-        return false;
+        // TODO : check in editor mode
+        return true;
     }
 
     GObject::~GObject()

@@ -1,52 +1,30 @@
 #include "runtime/resource/resource_manager/resource_manager.h"
 
+#include "runtime/resource/resource_manager/loader/obj_loader.h"
+#include "runtime/resource/resource_manager/loader/texture_loader.h"
+
+#include "runtime/resource/res_type/data/material_data.h"
+#include "runtime/resource/res_type/data/mesh_data.h"
+
 #include "runtime/core/base/hash.h"
+#include "runtime/core/base/macro.h"
 
 namespace ArchViz
 {
     void ResourceManager::initialize()
     {
-        m_obj_loader     = std::make_shared<ObjLoader>();
-        m_texture_loader = std::make_shared<TextureLoader>();
+        registerResourceType<MeshData>();
+        registerResourceType<TextureData>();
+
+        registerResourceLoader<MeshData, ObjLoader>();
+        registerResourceLoader<MeshData, TextureLoader>();
     }
 
     void ResourceManager::clear()
     {
-        m_obj_loader.reset();
-        m_texture_loader.reset();
-    }
-
-    void ResourceManager::createMesh(const MeshComponentRes& res)
-    {
-        for (auto& sub_mesh : res.m_sub_meshes)
-        {
-
-        }
-    }
-
-    void ResourceManager::createMaterial(const MaterialRes& res)
-    {
-        res.m_base_colour_texture_file;
-        res.m_metallic_roughness_texture_file;
-        res.m_normal_texture_file;
-        res.m_occlusion_texture_file;
-        res.m_emissive_texture_file;
-    }
-
-    std::weak_ptr<MeshData> ResourceManager::getMeshData(const std::string& uri)
-    {
-        auto it = m_mesh_data_cache.find(uri);
-        if (it == m_mesh_data_cache.end())
-            return {};
-        return it->second;
-    }
-
-    std::weak_ptr<TextureData> ResourceManager::getTextureData(const std::string& uri)
-    {
-        auto it = m_texture_cache.find(uri);
-        if (it == m_texture_cache.end())
-            return {};
-        return it->second;
+        m_resource_types.clear();
+        m_resource_arrays.clear();
+        m_loaders.clear();
     }
 
 } // namespace ArchViz

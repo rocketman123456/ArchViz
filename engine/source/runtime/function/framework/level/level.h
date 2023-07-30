@@ -16,7 +16,7 @@ namespace ArchViz
 
     using LevelObjectsMap = std::unordered_map<GObjectID, std::shared_ptr<GObject>>;
 
-    /// could use as ecs' entity manager
+    /// could use as ecs' entity manager & component manager
     /// The main class to manage all game objects
     class Level
     {

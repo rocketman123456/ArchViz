@@ -1,6 +1,9 @@
 #pragma once
+#include "runtime/core/base/hash.h"
 
+#include <atomic>
 #include <cstdint>
+#include <limits>
 
 namespace ArchViz
 {
@@ -36,59 +39,14 @@ namespace ArchViz
         ResourceHandle index;
     }; // struct TextureHandle
 
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
+    //// ---------------------------------------------------------------------------
+    //// ---------------------------------------------------------------------------
+    //// ---------------------------------------------------------------------------
+    //// ---------------------------------------------------------------------------
+    //// ---------------------------------------------------------------------------
 
-    struct GpuBufferHandle
-    {
-        ResourceHandle index;
-    }; // struct BufferHandle
-
-    struct GpuTextureHandle
-    {
-        ResourceHandle index;
-    }; // struct TextureHandle
-
-    struct ShaderStateHandle
-    {
-        ResourceHandle index;
-    }; // struct ShaderStateHandle
-
-    struct SamplerHandle
-    {
-        ResourceHandle index;
-    }; // struct SamplerHandle
-
-    struct DescriptorSetLayoutHandle
-    {
-        ResourceHandle index;
-    }; // struct DescriptorSetLayoutHandle
-
-    struct DescriptorSetHandle
-    {
-        ResourceHandle index;
-    }; // struct DescriptorSetHandle
-
-    struct PipelineHandle
-    {
-        ResourceHandle index;
-    }; // struct PipelineHandle
-
-    struct RenderPassHandle
-    {
-        ResourceHandle index;
-    }; // struct RenderPassHandle
-
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-
-    static const uint32_t k_invalid_index = 0xffffffff;
+    constexpr uint16_t k_invalid_id    = 0xffff;
+    constexpr uint32_t k_invalid_index = 0xffffffff;
 
     // Invalid handles
     // CPU side
@@ -99,19 +57,59 @@ namespace ArchViz
     static BufferHandle   k_invalid_buffer {k_invalid_index};
     static TextureHandle  k_invalid_texture {k_invalid_index};
 
-    // GPU side
-    static GpuBufferHandle           k_invalid_gpu_buffer {k_invalid_index};
-    static GpuTextureHandle          k_invalid_gpu_texture {k_invalid_index};
-    static ShaderStateHandle         k_invalid_shader {k_invalid_index};
-    static SamplerHandle             k_invalid_sampler {k_invalid_index};
-    static DescriptorSetLayoutHandle k_invalid_layout {k_invalid_index};
-    static DescriptorSetHandle       k_invalid_set {k_invalid_index};
-    static PipelineHandle            k_invalid_pipeline {k_invalid_index};
-    static RenderPassHandle          k_invalid_pass {k_invalid_index};
-
     template<typename T>
-    inline bool is_valid_handle(T handle)
+    inline bool is_valid_handle(const T& handle)
     {
         return T.index != k_invalid_index;
     }
+
+    using ResourceTypeId = uint16_t;
+    using MagicId        = uint16_t;
+    using ResourceId     = std::size_t;
+
+    constexpr MagicId        k_magic_id                 = 0x1234;
+    constexpr ResourceTypeId k_invalid_resource_type_id = std::numeric_limits<uint16_t>::max();
+    constexpr ResourceId     k_invalid_resource_id      = std::numeric_limits<std::size_t>::max();
+
+    class ResourceTypeIdAllocator
+    {
+    public:
+        static ResourceTypeId alloc();
+
+    private:
+        static std::atomic<ResourceTypeId> m_next_id;
+    };
+
+    class ResourceIdAllocator
+    {
+    public:
+        static ResourceId alloc();
+
+    private:
+        static std::atomic<ResourceId> m_next_id;
+    };
+
+    struct ResHandle
+    {
+        MagicId        magic {k_magic_id};
+        ResourceTypeId type;
+        ResourceId     index;
+    };
+
+    constexpr uint32_t k_max_resource_count = 1024;
+
 } // namespace ArchViz
+
+namespace std
+{
+    template<>
+    struct hash<ArchViz::ResHandle>
+    {
+        size_t operator()(ArchViz::ResHandle const& handle) const
+        {
+            size_t handle_hash = 0;
+            ArchViz::hash_combine(handle_hash, handle.magic, handle.type, handle.index);
+            return handle_hash;
+        }
+    };
+} // namespace std

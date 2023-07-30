@@ -242,7 +242,7 @@ namespace ArchViz
         return *this;
     }
 
-    DescriptorSetCreation& DescriptorSetCreation::texture(TextureHandle texture, uint16_t binding)
+    DescriptorSetCreation& DescriptorSetCreation::texture(GpuTextureHandle texture, uint16_t binding)
     {
         // Set a default sampler
         samplers[num_resources]    = k_invalid_sampler;
@@ -251,7 +251,7 @@ namespace ArchViz
         return *this;
     }
 
-    DescriptorSetCreation& DescriptorSetCreation::buffer(BufferHandle buffer, uint16_t binding)
+    DescriptorSetCreation& DescriptorSetCreation::buffer(GpuBufferHandle buffer, uint16_t binding)
     {
         samplers[num_resources]    = k_invalid_sampler;
         bindings[num_resources]    = binding;
@@ -259,7 +259,7 @@ namespace ArchViz
         return *this;
     }
 
-    DescriptorSetCreation& DescriptorSetCreation::textureSampler(TextureHandle texture, SamplerHandle sampler, uint16_t binding)
+    DescriptorSetCreation& DescriptorSetCreation::textureSampler(GpuTextureHandle texture, SamplerHandle sampler, uint16_t binding)
     {
         bindings[num_resources]   = binding;
         resources[num_resources]  = texture.index;
@@ -339,7 +339,7 @@ namespace ArchViz
     RenderPassCreation& RenderPassCreation::reset()
     {
         num_render_targets    = 0;
-        depth_stencil_texture = k_invalid_texture;
+        depth_stencil_texture = k_invalid_gpu_texture;
         resize                = 0;
         scale_x               = 1.f;
         scale_y               = 1.f;
@@ -348,7 +348,7 @@ namespace ArchViz
         return *this;
     }
 
-    RenderPassCreation& RenderPassCreation::addRenderTexture(TextureHandle texture)
+    RenderPassCreation& RenderPassCreation::addRenderTexture(GpuTextureHandle texture)
     {
         output_textures[num_render_targets++] = texture;
 
@@ -364,7 +364,7 @@ namespace ArchViz
         return *this;
     }
 
-    RenderPassCreation& RenderPassCreation::setDepthStencilTexture(TextureHandle texture)
+    RenderPassCreation& RenderPassCreation::setDepthStencilTexture(GpuTextureHandle texture)
     {
         depth_stencil_texture = texture;
 

@@ -7,7 +7,7 @@
 
 namespace ArchViz
 {
-    class ModelLoader : public Loader
+    class ModelLoader : public ILoader
     {
     public:
         virtual ~ModelLoader() = default;
@@ -18,7 +18,7 @@ namespace ArchViz
         //virtual MaterialHandle getMateial(const std::string& uri) = 0;
         //virtual MaterialHandle getMateial(uint64_t hash_uri)      = 0;
 
-        virtual ModelHandle getModel(const std::string& uri) = 0;
-        virtual ModelHandle getModel(uint64_t hash_uri)      = 0;
+        //virtual ModelHandle getModel(const std::string& uri) = 0;
+        //virtual ModelHandle getModel(uint64_t hash_uri)      = 0;
     };
 } // namespace ArchViz

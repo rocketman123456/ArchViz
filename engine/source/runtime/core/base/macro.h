@@ -32,6 +32,12 @@
 #define ASSERT(statement) assert(statement)
 #endif
 
+#ifdef NDEBUG
+#define STATIC_ASSERT(statement)
+#else
+#define STATIC_ASSERT(statement) static_assert(statement)
+#endif
+
 // https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
 #define ARCHVIZ_XSTR(s) ARCHVIZ_STR(s)
 #define ARCHVIZ_STR(s) #s

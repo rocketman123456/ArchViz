@@ -3,7 +3,7 @@
 
 #include <set>
 
-namespace Piccolo
+namespace ArchViz
 {
     class System
     {
@@ -22,4 +22,4 @@ namespace Piccolo
 
         std::set<Entity> m_entities;
     };
-} // namespace Piccolo
+} // namespace ArchViz

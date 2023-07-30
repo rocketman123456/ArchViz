@@ -1,6 +1,6 @@
 #include "runtime/function/framework/ecs/system_manager.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     void SystemManager::entityDestroyed(Entity entity)
     {
@@ -25,4 +25,4 @@ namespace Piccolo
                 system->m_entities.erase(entity);
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

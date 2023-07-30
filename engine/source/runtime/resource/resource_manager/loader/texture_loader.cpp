@@ -23,7 +23,7 @@ namespace ArchViz
 
         m_resource_manager;
 
-        std::unique_ptr<TextureData> texture;
+        std::shared_ptr<TextureData> texture = std::make_shared<TextureData>();
 
         //int          tex_width, tex_height, tex_channels;
         //stbi_uc*     pixels     = stbi_load(image_path.generic_string().c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
@@ -42,10 +42,5 @@ namespace ArchViz
         //}
 
         //stbi_image_free(pixels);
-    }
-
-    void TextureLoader::unload(const std::string& uri)
-    {
-        //
     }
 } // namespace ArchViz

@@ -45,7 +45,7 @@ namespace ArchViz
         VkBufferUsageFlags    flags;
         VkMemoryPropertyFlags properties;
 
-        BufferHandle buffer;
+        //BufferHandle buffer;
     };
 
     struct FrameGraphTexture
@@ -59,7 +59,7 @@ namespace ArchViz
 
         RenderPassOperation::Enum load_op;
 
-        TextureHandle texture;
+        //TextureHandle texture;
     };
 
     struct FrameGraphResourceInfo

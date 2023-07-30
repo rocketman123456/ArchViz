@@ -1,6 +1,6 @@
 #pragma once
 #include "runtime/function/render/rhi/gpu_enum.h"
-#include "runtime/resource/resource_manager/resource_handle.h"
+#include "runtime/function/render/rhi/gpu_resource_handle.h"
 
 #include <volk.h>
 #include <vk_mem_alloc.h>
@@ -262,9 +262,9 @@ namespace ArchViz
         // Building helpers
         DescriptorSetCreation& reset();
         DescriptorSetCreation& setLayout(DescriptorSetLayoutHandle layout);
-        DescriptorSetCreation& texture(TextureHandle texture, uint16_t binding);
-        DescriptorSetCreation& buffer(BufferHandle buffer, uint16_t binding);
-        DescriptorSetCreation& textureSampler(TextureHandle texture, SamplerHandle sampler, uint16_t binding); // TODO: separate samplers from textures
+        DescriptorSetCreation& texture(GpuTextureHandle texture, uint16_t binding);
+        DescriptorSetCreation& buffer(GpuBufferHandle buffer, uint16_t binding);
+        DescriptorSetCreation& textureSampler(GpuTextureHandle texture, SamplerHandle sampler, uint16_t binding); // TODO: separate samplers from textures
         DescriptorSetCreation& setName(const std::string& name);
 
     }; // struct DescriptorSetCreation
@@ -345,8 +345,8 @@ namespace ArchViz
         uint16_t             num_render_targets = 0;
         RenderPassType::Enum type               = RenderPassType::Geometry;
 
-        TextureHandle output_textures[k_max_image_outputs];
-        TextureHandle depth_stencil_texture;
+        GpuTextureHandle output_textures[k_max_image_outputs];
+        GpuTextureHandle depth_stencil_texture;
 
         float   scale_x = 1.f;
         float   scale_y = 1.f;
@@ -359,9 +359,9 @@ namespace ArchViz
         std::string name {};
 
         RenderPassCreation& reset();
-        RenderPassCreation& addRenderTexture(TextureHandle texture);
+        RenderPassCreation& addRenderTexture(GpuTextureHandle texture);
         RenderPassCreation& setScaling(float scale_x, float scale_y, uint8_t resize);
-        RenderPassCreation& setDepthStencilTexture(TextureHandle texture);
+        RenderPassCreation& setDepthStencilTexture(GpuTextureHandle texture);
         RenderPassCreation& setName(const std::string& name);
         RenderPassCreation& setType(RenderPassType::Enum type);
         RenderPassCreation& setOperations(RenderPassOperation::Enum color, RenderPassOperation::Enum depth, RenderPassOperation::Enum stencil);
@@ -452,7 +452,7 @@ namespace ArchViz
         VkBufferUsageFlags      type_flags = 0;
         ResourceUsageType::Enum usage      = ResourceUsageType::Immutable;
         uint32_t                size       = 0;
-        BufferHandle            parent_handle;
+        GpuBufferHandle            parent_handle;
 
     }; // struct BufferDescription
 
@@ -525,7 +525,7 @@ namespace ArchViz
 
     struct MapBufferParameters
     {
-        BufferHandle buffer;
+        GpuBufferHandle buffer;
         uint32_t     offset = 0;
         uint32_t     size   = 0;
 
@@ -538,7 +538,7 @@ namespace ArchViz
     struct ImageBarrier
     {
 
-        TextureHandle texture;
+        GpuTextureHandle texture;
 
     }; // struct ImageBarrier
 
@@ -547,7 +547,7 @@ namespace ArchViz
     struct MemoryBarrier
     {
 
-        BufferHandle buffer;
+        GpuBufferHandle buffer;
 
     }; // struct MemoryBarrier
 
@@ -605,8 +605,8 @@ namespace ArchViz
         uint32_t                size          = 0;
         uint32_t                global_offset = 0; // Offset into global constant, if dynamic
 
-        BufferHandle handle;
-        BufferHandle parent_buffer;
+        GpuBufferHandle handle;
+        GpuBufferHandle parent_buffer;
 
         std::string name {};
 
@@ -648,7 +648,7 @@ namespace ArchViz
         uint8_t  mipmaps = 1;
         uint8_t  flags   = 0;
 
-        TextureHandle     handle;
+        GpuTextureHandle     handle;
         TextureType::Enum type = TextureType::Texture2D;
 
         Sampler* sampler = nullptr;
@@ -742,8 +742,8 @@ namespace ArchViz
 
         RenderPassOutput output;
 
-        TextureHandle output_textures[k_max_image_outputs];
-        TextureHandle output_depth;
+        GpuTextureHandle output_textures[k_max_image_outputs];
+        GpuTextureHandle output_depth;
 
         RenderPassType::Enum type;
 

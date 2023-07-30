@@ -1,6 +1,6 @@
 #include "runtime/function/framework/ecs/coordinator.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     Coordinator g_coordinator = {};
 
@@ -26,4 +26,4 @@ namespace Piccolo
         m_component_manager->entityDestroyed(entity);
         m_system_manager->entityDestroyed(entity);
     }
-} // namespace Piccolo
+} // namespace ArchViz

@@ -3,7 +3,7 @@
 #include <bitset>
 #include <cstdint>
 
-namespace Piccolo
+namespace ArchViz
 {
     // ECS defines
     using Entity                       = std::uint32_t;
@@ -11,5 +11,4 @@ namespace Piccolo
     using ComponentType                = std::uint8_t;
     const ComponentType MAX_COMPONENTS = 32;
     using Signature                    = std::bitset<MAX_COMPONENTS>;
-
-} // namespace Piccolo
+} // namespace ArchViz

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "runtime/core/base/macro.h"
 #include "runtime/core/meta/serializer/serializer.h"
 #include "runtime/core/thread/work_executor.h"
@@ -108,11 +107,11 @@ namespace ArchViz
         std::filesystem::path getFullPath(const std::string& relative_path) const;
 
     public:
-        void setConfigManager(std::shared_ptr<ConfigManager> config_manager);
+        // void setConfigManager(std::shared_ptr<ConfigManager> config_manager);
         void setVFS(std::shared_ptr<VFS> vfs);
 
     private:
-        std::shared_ptr<ConfigManager> m_config_manager;
+        // std::shared_ptr<ConfigManager> m_config_manager;
         std::shared_ptr<VFS>           m_vfs;
     };
 } // namespace ArchViz

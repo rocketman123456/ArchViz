@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace Piccolo
+namespace ArchViz
 {
     class SystemManager
     {

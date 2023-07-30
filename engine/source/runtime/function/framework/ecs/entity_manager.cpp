@@ -1,7 +1,7 @@
 #include "runtime/function/framework/ecs/entity_manager.h"
 #include "runtime/core/base/macro.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     EntityManager::EntityManager()
     {
@@ -42,4 +42,4 @@ namespace Piccolo
         ASSERT(entity < MAX_ENTITIES && "Entity out of range.");
         return m_signatures[entity];
     }
-} // namespace Piccolo
+} // namespace ArchViz

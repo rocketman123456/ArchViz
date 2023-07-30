@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace Piccolo
+namespace ArchViz
 {
     class Coordinator
     {
@@ -81,4 +81,4 @@ namespace Piccolo
     };
 
     extern Coordinator g_coordinator;
-} // namespace Piccolo
+} // namespace ArchViz

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <queue>
 
-namespace Piccolo
+namespace ArchViz
 {
     class EntityManager
     {
@@ -23,4 +23,4 @@ namespace Piccolo
         std::array<Signature, MAX_ENTITIES> m_signatures {};
         uint32_t                            m_living_entity_count {};
     };
-} // namespace Piccolo
+} // namespace ArchViz

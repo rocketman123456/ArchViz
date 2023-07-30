@@ -6,32 +6,16 @@
 #include "runtime/resource/config_manager/config_manager.h"
 #include "runtime/resource/resource_manager/resource_manager.h"
 
-#include "runtime/resource/res_type/components/material_res.h"
 #include "runtime/resource/res_type/components/mesh_res.h"
-#include "runtime/resource/res_type/data/material_data.h"
 #include "runtime/resource/res_type/data/mesh_data.h"
 
 #include "runtime/core/base/macro.h"
-
-#include <tiny_obj_loader.h>
 
 #include <filesystem>
 
 namespace ArchViz
 {
-    ModelHandle ObjLoader::getModel(const std::string& uri)
-    {
-        //
-        return {};
-    }
-
-    ModelHandle ObjLoader::getModel(uint64_t hash_uri)
-    {
-        //
-        return {};
-    }
-
-    void ObjLoader::loadFromFile(const std::string& uri)
+    std::shared_ptr<MeshData> ObjLoader::createResource(const std::string& uri)
     {
         std::filesystem::path model_uri = g_runtime_global_context.m_config_manager->getRootFolder() / uri;
 
@@ -51,8 +35,36 @@ namespace ArchViz
             LOG_WARN(warn);
         }
 
-        std::unique_ptr<MeshData> mesh;
+        std::shared_ptr<MeshData> mesh = convertMeshData(attrib, shapes, materials);
+        return mesh;
+    }
 
+    std::shared_ptr<MeshData> ObjLoader::createResource(const SubMeshRes& create_info)
+    {
+        std::filesystem::path model_uri = g_runtime_global_context.m_config_manager->getRootFolder() / create_info.m_obj_file_ref;
+
+        tinyobj::attrib_t                attrib;
+        std::vector<tinyobj::shape_t>    shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string                      warn, err;
+
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_uri.generic_string().c_str(), model_uri.parent_path().generic_string().c_str()))
+        {
+            LOG_WARN(warn);
+            LOG_FATAL(err);
+        }
+
+        if (!warn.empty())
+        {
+            LOG_WARN(warn);
+        }
+
+        std::shared_ptr<MeshData> mesh = convertMeshData(attrib, shapes, materials);
+        return mesh;
+    }
+
+    std::shared_ptr<MeshData> ObjLoader::convertMeshData(const tinyobj::attrib_t& attrib, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials)
+    {
         // std::unordered_map<Vertex, uint32_t> unique_vertices {};
 
         // for (const auto& shape : shapes)
@@ -77,10 +89,7 @@ namespace ArchViz
         //        m_indices.push_back(unique_vertices[vertex]);
         //    }
         //}
-    }
 
-    void ObjLoader::unload(const std::string& uri)
-    {
-        //
+        return {};
     }
 } // namespace ArchViz

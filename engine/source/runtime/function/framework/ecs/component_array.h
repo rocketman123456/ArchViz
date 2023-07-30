@@ -6,7 +6,7 @@
 #include <cassert>
 #include <unordered_map>
 
-namespace Piccolo
+namespace ArchViz
 {
     // The virtual inheritance of IComponentArray is unfortunate but, as far as I can tell, unavoidable. As seen later, we'll have a list of every ComponentArray (one per component type), and we need
     // to notify all of them when an entity is destroyed so that it can remove the entity's data if it exists. The only way to keep a list of multiple templated types is to keep a list of their common
@@ -49,4 +49,4 @@ namespace Piccolo
         std::unordered_map<size_t, Entity> m_index_to_entity {};
         size_t                             m_size {};
     };
-} // namespace Piccolo
+} // namespace ArchViz

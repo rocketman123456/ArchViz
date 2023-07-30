@@ -12,6 +12,7 @@ namespace ArchViz
     class AssetManager;
     class ConfigManager;
 
+    /// could use as ecs' entity
     /// GObject : Game Object base class
     class GObject : public std::enable_shared_from_this<GObject>
     {
@@ -69,6 +70,8 @@ namespace ArchViz
         GObjectID   m_id {k_invalid_gobject_id};
         std::string m_name {};
         std::string m_definition_url {};
+
+        // Entity's id
 
         // we have to use the ReflectionPtr due to that the components need to be reflected
         // in editor, and it's polymorphism

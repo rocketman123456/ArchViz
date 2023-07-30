@@ -1,6 +1,6 @@
 #include "runtime/function/framework/ecs/component_manager.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     void ComponentManager::entityDestroyed(Entity entity)
     {
@@ -10,4 +10,4 @@ namespace Piccolo
             component->entityDestroyed(entity);
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz

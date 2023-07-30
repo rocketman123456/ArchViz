@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace Piccolo
+namespace ArchViz
 {
     class ComponentManager
     {
@@ -69,4 +69,4 @@ namespace Piccolo
         std::unordered_map<const char*, std::shared_ptr<IComponentArray>> m_component {};
         ComponentType                                                     m_next_component_type {};
     };
-} // namespace Piccolo
+} // namespace ArchViz

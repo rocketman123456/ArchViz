@@ -7,13 +7,12 @@ namespace ArchViz
 {
     class ResourceManager;
 
-    class TextureLoader : public Loader
+    class TextureLoader : public ILoader
     {
     public:
         virtual ~TextureLoader() = default;
 
-        void loadFromFile(const std::string& uri) override;
-        void unload(const std::string& uri) override;
+        void loadFromFile(const std::string& uri);
 
     public:
         std::weak_ptr<ResourceManager> m_resource_manager;

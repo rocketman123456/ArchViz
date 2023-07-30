@@ -1,6 +1,6 @@
 #include "runtime/function/framework/ecs/component_array.h"
 
-namespace Piccolo
+namespace ArchViz
 {
     template<typename T>
     void ComponentArray<T>::removeData(Entity entity)
@@ -30,4 +30,4 @@ namespace Piccolo
             removeData(entity);
         }
     }
-} // namespace Piccolo
+} // namespace ArchViz
