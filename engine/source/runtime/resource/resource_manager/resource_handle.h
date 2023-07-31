@@ -59,7 +59,7 @@ namespace ArchViz
     template<typename T>
     inline bool is_valid_handle(const T& handle)
     {
-        return T.index != k_invalid_index;
+        return handle.index != k_invalid_index;
     }
 
     using ResourceTypeId = uint16_t;
@@ -96,6 +96,12 @@ namespace ArchViz
     };
 
     static ResHandle k_invalid_res_handle {0, k_invalid_resource_type_id, k_invalid_index};
+
+    template<>
+    inline bool is_valid_handle(const ResHandle& handle)
+    {
+        return handle.index != k_invalid_index && handle.type != k_invalid_resource_type_id && handle.magic == k_magic_id;
+    }
 
     constexpr uint32_t k_max_resource_count = 1024;
     constexpr size_t   k_max_resource_size  = 1024 * 1024 * 40; // 40 Mb

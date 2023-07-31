@@ -18,7 +18,7 @@ namespace ArchViz
     public:
         virtual ~IResourceArray() = default;
 
-        virtual void resuorceDestroyed(const ResHandle& res) = 0;
+        virtual void handleDestroyed(const ResourceId& res) = 0;
     };
 
     template<typename T>
@@ -28,11 +28,11 @@ namespace ArchViz
         explicit ResourceArray(size_t count, size_t size);
         virtual ~ResourceArray() = default;
 
-        std::shared_ptr<T> getData(const ResHandle& handle);
+        std::weak_ptr<T> getData(const ResourceId& handle);
 
-        void insertData(const ResHandle& handle, std::shared_ptr<T> resource, size_t size);
-        void removeData(const ResHandle& handle);
-        void resuorceDestroyed(const ResHandle& handle) override;
+        void insertData(const ResourceId& handle, std::shared_ptr<T> resource, size_t size);
+        void removeData(const ResourceId& handle);
+        void handleDestroyed(const ResourceId& handle) override;
 
     private:
         size_t m_max_count;
@@ -41,9 +41,9 @@ namespace ArchViz
         std::vector<std::shared_ptr<T>> m_resources {};
         std::vector<size_t>             m_resource_sizes {};
 
-        std::unordered_map<ResHandle, size_t> m_handle_to_index {};
-        std::unordered_map<size_t, ResHandle> m_index_to_handle {};
-        size_t                                m_array_size {0};
-        size_t                                m_content_size {0};
+        std::unordered_map<ResourceId, size_t> m_handle_to_index {};
+        std::unordered_map<size_t, ResourceId> m_index_to_handle {};
+        size_t                                 m_array_size {0};
+        size_t                                 m_content_size {0};
     };
 } // namespace ArchViz

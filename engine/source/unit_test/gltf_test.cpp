@@ -88,7 +88,6 @@ int main(int argc, char** argv)
     config_manager->initialize(config_file_path.generic_string());
 
     std::shared_ptr<AssetManager> asset_manager = std::make_shared<AssetManager>();
-    asset_manager->setConfigManager(config_manager);
 
     VFSConfig config;
     asset_manager->loadAsset<VFSConfig>("config/config.vfs.json", config);

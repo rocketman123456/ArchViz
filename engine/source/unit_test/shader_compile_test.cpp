@@ -5,6 +5,8 @@
 #include "runtime/function/render/rhi/spirv_parser.h"
 #include "runtime/function/render/rhi/vulkan/utils/vulkan_shader_utils.h"
 
+#include "runtime/function/global/global_context.h"
+
 #include <filesystem>
 #include <iostream>
 #include <memory>
