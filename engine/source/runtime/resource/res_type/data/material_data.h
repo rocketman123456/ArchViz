@@ -27,7 +27,6 @@ namespace ArchViz
         ResHandle m_normal {k_invalid_res_handle};
         ResHandle m_occlusion {k_invalid_res_handle};
         ResHandle m_emissive {k_invalid_res_handle};
-
-        std::string m_uri;
+        // std::string m_uri;
     };
 } // namespace ArchViz

@@ -35,19 +35,17 @@ namespace ArchViz
 
         template<typename T>
         ResourceTypeId getResourceType() const;
-        const char*    getResourceTypeName(ResourceTypeId type) const;
+
+        const char* getResourceTypeName(ResourceTypeId type) const;
 
         template<typename T, typename L>
         void registerResourceLoader();
 
-        template<typename T>
-        ResHandle createHandle();
+        template<typename T, typename CI>
+        ResHandle loadResource(const std::string& uri);
 
         template<typename T, typename CI>
-        std::weak_ptr<T> loadResource(const std::string& uri);
-
-        template<typename T, typename CI>
-        std::weak_ptr<T> loadResource(const std::string& uri, const CI& create_info);
+        ResHandle loadResource(const std::string& uri, const CI& create_info);
 
         template<typename T>
         std::weak_ptr<T> getResource(const ResHandle& handle);
@@ -56,6 +54,9 @@ namespace ArchViz
         std::weak_ptr<T> getResource(const std::string& uri);
 
     private:
+        template<typename T>
+        ResHandle createHandle();
+
         template<typename T>
         void addResource(const ResHandle& handle, std::shared_ptr<T> res, size_t size);
 
@@ -213,18 +214,19 @@ namespace ArchViz
     }
 
     template<typename T, typename CI>
-    std::weak_ptr<T> ResourceManager::loadResource(const std::string& uri)
+    ResHandle ResourceManager::loadResource(const std::string& uri)
     {
         if (m_resource_handles.count(uri) != 0)
         {
-            return getResource<T>(m_resource_handles[uri]);
+            LOG_DEBUG("resource loaded: {}", uri);
+            return m_resource_handles[uri];
         }
 
         const std::type_info& type = typeid(T);
         if (m_resource_loaders.count(type.name()) == 0)
         {
             LOG_ERROR("cannot find a valid loadr for: {}", type.name());
-            return {};
+            return k_invalid_res_handle;
         }
 
         LOG_DEBUG("load resource: {}", uri);
@@ -240,24 +242,25 @@ namespace ArchViz
             m_resource_handles[uri]        = handle;
             m_resource_handles_inv[handle] = uri;
             addResource<T>(handle, res, size);
-            return res;
+            return handle;
         }
-        return {};
+        return k_invalid_res_handle;
     }
 
     template<typename T, typename CI>
-    std::weak_ptr<T> ResourceManager::loadResource(const std::string& uri, const CI& create_info)
+    ResHandle ResourceManager::loadResource(const std::string& uri, const CI& create_info)
     {
         if (m_resource_handles.count(uri) != 0)
         {
-            return getResource<T>(m_resource_handles[uri]);
+            LOG_DEBUG("resource loaded: {}", uri);
+            return m_resource_handles[uri];
         }
 
         const std::type_info& type = typeid(T);
         if (m_resource_loaders.count(type.name()) == 0)
         {
             LOG_ERROR("cannot find a valid loadr for: {}", type.name());
-            return {};
+            return k_invalid_res_handle;
         }
 
         LOG_DEBUG("load resource: {}", uri);
@@ -273,10 +276,10 @@ namespace ArchViz
             m_resource_handles[uri]        = handle;
             m_resource_handles_inv[handle] = uri;
             addResource<T>(handle, res, size);
-            return res;
+            return handle;
         }
 
-        return {};
+        return k_invalid_res_handle;
     }
 
     template<typename T>
