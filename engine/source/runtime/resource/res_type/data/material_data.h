@@ -22,11 +22,11 @@ namespace ArchViz
     class MaterialData
     {
     public:
-        /*TextureHandle m_base_colour {k_invalid_texture};
-        TextureHandle m_metallic_roughness {k_invalid_texture};
-        TextureHandle m_normal {k_invalid_texture};
-        TextureHandle m_occlusion {k_invalid_texture};
-        TextureHandle m_emissive {k_invalid_texture};*/
+        ResHandle m_base_colour {k_invalid_res_handle};
+        ResHandle m_metallic_roughness {k_invalid_res_handle};
+        ResHandle m_normal {k_invalid_res_handle};
+        ResHandle m_occlusion {k_invalid_res_handle};
+        ResHandle m_emissive {k_invalid_res_handle};
 
         std::string m_uri;
     };

@@ -3,8 +3,12 @@
 
 #include "sol/sol.hpp"
 
+#include <memory>
+
 namespace ArchViz
 {
+    class GObject;
+
     REFLECTION_TYPE(LuaComponent)
     CLASS(LuaComponent : public Component, WhiteListFields)
     {
@@ -28,6 +32,9 @@ namespace ArchViz
     protected:
         sol::state m_lua_state;
 
+        bool m_should_tick = false;
+
+        // TODO : load script from file
         META(Enable)
         std::string m_lua_script;
     };

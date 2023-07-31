@@ -23,12 +23,22 @@ namespace ArchViz
         Blend
     };
 
+    REFLECTION_TYPE(TextureRes)
+    CLASS(TextureRes, Fields)
+    {
+        REFLECTION_BODY(TextureRes);
+
+    public:
+        std::string m_texture_uri;
+    };
+
     REFLECTION_TYPE(MaterialRes)
     CLASS(MaterialRes, Fields)
     {
         REFLECTION_BODY(MaterialRes);
 
     public:
+        // TODO : change string into TextureRes
         std::string m_base_colour_texture_file;
         std::string m_metallic_roughness_texture_file;
         std::string m_normal_texture_file;

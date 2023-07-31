@@ -15,7 +15,7 @@
 
 namespace ArchViz
 {
-    std::shared_ptr<MeshData> ObjLoader::createResource(const std::string& uri)
+    std::pair<std::shared_ptr<MeshData>, size_t> ObjLoader::createResource(const std::string& uri)
     {
         std::filesystem::path model_uri = g_runtime_global_context.m_config_manager->getRootFolder() / uri;
 
@@ -36,10 +36,13 @@ namespace ArchViz
         }
 
         std::shared_ptr<MeshData> mesh = convertMeshData(attrib, shapes, materials);
-        return mesh;
+
+        size_t vertex_size = mesh->vertex_buffer.size() * sizeof(mesh->vertex_buffer[0]);
+        size_t index_size  = mesh->index_buffer.size() * sizeof(mesh->index_buffer[0]);
+        return {mesh, vertex_size + index_size};
     }
 
-    std::shared_ptr<MeshData> ObjLoader::createResource(const SubMeshRes& create_info)
+    std::pair<std::shared_ptr<MeshData>, size_t> ObjLoader::createResource(const SubMeshRes& create_info)
     {
         std::filesystem::path model_uri = g_runtime_global_context.m_config_manager->getRootFolder() / create_info.m_obj_file_ref;
 
@@ -60,7 +63,10 @@ namespace ArchViz
         }
 
         std::shared_ptr<MeshData> mesh = convertMeshData(attrib, shapes, materials);
-        return mesh;
+
+        size_t vertex_size = mesh->vertex_buffer.size() * sizeof(mesh->vertex_buffer[0]);
+        size_t index_size  = mesh->index_buffer.size() * sizeof(mesh->index_buffer[0]);
+        return {mesh, vertex_size + index_size};
     }
 
     std::shared_ptr<MeshData> ObjLoader::convertMeshData(const tinyobj::attrib_t& attrib, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials)

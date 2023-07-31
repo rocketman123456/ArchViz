@@ -45,8 +45,7 @@ namespace ArchViz
     //// ---------------------------------------------------------------------------
     //// ---------------------------------------------------------------------------
 
-    constexpr uint16_t k_invalid_id    = 0xffff;
-    constexpr uint32_t k_invalid_index = 0xffffffff;
+    constexpr ResourceHandle k_invalid_index = 0xffffffff;
 
     // Invalid handles
     // CPU side
@@ -65,11 +64,11 @@ namespace ArchViz
 
     using ResourceTypeId = uint16_t;
     using MagicId        = uint16_t;
-    using ResourceId     = std::size_t;
+    using ResourceId     = uint64_t;
 
     constexpr MagicId        k_magic_id                 = 0x1234;
     constexpr ResourceTypeId k_invalid_resource_type_id = std::numeric_limits<uint16_t>::max();
-    constexpr ResourceId     k_invalid_resource_id      = std::numeric_limits<std::size_t>::max();
+    constexpr ResourceId     k_invalid_resource_id      = std::numeric_limits<uint64_t>::max();
 
     class ResourceTypeIdAllocator
     {
@@ -96,8 +95,10 @@ namespace ArchViz
         ResourceId     index;
     };
 
-    constexpr uint32_t k_max_resource_count = 1024;
+    static ResHandle k_invalid_res_handle {0, k_invalid_resource_type_id, k_invalid_index};
 
+    constexpr uint32_t k_max_resource_count = 1024;
+    constexpr size_t   k_max_resource_size  = 1024 * 1024 * 40; // 40 Mb
 } // namespace ArchViz
 
 namespace std

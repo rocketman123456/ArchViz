@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace ArchViz
 {
@@ -17,7 +18,7 @@ namespace ArchViz
     public:
         virtual ~Loader() = default;
 
-        virtual std::shared_ptr<T> createResource(const CI& create_info)  = 0;
-        virtual std::shared_ptr<T> createResource(const std::string& uri) = 0;
+        virtual std::pair<std::shared_ptr<T>, size_t> createResource(const CI& create_info)  = 0;
+        virtual std::pair<std::shared_ptr<T>, size_t> createResource(const std::string& uri) = 0;
     };
 } // namespace ArchViz

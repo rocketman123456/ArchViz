@@ -47,29 +47,11 @@ namespace ArchViz
         std::vector<SkeletonBinding> bind;
     };
 
-    //struct RawMeshVertex
-    //{
-    //    FVector3 postion {};
-    //    FVector3 normal {};
-    //    FVector3 tangent {};
-    //    FVector2 uv {};
-    //};
-
-    //struct RawSubMeshData
-    //{
-    //    uint64_t first_vertex;
-    //    uint64_t vertex_count;
-    //    uint64_t first_index;
-    //    uint64_t index_count;
-    //};
-
-    //struct RawMeshData
-    //{
-    //    std::vector<RawMeshVertex> vertices;
-    //    std::vector<uint32_t>      indices;
-
-    //    // TODO : 
-    //    std::vector<RawSubMeshData> sub_meshes;
-    //};
+    // TODO : use same structure in gltf to build data
+    struct ModelData
+    {
+        //std::vector<ResHandle> mesh_data {};
+        //std::vector<ResHandle> material_data {};
+    };
 
 } // namespace ArchViz

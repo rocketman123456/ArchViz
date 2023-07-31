@@ -25,31 +25,25 @@ namespace ArchViz
     class ResourceArray : public IResourceArray
     {
     public:
-        void insertData(const ResHandle& handle, std::shared_ptr<T> resource)
-        {
-            ASSERT(m_handle_to_index.count(handle) == 0 && "Component added to same entity more than once.");
-            // Put new entry at end
-            size_t new_index             = m_size;
-            m_handle_to_index[handle]    = new_index;
-            m_index_to_handle[new_index] = handle;
-            m_resources[new_index]       = resource;
-            ++m_size;
-        }
+        explicit ResourceArray(size_t count, size_t size);
+        virtual ~ResourceArray() = default;
 
-        T& getData(const ResHandle& handle)
-        {
-            ASSERT(m_handle_to_index.count(handle) != 0 && "Retrieving non-existent component.");
-            return m_resources[m_handle_to_index[handle]];
-        }
+        std::shared_ptr<T> getData(const ResHandle& handle);
 
+        void insertData(const ResHandle& handle, std::shared_ptr<T> resource, size_t size);
         void removeData(const ResHandle& handle);
-        void entityDestroyed(const ResHandle& handle) override;
+        void resuorceDestroyed(const ResHandle& handle) override;
 
     private:
-        std::array<std::shared_ptr<T>, k_max_resource_count> m_resources {};
+        size_t m_max_count;
+        size_t m_max_size;
+
+        std::vector<std::shared_ptr<T>> m_resources {};
+        std::vector<size_t>             m_resource_sizes {};
 
         std::unordered_map<ResHandle, size_t> m_handle_to_index {};
         std::unordered_map<size_t, ResHandle> m_index_to_handle {};
-        size_t                                m_size {};
+        size_t                                m_array_size {0};
+        size_t                                m_content_size {0};
     };
 } // namespace ArchViz

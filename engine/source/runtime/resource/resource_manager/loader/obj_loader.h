@@ -19,8 +19,8 @@ namespace ArchViz
     public:
         virtual ~ObjLoader() = default;
 
-        std::shared_ptr<MeshData> createResource(const SubMeshRes& create_info) override;
-        std::shared_ptr<MeshData> createResource(const std::string& uri) override;
+        std::pair<std::shared_ptr<MeshData>, size_t> createResource(const SubMeshRes& create_info) override;
+        std::pair<std::shared_ptr<MeshData>, size_t> createResource(const std::string& uri) override;
 
     private:
         std::shared_ptr<MeshData> convertMeshData(const tinyobj::attrib_t& attrib, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials);
