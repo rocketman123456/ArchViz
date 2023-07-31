@@ -93,15 +93,13 @@ namespace ArchViz
         MagicId        magic {k_magic_id};
         ResourceTypeId type;
         ResourceId     index;
+
+        bool isValid(const ResHandle& handle) { return handle.index != k_invalid_index && handle.type != k_invalid_resource_type_id && handle.magic == k_magic_id; }
+
+        bool operator==(const ResHandle& other) { return magic == other.magic && type == other.type && index == other.index; }
     };
 
     static ResHandle k_invalid_res_handle {0, k_invalid_resource_type_id, k_invalid_index};
-
-    template<>
-    inline bool is_valid_handle(const ResHandle& handle)
-    {
-        return handle.index != k_invalid_index && handle.type != k_invalid_resource_type_id && handle.magic == k_magic_id;
-    }
 
     constexpr uint32_t k_max_resource_count = 1024;
     constexpr size_t   k_max_resource_size  = 1024 * 1024 * 40; // 40 Mb
@@ -112,11 +110,17 @@ namespace std
     template<>
     struct hash<ArchViz::ResHandle>
     {
-        size_t operator()(ArchViz::ResHandle const& handle) const
+        size_t operator()(const ArchViz::ResHandle& handle) const
         {
             size_t handle_hash = 0;
             ArchViz::hash_combine(handle_hash, handle.magic, handle.type, handle.index);
             return handle_hash;
         }
+    };
+
+    template<>
+    struct equal_to<ArchViz::ResHandle>
+    {
+        constexpr bool operator()(const ArchViz::ResHandle& lhs, const ArchViz::ResHandle& rhs) const { return lhs.magic == rhs.magic && lhs.type == rhs.type && lhs.index == rhs.index; }
     };
 } // namespace std

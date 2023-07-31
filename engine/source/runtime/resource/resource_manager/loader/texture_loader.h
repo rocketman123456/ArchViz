@@ -19,6 +19,6 @@ namespace ArchViz
         std::pair<std::shared_ptr<TextureData>, size_t> createResource(const std::string& uri) override;
 
     private:
-        std::shared_ptr<TextureData> loadFromFile(const std::string& uri, int* width, int* height, int* channel);
+        std::shared_ptr<TextureData> loadFromFile(const std::string& uri);
     };
 } // namespace ArchViz

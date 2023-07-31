@@ -62,7 +62,7 @@ namespace std
     template<>
     struct hash<ArchViz::Vertex>
     {
-        size_t operator()(ArchViz::Vertex const& vertex) const
+        size_t operator()(const ArchViz::Vertex& vertex) const
         {
             size_t pos_hash = 0;
             ArchViz::hash_combine(pos_hash, vertex.pos[0], vertex.pos[1], vertex.pos[2]);

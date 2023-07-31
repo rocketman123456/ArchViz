@@ -3,6 +3,10 @@
 #include "runtime/platform/file_system/vfs.h"
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
+#include "runtime/resource/resource_manager/resource_manager.h"
+
+#include "runtime/resource/res_type/components/material_res.h"
+#include "runtime/resource/res_type/data/material_data.h"
 
 #include <filesystem>
 #include <iostream>
@@ -18,6 +22,10 @@ int main(int argc, char** argv)
     cout << config_file_path << endl;
 
     g_runtime_global_context.startSystems(config_file_path.generic_string());
+
+    TextureRes texture_res {"asset-test/data/texture/default/albedo.jpg"};
+
+    std::weak_ptr<TextureData> texture = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg", texture_res);
 
     return 0;
 }
