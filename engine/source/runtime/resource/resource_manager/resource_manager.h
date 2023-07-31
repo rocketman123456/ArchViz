@@ -236,11 +236,9 @@ namespace ArchViz
         std::tie(res, size) = loader->createResource(uri);
         if (res != nullptr)
         {
-            ResHandle handle = createHandle<T>();
-            m_resource_handles.insert({uri, handle});
-            m_resource_handles_inv.insert({handle, uri});
-            // m_resource_handles[uri]        = handle;
-            // m_resource_handles_inv[handle] = uri;
+            ResHandle handle               = createHandle<T>();
+            m_resource_handles[uri]        = handle;
+            m_resource_handles_inv[handle] = uri;
             addResource<T>(handle, res, size);
             return res;
         }
@@ -271,11 +269,9 @@ namespace ArchViz
         std::tie(res, size) = loader->createResource(create_info);
         if (res != nullptr)
         {
-            ResHandle handle = createHandle<T>();
-            m_resource_handles.insert({uri, handle});
-            m_resource_handles_inv.insert({handle, uri});
-            // m_resource_handles[uri]        = handle;
-            // m_resource_handles_inv[handle] = uri;
+            ResHandle handle               = createHandle<T>();
+            m_resource_handles[uri]        = handle;
+            m_resource_handles_inv[handle] = uri;
             addResource<T>(handle, res, size);
             return res;
         }

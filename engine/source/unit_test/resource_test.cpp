@@ -25,7 +25,8 @@ int main(int argc, char** argv)
 
     TextureRes texture_res {"asset-test/data/texture/default/albedo.jpg"};
 
-    std::weak_ptr<TextureData> texture = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg", texture_res);
+    std::weak_ptr<TextureData> texture   = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg", texture_res);
+    std::weak_ptr<TextureData> texture_2 = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg");
 
     return 0;
 }
