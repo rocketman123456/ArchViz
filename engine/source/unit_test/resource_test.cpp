@@ -31,5 +31,7 @@ int main(int argc, char** argv)
 
     ResHandle material = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>("asset-test/material/white.material.json");
 
+    ResHandle material_2 = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>("asset-test/material/gold.material.json");
+
     return 0;
 }

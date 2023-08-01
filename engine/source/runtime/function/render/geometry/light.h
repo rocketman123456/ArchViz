@@ -48,13 +48,23 @@ namespace std
     template<>
     struct hash<ArchViz::Light>
     {
-        size_t operator()(ArchViz::Light const& light) const
+        size_t operator()(const ArchViz::Light& light) const
         {
             size_t pos_hash = 0;
             ArchViz::hash_combine(pos_hash, light.position[0], light.position[1], light.position[2]);
             size_t color_hash = 0;
             ArchViz::hash_combine(color_hash, light.color[0], light.color[1], light.color[2]);
             return pos_hash ^ ((color_hash << 1) >> 1);
+        }
+    };
+
+    template<>
+    struct equal_to<ArchViz::Light>
+    {
+        bool operator()(const ArchViz::Light& lhs, const ArchViz::Light& rhs) const
+        {
+            const std::hash<ArchViz::Light> _hash_;
+            return _hash_(lhs) == _hash_(rhs);
         }
     };
 } // namespace std

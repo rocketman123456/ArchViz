@@ -4,6 +4,7 @@
 #include "runtime/core/base/hash.h"
 #include "runtime/core/base/macro.h"
 
+#include "runtime/resource/resource_manager/compiler/compiler.h"
 #include "runtime/resource/resource_manager/loader/loader.h"
 
 #include "runtime/resource/resource_manager/resource_array.h"
@@ -41,11 +42,21 @@ namespace ArchViz
         template<typename T, typename L>
         void registerResourceLoader();
 
+        template<typename T, typename C>
+        void registerResourceCompiler();
+
         template<typename T, typename CI>
         ResHandle loadResource(const std::string& uri);
 
         template<typename T, typename CI>
         ResHandle loadResource(const std::string& uri, const CI& create_info);
+
+        // TODO
+        // template<typename T, typename CI>
+        // ResHandle compileResource(const std::string& uri);
+
+        // template<typename T, typename CI>
+        // ResHandle compileResource(const std::string& uri, const CI& create_info);
 
         template<typename T>
         std::weak_ptr<T> getResource(const ResHandle& handle);
@@ -85,7 +96,8 @@ namespace ArchViz
         std::unordered_map<std::string, ResHandle> m_resource_handles;     // uri -> handle
         std::unordered_map<ResHandle, std::string> m_resource_handles_inv; // uri -> handle
 
-        std::unordered_map<const char*, std::shared_ptr<ILoader>> m_resource_loaders; // typeid -> loader
+        std::unordered_map<const char*, std::shared_ptr<ILoader>>   m_resource_loaders;   // typeid -> loader
+        std::unordered_map<const char*, std::shared_ptr<ICompiler>> m_resource_compilers; // typeid -> compiler
     };
 
     template<typename T>
@@ -140,6 +152,24 @@ namespace ArchViz
             ASSERT(is_loader && "not a valid loader class");
 
             m_resource_loaders[type.name()] = loader;
+        }
+    }
+
+    template<typename T, typename C>
+    void ResourceManager::registerResourceCompiler()
+    {
+        // one resource type can only have one loader now
+        const std::type_info& type = typeid(T);
+
+        if (m_resource_compilers.count(type.name()) == 0)
+        {
+            std::shared_ptr<C> compiler = std::make_shared<C>();
+
+            // must be a ILoader class
+            bool is_compiler = std::is_base_of<ICompiler, C>::value;
+            ASSERT(is_compiler && "not a valid loader class");
+
+            m_resource_compilers[type.name()] = compiler;
         }
     }
 

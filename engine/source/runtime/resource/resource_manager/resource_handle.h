@@ -121,6 +121,10 @@ namespace std
     template<>
     struct equal_to<ArchViz::ResHandle>
     {
-        constexpr bool operator()(const ArchViz::ResHandle& lhs, const ArchViz::ResHandle& rhs) const { return lhs.magic == rhs.magic && lhs.type == rhs.type && lhs.index == rhs.index; }
+        bool operator()(const ArchViz::ResHandle& lhs, const ArchViz::ResHandle& rhs) const
+        {
+            const std::hash<ArchViz::ResHandle> _hash_;
+            return _hash_(lhs) == _hash_(rhs);
+        }
     };
 } // namespace std

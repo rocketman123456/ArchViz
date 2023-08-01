@@ -14,23 +14,23 @@ namespace ArchViz
 
         if (!create_info.m_base_colour_texture_file.empty())
         {
-            material->m_base_colour = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>(create_info.m_base_colour_texture_file);
+            material->m_base_colour = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>(create_info.m_base_colour_texture_file);
         }
         if (!create_info.m_metallic_roughness_texture_file.empty())
         {
-            material->m_metallic_roughness = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>(create_info.m_metallic_roughness_texture_file);
+            material->m_metallic_roughness = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>(create_info.m_metallic_roughness_texture_file);
         }
         if (!create_info.m_normal_texture_file.empty())
         {
-            material->m_normal = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>(create_info.m_normal_texture_file);
+            material->m_normal = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>(create_info.m_normal_texture_file);
         }
         if (!create_info.m_occlusion_texture_file.empty())
         {
-            material->m_occlusion = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>(create_info.m_occlusion_texture_file);
+            material->m_occlusion = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>(create_info.m_occlusion_texture_file);
         }
         if (!create_info.m_emissive_texture_file.empty())
         {
-            material->m_emissive = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>(create_info.m_emissive_texture_file);
+            material->m_emissive = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>(create_info.m_emissive_texture_file);
         }
 
         return {material, sizeof(MaterialData)};

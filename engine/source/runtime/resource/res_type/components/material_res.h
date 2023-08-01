@@ -38,7 +38,6 @@ namespace ArchViz
         REFLECTION_BODY(MaterialRes);
 
     public:
-        // TODO : change string into TextureRes
         std::string m_base_colour_texture_file;
         std::string m_metallic_roughness_texture_file;
         std::string m_normal_texture_file;

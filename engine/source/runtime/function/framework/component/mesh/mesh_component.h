@@ -6,8 +6,6 @@
 
 namespace ArchViz
 {
-    class ResourceManager;
-
     REFLECTION_TYPE(MeshComponent)
     CLASS(MeshComponent : public Component, WhiteListFields)
     {
@@ -22,7 +20,5 @@ namespace ArchViz
     private:
         META(Enable)
         MeshComponentRes m_mesh_res;
-
-        std::weak_ptr<ResourceManager> m_resource_manager;
     };
 } // namespace ArchViz

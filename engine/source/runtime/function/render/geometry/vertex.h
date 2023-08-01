@@ -73,4 +73,14 @@ namespace std
             return pos_hash ^ ((color_hash << 1) >> 1) ^ (tex_hash << 1);
         }
     };
+
+    template<>
+    struct equal_to<ArchViz::Vertex>
+    {
+        bool operator()(const ArchViz::Vertex& lhs, const ArchViz::Vertex& rhs) const
+        {
+            const std::hash<ArchViz::Vertex> _hash_;
+            return _hash_(lhs) == _hash_(rhs);
+        }
+    };
 } // namespace std
