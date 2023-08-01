@@ -45,7 +45,7 @@ namespace ArchViz
         content.resize(file_size);
         fin.seekg(0, fin.beg);
 
-        fin.read(reinterpret_cast<char*>(content.data()), sizeof(file_size));
+        fin.read(reinterpret_cast<char*>(content.data()), file_size);
         fin.close();
     }
 
@@ -69,7 +69,7 @@ namespace ArchViz
             LOG_ERROR("open file: {} failed!", file_path.generic_string());
             return;
         }
-        fin.write((const char*)content.data(), content.size());
+        fin.write((char*)content.data(), content.size());
         fin.close();
     }
 

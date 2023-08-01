@@ -6,42 +6,42 @@ namespace ArchViz
 {
     struct GpuBufferHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct GpuTextureHandle
 
     struct GpuTextureHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct GpuTextureHandle
 
     struct ShaderStateHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct ShaderStateHandle
 
     struct SamplerHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct SamplerHandle
 
     struct DescriptorSetLayoutHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct DescriptorSetLayoutHandle
 
     struct DescriptorSetHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct DescriptorSetHandle
 
     struct PipelineHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct PipelineHandle
 
     struct RenderPassHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct RenderPassHandle
 
     // Invalid handles

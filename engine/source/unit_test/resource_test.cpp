@@ -25,13 +25,13 @@ int main(int argc, char** argv)
 
     TextureRes texture_res {"asset-test/data/texture/default/albedo.jpg"};
 
-    ResHandle texture = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg", texture_res);
+    ResourceHandle texture = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg", texture_res);
 
-    ResHandle texture_2 = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg");
+    ResourceHandle texture_2 = g_runtime_global_context.m_resource_manager->loadResource<TextureData, TextureRes>("asset-test/data/texture/default/albedo.jpg");
 
-    ResHandle material = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>("asset-test/material/white.material.json");
+    ResourceHandle material = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>("asset-test/material/white.material.json");
 
-    ResHandle material_2 = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>("asset-test/material/gold.material.json");
+    ResourceHandle material_2 = g_runtime_global_context.m_resource_manager->loadResource<MaterialData, MaterialRes>("asset-test/material/gold.material.json");
 
     return 0;
 }

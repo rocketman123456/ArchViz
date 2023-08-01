@@ -471,7 +471,8 @@ namespace ArchViz
         }
         ImGui::End();
 
-        ImGui::Begin(u8"ArchViz æµ‹è¯•");
+        // should check file encoding to make chinese usable
+        ImGui::Begin(u8"ArchViz ²âÊÔ");
         {
             ImGui::Text("Hello, world %d", 123);
         }

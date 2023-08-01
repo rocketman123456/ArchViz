@@ -7,36 +7,36 @@
 
 namespace ArchViz
 {
-    using ResourceHandle = uint32_t;
+    using ResourceIndex = uint32_t;
 
     struct ModelHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct ModelHandle
 
     struct MeshHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct MeshHandle
 
     struct MaterialHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct MaterialHandle
 
     struct AudioHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     };
 
     struct BufferHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct BufferHandle
 
     struct TextureHandle
     {
-        ResourceHandle index;
+        ResourceIndex index;
     }; // struct TextureHandle
 
     //// ---------------------------------------------------------------------------
@@ -45,7 +45,7 @@ namespace ArchViz
     //// ---------------------------------------------------------------------------
     //// ---------------------------------------------------------------------------
 
-    constexpr ResourceHandle k_invalid_index = 0xffffffff;
+    constexpr ResourceIndex k_invalid_index = 0xffffffff;
 
     // Invalid handles
     // CPU side
@@ -88,18 +88,18 @@ namespace ArchViz
         static std::atomic<ResourceId> m_next_id;
     };
 
-    struct ResHandle
+    struct ResourceHandle
     {
         MagicId        magic {k_magic_id};
         ResourceTypeId type;
         ResourceId     index;
 
-        bool isValid(const ResHandle& handle) { return handle.index != k_invalid_index && handle.type != k_invalid_resource_type_id && handle.magic == k_magic_id; }
+        bool isValid(const ResourceHandle& handle) { return handle.index != k_invalid_index && handle.type != k_invalid_resource_type_id && handle.magic == k_magic_id; }
 
-        bool operator==(const ResHandle& other) { return magic == other.magic && type == other.type && index == other.index; }
+        bool operator==(const ResourceHandle& other) { return magic == other.magic && type == other.type && index == other.index; }
     };
 
-    static ResHandle k_invalid_res_handle {0, k_invalid_resource_type_id, k_invalid_index};
+    static ResourceHandle k_invalid_res_handle {0, k_invalid_resource_type_id, k_invalid_index};
 
     constexpr uint32_t k_max_resource_count = 1024;
     constexpr size_t   k_max_resource_size  = 1024 * 1024 * 40; // 40 Mb
@@ -108,9 +108,9 @@ namespace ArchViz
 namespace std
 {
     template<>
-    struct hash<ArchViz::ResHandle>
+    struct hash<ArchViz::ResourceHandle>
     {
-        size_t operator()(const ArchViz::ResHandle& handle) const
+        size_t operator()(const ArchViz::ResourceHandle& handle) const
         {
             size_t handle_hash = 0;
             ArchViz::hash_combine(handle_hash, handle.magic, handle.type, handle.index);
@@ -119,11 +119,11 @@ namespace std
     };
 
     template<>
-    struct equal_to<ArchViz::ResHandle>
+    struct equal_to<ArchViz::ResourceHandle>
     {
-        bool operator()(const ArchViz::ResHandle& lhs, const ArchViz::ResHandle& rhs) const
+        bool operator()(const ArchViz::ResourceHandle& lhs, const ArchViz::ResourceHandle& rhs) const
         {
-            const std::hash<ArchViz::ResHandle> _hash_;
+            const std::hash<ArchViz::ResourceHandle> _hash_;
             return _hash_(lhs) == _hash_(rhs);
         }
     };

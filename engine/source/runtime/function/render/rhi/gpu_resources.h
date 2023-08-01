@@ -250,7 +250,7 @@ namespace ArchViz
     struct DescriptorSetCreation
     {
 
-        ResourceHandle resources[k_max_descriptors_per_set];
+        ResourceIndex resources[k_max_descriptors_per_set];
         SamplerHandle  samplers[k_max_descriptors_per_set];
         uint16_t       bindings[k_max_descriptors_per_set];
 
@@ -581,7 +581,7 @@ namespace ArchViz
     {
 
         ResourceDeletionType::Enum type;
-        ResourceHandle             handle;
+        ResourceIndex             handle;
         uint32_t                   current_frame;
     }; // struct ResourceUpdate
 
@@ -702,7 +702,7 @@ namespace ArchViz
     {
         VkDescriptorSet vk_descriptor_set;
 
-        ResourceHandle* resources = nullptr;
+        ResourceIndex* resources = nullptr;
         SamplerHandle*  samplers  = nullptr;
         uint16_t*       bindings  = nullptr;
 

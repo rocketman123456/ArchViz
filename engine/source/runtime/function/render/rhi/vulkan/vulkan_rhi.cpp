@@ -283,40 +283,13 @@ namespace ArchViz
         if (cache.size() != 0)
         {
             VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
-            if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
-                memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
+            // TODO : add memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE)
+            if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID)
             {
                 create_info.initialDataSize = cache.size();
                 create_info.pInitialData    = cache.data();
             }
         }
-
-        // auto cache_path =   g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
-
-        //// TODO : use vfs instead
-        // FILE* file = fopen(cache_path.generic_string().c_str(), "rb");
-
-        // if (file != nullptr)
-        //{
-        //     size_t               cache_size = 0;
-        //     std::vector<uint8_t> cache;
-
-        //    fseek(file, 0, SEEK_END);
-        //    cache_size = ftell(file);
-        //    cache.resize(cache_size);
-        //    rewind(file);
-        //    fread(cache.data(), cache.size(), 1, file);
-
-        //    VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
-        //    if (cache_header->deviceID == m_vulkan_device->m_properties.deviceID && cache_header->vendorID == m_vulkan_device->m_properties.vendorID &&
-        //        memcmp(cache_header->pipelineCacheUUID, m_vulkan_device->m_properties.pipelineCacheUUID, VK_UUID_SIZE))
-        //    {
-        //        create_info.initialDataSize = cache.size();
-        //        create_info.pInitialData    = cache.data();
-        //    }
-
-        //    fclose(file);
-        //}
 
         if (vkCreatePipelineCache(m_vulkan_device->m_device, &create_info, nullptr, &m_pipeline_cache) != VK_SUCCESS)
         {
@@ -1334,6 +1307,8 @@ namespace ArchViz
             cache.resize(cache_size);
             vkGetPipelineCacheData(m_vulkan_device->m_device, m_pipeline_cache, &cache_size, cache.data());
 
+            VkPipelineCacheHeaderVersionOne* cache_header = (VkPipelineCacheHeaderVersionOne*)cache.data();
+
             auto cache_path = g_runtime_global_context.m_config_manager->getRootFolder() / "pipeline.cache";
             g_runtime_global_context.m_asset_manager->writeBinaryFile(cache_path.generic_string(), cache);
         }
@@ -1349,4 +1324,5 @@ namespace ArchViz
         m_vulkan_instance->clear();
         m_vulkan_instance.reset();
     }
+
 } // namespace ArchViz

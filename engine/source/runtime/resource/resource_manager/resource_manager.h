@@ -46,10 +46,10 @@ namespace ArchViz
         void registerResourceCompiler();
 
         template<typename T, typename CI>
-        ResHandle loadResource(const std::string& uri);
+        ResourceHandle loadResource(const std::string& uri);
 
         template<typename T, typename CI>
-        ResHandle loadResource(const std::string& uri, const CI& create_info);
+        ResourceHandle loadResource(const std::string& uri, const CI& create_info);
 
         // TODO
         // template<typename T, typename CI>
@@ -59,20 +59,20 @@ namespace ArchViz
         // ResHandle compileResource(const std::string& uri, const CI& create_info);
 
         template<typename T>
-        std::weak_ptr<T> getResource(const ResHandle& handle);
+        std::weak_ptr<T> getResource(const ResourceHandle& handle);
 
         template<typename T>
         std::weak_ptr<T> getResource(const std::string& uri);
 
     private:
         template<typename T>
-        ResHandle createHandle();
+        ResourceHandle createHandle();
 
         template<typename T>
-        void addResource(const ResHandle& handle, std::shared_ptr<T> res, size_t size);
+        void addResource(const ResourceHandle& handle, std::shared_ptr<T> res, size_t size);
 
         template<typename T>
-        void removeResource(const ResHandle& handle);
+        void removeResource(const ResourceHandle& handle);
 
         template<typename T>
         void removeResource(const std::string& uri);
@@ -93,8 +93,8 @@ namespace ArchViz
         std::unordered_map<const char*, std::shared_ptr<IResourceArray>>    m_resource_arrays;    // resource storage
         std::unordered_map<ResourceTypeId, std::shared_ptr<IResourceArray>> m_resource_id_arrays; // resource storage
 
-        std::unordered_map<std::string, ResHandle> m_resource_handles;     // uri -> handle
-        std::unordered_map<ResHandle, std::string> m_resource_handles_inv; // uri -> handle
+        std::unordered_map<std::string, ResourceHandle> m_resource_handles;     // uri -> handle
+        std::unordered_map<ResourceHandle, std::string> m_resource_handles_inv; // uri -> handle
 
         std::unordered_map<const char*, std::shared_ptr<ILoader>>   m_resource_loaders;   // typeid -> loader
         std::unordered_map<const char*, std::shared_ptr<ICompiler>> m_resource_compilers; // typeid -> compiler
@@ -174,7 +174,7 @@ namespace ArchViz
     }
 
     template<typename T>
-    ResHandle ResourceManager::createHandle()
+    ResourceHandle ResourceManager::createHandle()
     {
         const auto& type    = typeid(T);
         auto        type_id = m_resource_types[type.name()];
@@ -183,14 +183,14 @@ namespace ArchViz
     }
 
     template<typename T>
-    void ResourceManager::addResource(const ResHandle& handle, std::shared_ptr<T> res, size_t size)
+    void ResourceManager::addResource(const ResourceHandle& handle, std::shared_ptr<T> res, size_t size)
     {
         // Add a component to the array for an handle
         getResourceArray<T>(handle.type)->insertData(handle.index, res, size);
     }
 
     template<typename T>
-    void ResourceManager::removeResource(const ResHandle& handle)
+    void ResourceManager::removeResource(const ResourceHandle& handle)
     {
         if (m_resource_handles_inv.count(handle) == 0)
         {
@@ -225,7 +225,7 @@ namespace ArchViz
     }
 
     template<typename T>
-    std::weak_ptr<T> ResourceManager::getResource(const ResHandle& handle)
+    std::weak_ptr<T> ResourceManager::getResource(const ResourceHandle& handle)
     {
         // Get a reference to a component from the array for an handle
         return getResourceArray<T>(handle.type)->getData(handle.index);
@@ -244,7 +244,7 @@ namespace ArchViz
     }
 
     template<typename T, typename CI>
-    ResHandle ResourceManager::loadResource(const std::string& uri)
+    ResourceHandle ResourceManager::loadResource(const std::string& uri)
     {
         if (m_resource_handles.count(uri) != 0)
         {
@@ -268,7 +268,7 @@ namespace ArchViz
         std::tie(res, size) = loader->createResource(uri);
         if (res != nullptr)
         {
-            ResHandle handle               = createHandle<T>();
+            ResourceHandle handle               = createHandle<T>();
             m_resource_handles[uri]        = handle;
             m_resource_handles_inv[handle] = uri;
             addResource<T>(handle, res, size);
@@ -278,7 +278,7 @@ namespace ArchViz
     }
 
     template<typename T, typename CI>
-    ResHandle ResourceManager::loadResource(const std::string& uri, const CI& create_info)
+    ResourceHandle ResourceManager::loadResource(const std::string& uri, const CI& create_info)
     {
         if (m_resource_handles.count(uri) != 0)
         {
@@ -302,7 +302,7 @@ namespace ArchViz
         std::tie(res, size) = loader->createResource(create_info);
         if (res != nullptr)
         {
-            ResHandle handle               = createHandle<T>();
+            ResourceHandle handle               = createHandle<T>();
             m_resource_handles[uri]        = handle;
             m_resource_handles_inv[handle] = uri;
             addResource<T>(handle, res, size);
