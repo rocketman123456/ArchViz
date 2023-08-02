@@ -54,4 +54,9 @@ namespace ArchViz
     static DescriptorSetHandle       k_invalid_set {k_invalid_index};
     static PipelineHandle            k_invalid_pipeline {k_invalid_index};
     static RenderPassHandle          k_invalid_pass {k_invalid_index};
+
+    struct GpuResourceHandle : public ResourceHandle
+    {};
+
+    static GpuResourceHandle k_invalid_gpu_resource_handle {0, k_invalid_resource_type_id, k_invalid_index};
 } // namespace ArchViz

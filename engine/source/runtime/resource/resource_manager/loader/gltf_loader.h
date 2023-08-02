@@ -1,5 +1,5 @@
 #pragma once
-#include "runtime/resource/resource_manager/loader/model_loader.h"
+#include "runtime/resource/resource_manager/loader/loader.h"
 
 #include "runtime/resource/res_type/components/mesh_res.h"
 #include "runtime/resource/res_type/data/mesh_data.h"

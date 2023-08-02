@@ -1,9 +1,11 @@
 #include "runtime/resource/resource_manager/resource_manager.h"
 
+#include "runtime/resource/resource_manager/loader/audio_loader.h"
 #include "runtime/resource/resource_manager/loader/material_loader.h"
 #include "runtime/resource/resource_manager/loader/obj_loader.h"
 #include "runtime/resource/resource_manager/loader/texture_loader.h"
 
+#include "runtime/resource/res_type/data/audio_data.h"
 #include "runtime/resource/res_type/data/material_data.h"
 #include "runtime/resource/res_type/data/mesh_data.h"
 
@@ -14,10 +16,12 @@ namespace ArchViz
         registerResourceType<MeshData>();
         registerResourceType<TextureData>();
         registerResourceType<MaterialData>();
+        registerResourceType<AudioData>();
 
         registerResourceLoader<MeshData, ObjLoader>();
         registerResourceLoader<TextureData, TextureLoader>();
         registerResourceLoader<MaterialData, MaterialLoader>();
+        registerResourceLoader<AudioData, AudioLoader>();
     }
 
     void ResourceManager::clear()

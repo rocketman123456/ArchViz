@@ -1,4 +1,5 @@
 #pragma once
+#include <future>
 #include <memory>
 #include <string>
 #include <utility>
@@ -20,5 +21,8 @@ namespace ArchViz
 
         virtual std::pair<std::shared_ptr<T>, size_t> createResource(const CI& create_info)  = 0;
         virtual std::pair<std::shared_ptr<T>, size_t> createResource(const std::string& uri) = 0;
+
+        // virtual std::future<std::pair<std::shared_ptr<T>, size_t>> createResourceAsync(const CI& create_info) = 0;
+        // virtual std::future<std::pair<std::shared_ptr<T>, size_t>> createResourceAsync(const std::string& uri) = 0;
     };
 } // namespace ArchViz

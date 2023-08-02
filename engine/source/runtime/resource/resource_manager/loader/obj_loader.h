@@ -12,8 +12,6 @@
 
 namespace ArchViz
 {
-    class ResourceManager;
-
     class ObjLoader : public Loader<MeshData, SubMeshRes>
     {
     public:
@@ -24,8 +22,5 @@ namespace ArchViz
 
     private:
         std::shared_ptr<MeshData> convertMeshData(const tinyobj::attrib_t& attrib, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials);
-
-    public:
-        std::weak_ptr<ResourceManager> m_resource_manager;
     };
 } // namespace ArchViz

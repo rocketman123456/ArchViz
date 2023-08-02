@@ -52,6 +52,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC Eigen3::Eigen)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
 target_link_libraries(${TARGET_NAME} PUBLIC sol2::sol2)
 target_link_libraries(${TARGET_NAME} PUBLIC lua_static)
+target_link_libraries(${TARGET_NAME} PUBLIC soloud)
 # target_link_libraries(${TARGET_NAME} PUBLIC zip)
 target_link_libraries(${TARGET_NAME} PUBLIC
   glslang
@@ -84,6 +85,7 @@ target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/Vu
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/VulkanMemoryAllocator/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/sol2/include)
 target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/lua)
+target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/soloud/include)
 
 # target_include_directories(${TARGET_NAME} PUBLIC ${ENGINE_ROOT_DIR}/3rd_party/libzip/lib)
 # target_include_directories(${TARGET_NAME} PUBLIC ${STB_INCLUDE_DIRS})

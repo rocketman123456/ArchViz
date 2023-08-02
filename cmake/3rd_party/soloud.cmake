@@ -1,4 +1,4 @@
-file(GLOB_RECURSE soloud_audio_sources CONFIGURE_DEPENDS  "${CMAKE_CURRENT_SOURCE_DIR}/soloud/src/audiosource/*.cpp")
+file(GLOB_RECURSE soloud_audio_sources CONFIGURE_DEPENDS  "${CMAKE_CURRENT_SOURCE_DIR}/soloud/src/audiosource/**.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/soloud/src/audiosource/**.c")
 file(GLOB_RECURSE soloud_c_api_sources CONFIGURE_DEPENDS  "${CMAKE_CURRENT_SOURCE_DIR}/soloud/src/c_api/*.cpp")
 file(GLOB_RECURSE soloud_core_sources CONFIGURE_DEPENDS  "${CMAKE_CURRENT_SOURCE_DIR}/soloud/src/core/*.cpp")
 file(GLOB_RECURSE soloud_filter_sources CONFIGURE_DEPENDS  "${CMAKE_CURRENT_SOURCE_DIR}/soloud/src/filter/*.cpp")
