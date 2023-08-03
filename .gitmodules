@@ -97,6 +97,9 @@
 [submodule "engine/3rd_party/RE-flex"]
 	path = engine/3rd_party/RE-flex
 	url = https://github.com/Genivia/RE-flex.git
-[submodule "engine/3rd_party/KTX-Software"]
-	path = engine/3rd_party/KTX-Software
-	url = https://github.com/KhronosGroup/KTX-Software.git
+[submodule "engine/3rd_party/mimalloc"]
+	path = engine/3rd_party/mimalloc
+	url = https://github.com/microsoft/mimalloc.git
+[submodule "engine/3rd_party/Hoard"]
+	path = engine/3rd_party/Hoard
+	url = https://github.com/emeryberger/Hoard.git
